@@ -1,0 +1,19 @@
+[UNNAMED]
++SessionDate=06.11.2018
+crc32v2=1087430019
++CurrentKey=Record Order
+ENV File Path=
+OEM=0
+Record Order=Record Order
+C2IPCT:PKID=C2IPCT:PKID
+C2IPCT:KC2IP=C2IPCT:KC2IP
+C2IPCT:KC2IE=C2IPCT:KC2IE
+Record Number=47R(2)~Rec No~C(0)@N_12@Y?Rec No:
+C2IPCT:ID=52R(2)~C2ipct:Id~C(0)@N-14@?C2ipct:Id:
+C2IPCT:C2IPPACKAGE=106R(2)~C2ipct:C2ippackage~C(0)@N-14@?C2ipct:C2ippackage:
+C2IPCT:C2IEINSTANCE=104R(2)~C2ipct:C2ieinstance~C(0)@N-14@?C2ipct:C2ieinstance:
+Columns=4
+Column1=RECORD NUMBER
+Column2=C2IPCT:ID
+Column3=C2IPCT:C2IPPACKAGE
+Column4=C2IPCT:C2IEINSTANCE
