@@ -71,3 +71,16 @@ obj/release/learnMil_BC1.obj
 zlib.dll
 cs_libpng.dll
 learnMil.ap~
+obj/release/learnMil005.obj
+obj/release/learnMil005.obj
+obj/release/learnMil005.RSC
+obj/release/learnMil006.obj
+obj/release/learnMil005.obj
+obj/release/learnMil005.RSC
+obj/release/learnMil006.RSC
+obj/release/learnMil_BC2.obj
+obj/release/learnMil005.RSC
+*.obj
+obj/release/learnMil005.obj
+obj/release/learnMil005.RSC
+obj/release/learnMil_BC2.obj
