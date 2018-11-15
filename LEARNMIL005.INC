@@ -2,7 +2,7 @@
 U_c2ieActionResources  PROCEDURE                      !Form c2ieActionResources
 B_c2ieActionObjectives PROCEDURE                      !Browse the c2ieActionObjectives file
 U_c2ieActionObjectives PROCEDURE                      !Form c2ieActionObjectives
-B_myOrganization       PROCEDURE                      !Browse the myOrganization file
+View_myOrganization    PROCEDURE                      !Browse the myOrganization file
 U_myOrganization       PROCEDURE                      !Form myOrganization
 B_OrgTOO               PROCEDURE                      !Browse the OrgTOO file
 U_OrgTOO               PROCEDURE                      !Form OrgTOO
