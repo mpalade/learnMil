@@ -125,9 +125,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieActRes:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(c2ieActRes:Record,History::c2ieActRes:Record)
   SELF.AddHistoryField(?c2ieActRes:ID,1)
@@ -329,9 +329,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -523,9 +523,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieActObj:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(c2ieActObj:Record,History::c2ieActObj:Record)
   SELF.AddHistoryField(?c2ieActObj:ID,1)
@@ -851,9 +851,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -925,7 +925,7 @@ ReturnValue          BYTE,AUTO
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
   BRW1.AskProcedure = 1                                    ! Will call: U_myOrganization
   BRW8.AskProcedure = 2                                    ! Will call: U_OrgTOO
-  BRW9.AskProcedure = 3                                    ! Will call: U_OrgMissions
+  BRW9.AskProcedure = 3                                    ! Will call: View_OrgMissions
   BRW12.AskProcedure = 4                                   ! Will call: U_C2IPExplorer
   BRW14.AskProcedure = 5                                   ! Will call: U_myOrgORBAT
   BRW1.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
@@ -972,7 +972,7 @@ ReturnValue          BYTE,AUTO
     EXECUTE Number
       U_myOrganization
       U_OrgTOO
-      U_OrgMissions
+      View_OrgMissions
       U_C2IPExplorer
       U_myOrgORBAT
     END
@@ -1133,9 +1133,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?myOrg:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(myOrg:Record,History::myOrg:Record)
   SELF.AddHistoryField(?myOrg:ID,1)
@@ -1324,9 +1324,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1530,9 +1530,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?OrgTOO:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgTOO:Record,History::OrgTOO:Record)
   SELF.AddHistoryField(?OrgTOO:ID,1)
@@ -1739,9 +1739,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1764,7 +1764,7 @@ ReturnValue          BYTE,AUTO
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
   INIMgr.Fetch('B_OrgMissions',QuickWindow)                ! Restore window settings from non-volatile store
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
-  BRW1.AskProcedure = 1                                    ! Will call: U_OrgMissions
+  BRW1.AskProcedure = 1                                    ! Will call: View_OrgMissions
   BRW1.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
   BRW1.ToolbarItem.HelpButton = ?Help
   SELF.SetAlerts()
@@ -1798,7 +1798,7 @@ ReturnValue          BYTE,AUTO
     ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
   ELSE
     GlobalRequest = Request
-    U_OrgMissions
+    View_OrgMissions
     ReturnValue = GlobalResponse
   END
   RETURN ReturnValue
@@ -1829,7 +1829,7 @@ Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize
 !!! Generated from procedure template - Window
 !!! Form OrgMissions
 !!! </summary>
-U_OrgMissions PROCEDURE 
+View_OrgMissions PROCEDURE 
 
 CurrentTab           STRING(80)                            ! 
 ActionMessage        CSTRING(40)                           ! 
@@ -1878,7 +1878,7 @@ Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
 History::OrgMiss:Record LIKE(OrgMiss:RECORD),THREAD
-QuickWindow          WINDOW('Form OrgMissions'),AT(,,417,273),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
+QuickWindow          WINDOW('View Mission'),AT(,,417,273),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
   RESIZE,CENTER,GRAY,IMM,MDI,HLP('U_OrgMissions'),SYSTEM
                        SHEET,AT(4,4,411,58),USE(?CurrentTab)
                          TAB('&1) General'),USE(?Tab:1)
@@ -1905,6 +1905,7 @@ QuickWindow          WINDOW('Form OrgMissions'),AT(,,417,273),FONT('Microsoft Sa
                        BUTTON('&Insert'),AT(5,129,42,12),USE(?Insert)
                        BUTTON('&Change'),AT(47,129,42,12),USE(?Change)
                        BUTTON('&Delete'),AT(89,129,42,12),USE(?Delete)
+                       BUTTON('View in TaskOrg Editor App'),AT(133,129),USE(?BUTTON1)
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -1973,16 +1974,16 @@ ThisWindow.Init PROCEDURE
 ReturnValue          BYTE,AUTO
 
   CODE
-  GlobalErrors.SetProcedureName('U_OrgMissions')
+  GlobalErrors.SetProcedureName('View_OrgMissions')
   SELF.Request = GlobalRequest                             ! Store the incoming request
   ReturnValue = PARENT.Init()
   IF ReturnValue THEN RETURN ReturnValue.
   SELF.FirstField = ?OrgMiss:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgMiss:Record,History::OrgMiss:Record)
   SELF.AddHistoryField(?OrgMiss:ID,1)
@@ -2018,6 +2019,7 @@ ReturnValue          BYTE,AUTO
     DISABLE(?Insert)
     DISABLE(?Change)
     DISABLE(?Delete)
+    DISABLE(?BUTTON1)
   END
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
@@ -2032,7 +2034,7 @@ ReturnValue          BYTE,AUTO
   BRW10.AddField(MissTSK:Mission,BRW10.Q.MissTSK:Mission)  ! Field MissTSK:Mission is a hot field or requires assignment from browse
   BRW10.AddField(C2IP:ID,BRW10.Q.C2IP:ID)                  ! Field C2IP:ID is a hot field or requires assignment from browse
   BRW10.AddField(tpyC2IP:ID,BRW10.Q.tpyC2IP:ID)            ! Field tpyC2IP:ID is a hot field or requires assignment from browse
-  INIMgr.Fetch('U_OrgMissions',QuickWindow)                ! Restore window settings from non-volatile store
+  INIMgr.Fetch('View_OrgMissions',QuickWindow)             ! Restore window settings from non-volatile store
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
   ToolBarForm.HelpButton=?Help
   SELF.AddItem(ToolbarForm)
@@ -2070,7 +2072,7 @@ ReturnValue          BYTE,AUTO
     Relate:MilMissions.Close
   END
   IF SELF.Opened
-    INIMgr.Update('U_OrgMissions',QuickWindow)             ! Save window data to non-volatile store
+    INIMgr.Update('View_OrgMissions',QuickWindow)          ! Save window data to non-volatile store
   END
   GlobalErrors.SetProcedureName
   RETURN ReturnValue
@@ -2234,9 +2236,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE

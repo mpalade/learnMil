@@ -7,6 +7,6 @@ U_myOrganization       PROCEDURE                      !Form myOrganization
 B_OrgTOO               PROCEDURE                      !Browse the OrgTOO file
 U_OrgTOO               PROCEDURE                      !Form OrgTOO
 B_OrgMissions          PROCEDURE                      !Browse the OrgMissions file
-U_OrgMissions          PROCEDURE                      !Form OrgMissions
+View_OrgMissions       PROCEDURE                      !Form OrgMissions
 B_TOOs                 PROCEDURE                      !Browse the TheaterOfOps file
   END

@@ -149,9 +149,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?MissTSK:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
