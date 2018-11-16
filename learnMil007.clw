@@ -3,13 +3,19 @@
    MEMBER('learnMil.clw')                                  ! This is a MEMBER module
 
 
+   INCLUDE('ABBROWSE.INC'),ONCE
    INCLUDE('ABDROPS.INC'),ONCE
+   INCLUDE('ABEIP.INC'),ONCE
+   INCLUDE('ABPOPUP.INC'),ONCE
    INCLUDE('ABRESIZE.INC'),ONCE
    INCLUDE('ABTOOLBA.INC'),ONCE
    INCLUDE('ABWINDOW.INC'),ONCE
 
                      MAP
                        INCLUDE('LEARNMIL007.INC'),ONCE        !Local module procedure declarations
+                       INCLUDE('LEARNMIL002.INC'),ONCE        !Req'd for module callout resolution
+                       INCLUDE('LEARNMIL003.INC'),ONCE        !Req'd for module callout resolution
+                       INCLUDE('LEARNMIL004.INC'),ONCE        !Req'd for module callout resolution
                      END
 
 
@@ -88,6 +94,7 @@ Ask                    PROCEDURE(),DERIVED
 Init                   PROCEDURE(),BYTE,PROC,DERIVED
 Kill                   PROCEDURE(),BYTE,PROC,DERIVED
 Run                    PROCEDURE(),BYTE,PROC,DERIVED
+Run                    PROCEDURE(USHORT Number,BYTE Request),BYTE,PROC,DERIVED
 TakeAccepted           PROCEDURE(),BYTE,PROC,DERIVED
                      END
 
@@ -152,12 +159,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
+  SELF.AddUpdateFile(Access:MissionTASKORG)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
   SELF.AddHistoryField(?MissTSK:Mission,2)
   SELF.AddHistoryField(?MissTSK:TASKORGC2IP,3)
-  SELF.AddUpdateFile(Access:MissionTASKORG)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
@@ -198,7 +205,8 @@ ReturnValue          BYTE,AUTO
   FDCB8.AddUpdateField(OrgMiss:ID,MissTSK:Mission)
   ThisWindow.AddItem(FDCB8.WindowComponent)
   FDCB8.DefaultFill = 0
-  FDCB9.Init(C2IP:Name,?C2IP:Name,Queue:FileDropCombo:1.ViewPosition,FDCB9::View:FileDropCombo,Queue:FileDropCombo:1,Relate:C2IPExplorer,ThisWindow,GlobalErrors,0,1,0)
+  FDCB9.Init(C2IP:Name,?C2IP:Name,Queue:FileDropCombo:1.ViewPosition,FDCB9::View:FileDropCombo,Queue:FileDropCombo:1,Relate:C2IPExplorer,ThisWindow,GlobalErrors,1,1,0)
+  FDCB9.AskProcedure = 1
   FDCB9.Q &= Queue:FileDropCombo:1
   FDCB9.AddSortOrder(C2IPExp:KOrganization)
   FDCB9.AddField(C2IP:Name,FDCB9.Q.C2IP:Name) !List box control field - type derived from field
@@ -242,6 +250,22 @@ ReturnValue          BYTE,AUTO
   RETURN ReturnValue
 
 
+ThisWindow.Run PROCEDURE(USHORT Number,BYTE Request)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Run(Number,Request)
+  IF SELF.Request = ViewRecord
+    ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
+  ELSE
+    GlobalRequest = Request
+    UpdateC2IPs
+    ReturnValue = GlobalResponse
+  END
+  RETURN ReturnValue
+
+
 ThisWindow.TakeAccepted PROCEDURE
 
 ReturnValue          BYTE,AUTO
@@ -256,6 +280,8 @@ Looped BYTE
     END
   ReturnValue = PARENT.TakeAccepted()
     CASE ACCEPTED()
+    OF ?C2IP:Name
+      FDCB9.TakeAccepted()
     OF ?OK
       ThisWindow.Update()
       IF SELF.Request = ViewRecord AND NOT SELF.BatchProcessing THEN
@@ -266,6 +292,1021 @@ Looped BYTE
   END
   ReturnValue = Level:Fatal
   RETURN ReturnValue
+
+
+Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+
+
+  CODE
+  PARENT.Init(AppStrategy,SetWindowMinSize,SetWindowMaxSize)
+  SELF.SetParentDefaults()                                 ! Calculate default control parent-child relationships based upon their positions on the window
+
+!!! <summary>
+!!! Generated from procedure template - Window
+!!! Window
+!!! </summary>
+create_COP PROCEDURE (ULONG pOrgRef, ULONG pMissionRef)
+
+sCOPName             STRING(100)                           ! 
+nC2IERef             DECIMAL(7)                            ! 
+nC2IPRef             DECIMAL(7)                            ! 
+QuickWindow          WINDOW('Create COP'),AT(,,523,345),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
+  RESIZE,CENTER,GRAY,IMM,HLP('create_COP'),SYSTEM
+                       BUTTON('&OK'),AT(367,329,49,14),USE(?Ok),LEFT,ICON('WAOK.ICO'),FLAT,MSG('Accept operation'), |
+  TIP('Accept Operation')
+                       BUTTON('&Cancel'),AT(420,329,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel Operation'), |
+  TIP('Cancel Operation')
+                       BUTTON('&Help'),AT(472,329,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+  STD(STD:Help),TIP('See Help Window')
+                       PROMPT('Name:'),AT(2,10),USE(?sCOPName:Prompt)
+                       ENTRY(@s100),AT(53,10,361,10),USE(sCOPName)
+                     END
+
+ThisWindow           CLASS(WindowManager)
+Init                   PROCEDURE(),BYTE,PROC,DERIVED
+Kill                   PROCEDURE(),BYTE,PROC,DERIVED
+TakeAccepted           PROCEDURE(),BYTE,PROC,DERIVED
+                     END
+
+Toolbar              ToolbarClass
+Resizer              CLASS(WindowResizeClass)
+Init                   PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+                     END
+
+
+  CODE
+  GlobalResponse = ThisWindow.Run()                        ! Opens the window and starts an Accept Loop
+
+!---------------------------------------------------------------------------
+DefineListboxStyle ROUTINE
+!|
+!| This routine create all the styles to be shared in this window
+!| It`s called after the window open
+!|
+!---------------------------------------------------------------------------
+
+ThisWindow.Init PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  GlobalErrors.SetProcedureName('create_COP')
+  SELF.Request = GlobalRequest                             ! Store the incoming request
+  ReturnValue = PARENT.Init()
+  IF ReturnValue THEN RETURN ReturnValue.
+  SELF.FirstField = ?Ok
+  SELF.VCRRequest &= VCRRequest
+  SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
+  CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
+  IF SELF.Request = SelectRecord
+     SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
+  ELSE
+     SELF.AddItem(?Ok,RequestCompleted)                    ! Add the close control to the window manger
+  END
+  SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
+  Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IEs.Open                                       ! File _C2IEs used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IPContent.Open                                 ! File _C2IPContent used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IPs.Open                                       ! File _C2IPs used by this procedure, so make sure it's RelationManager is open
+  Access:type_C2IP.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
+  Access:type_C2IE.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
+  SELF.FilesOpened = True
+  SELF.Open(QuickWindow)                                   ! Open window
+  Do DefineListboxStyle
+  Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
+  SELF.AddItem(Resizer)                                    ! Add resizer to window manager
+  INIMgr.Fetch('create_COP',QuickWindow)                   ! Restore window settings from non-volatile store
+  Resizer.Resize                                           ! Reset required after window size altered by INI manager
+  SELF.SetAlerts()
+  ! Create COP C2IP
+  
+  sCOPName = ''
+  LOOP 10 TIMES
+      sCOPName = CLIP(sCOPName) & CHR(RANDOM(97, 122))    
+  END
+  
+  
+  IF LEN(CLIP(sCOPName))>0 THEN
+      ! Create default OVERLAY C2IE
+      Access:_C2IEs.PrimeAutoInc()
+      nC2IERef    = _C2IE:ID
+      tpyC2IE:Code    = 'OVERLAY'
+      IF Access:type_C2IE.Fetch(tpyC2IE:KCode) = Level:Benign THEN
+          _C2IE:Type  = tpyC2IE:ID
+      END
+      _C2IE:Name  = sCOPName
+      IF Access:_C2IEs.TryInsert() = Level:Benign THEN        
+          ! Create COP C2IP
+          Access:_C2IPs.PrimeAutoInc()
+          nC2IPRef    = _C2IP:ID
+          tpyC2IP:Code     = 'COP'
+          IF Access:type_C2IP.Fetch(tpyC2IP:KCode) = Level:Benign THEN
+              _C2IP:Type  = tpyC2IP:ID
+          END
+          _C2IP:Name  = sCOPName
+          
+          IF Access:_C2IPs.TryInsert() = Level:Benign THEN
+              ! Create association C2IP - C2IE
+              
+              Access:_C2IPContent.PrimeAutoInc()
+              _C2IPCt:C2IPPackage = nC2IPRef
+              _C2IPCt:C2IEInstance    = nC2IERef
+              IF Access:_C2IPContent.TryInsert() = Level:Benign THEN
+                  !MESSAGE('COP created')
+                  
+                  ! Add the new C2IP to the current C2IP Explorer
+                  Access:C2IPExplorer.PrimeAutoInc()
+                  C2IPExp:Organization    = pOrgRef                
+                  C2IPExp:C2IP            = nC2IPRef
+                  C2IPExp:Mission         = pMissionRef
+                  
+                  IF Access:C2IPExplorer.TryInsert() = Level:Benign THEN
+                      MESSAGE('C2IP COP created')
+                  END
+                  
+              END
+              
+          END
+          
+      END
+      
+  
+  END
+  
+  RETURN ReturnValue
+
+
+ThisWindow.Kill PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Kill()
+  IF ReturnValue THEN RETURN ReturnValue.
+  IF SELF.FilesOpened
+    Relate:C2IPExplorer.Close
+    Relate:_C2IEs.Close
+    Relate:_C2IPContent.Close
+    Relate:_C2IPs.Close
+  END
+  IF SELF.Opened
+    INIMgr.Update('create_COP',QuickWindow)                ! Save window data to non-volatile store
+  END
+  GlobalErrors.SetProcedureName
+  RETURN ReturnValue
+
+
+ThisWindow.TakeAccepted PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+Looped BYTE
+  CODE
+  LOOP                                                     ! This method receive all EVENT:Accepted's
+    IF Looped
+      RETURN Level:Notify
+    ELSE
+      Looped = 1
+    END
+  ReturnValue = PARENT.TakeAccepted()
+    CASE ACCEPTED()
+    OF ?Ok
+      ThisWindow.Update()
+      ! Update COP C2IP Name
+      
+      _C2IP:Name  = sCOPName
+      
+      IF LEN(CLIP(sCOPName))>0 THEN
+          IF Access:_C2IPs.TryUpdate() = Level:Benign THEN
+              ! COP C2IP Name saved
+          END
+          
+      
+      END
+      
+    END
+    RETURN ReturnValue
+  END
+  ReturnValue = Level:Fatal
+  RETURN ReturnValue
+
+
+Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+
+
+  CODE
+  PARENT.Init(AppStrategy,SetWindowMinSize,SetWindowMaxSize)
+  SELF.SetParentDefaults()                                 ! Calculate default control parent-child relationships based upon their positions on the window
+
+!!! <summary>
+!!! Generated from procedure template - Window
+!!! COP Editor
+!!! </summary>
+COPApp PROCEDURE (ULONG pC2IPRef,ULONG pOrgRef,ULONG pMissionRef,ULONG pTASKORGC2IPRef)
+
+CurrentTab           STRING(80)                            ! 
+vOvrlRef             DECIMAL(7),DIM(20)                    ! 
+nOvrlRef             STRING(20)                            ! 
+selC2IPRef           DECIMAL(7)                            ! 
+selC2IPName          STRING(100)                           ! 
+selC2IERef           DECIMAL(7)                            ! 
+selC2IEBSORef        DECIMAL(7)                            ! 
+selBSORef            DECIMAL(7)                            ! 
+selBSOHostility      DECIMAL(7)                            ! 
+sBSOTypeCode         STRING(20)                            ! 
+sBSOHostilityCode    STRING(20)                            ! 
+sBSOCode             STRING(20)                            ! 
+sC2IETypeCode        STRING(20)                            ! 
+sMoveToOvrlOptMenu   STRING(100)                           ! 
+nMoveToOvrlSelection SIGNED                                ! 
+vActPoints           LONG,DIM(20)                          ! 
+sCOPName             STRING(100)                           ! 
+nC2IERef             DECIMAL(7)                            ! 
+nC2IPRef             DECIMAL(7)                            ! 
+BRW1::View:Browse    VIEW(C2IPContent)
+                       PROJECT(C2IPCt:ID)
+                       PROJECT(C2IPCt:C2IPPackage)
+                       PROJECT(C2IPCt:C2IEInstance)
+                       JOIN(C2IE:PKID,C2IPCt:C2IEInstance)
+                         PROJECT(C2IE:Name)
+                         PROJECT(C2IE:ID)
+                         PROJECT(C2IE:Type)
+                         JOIN(tpyC2IE:PKID,C2IE:Type)
+                           PROJECT(tpyC2IE:Code)
+                           PROJECT(tpyC2IE:ID)
+                         END
+                       END
+                     END
+Queue:Browse:1       QUEUE                            !Queue declaration for browse/combo box using ?Browse:1
+C2IPCt:ID              LIKE(C2IPCt:ID)                !List box control field - type derived from field
+C2IPCt:C2IPPackage     LIKE(C2IPCt:C2IPPackage)       !List box control field - type derived from field
+C2IPCt:C2IEInstance    LIKE(C2IPCt:C2IEInstance)      !List box control field - type derived from field
+tpyC2IE:Code           LIKE(tpyC2IE:Code)             !List box control field - type derived from field
+C2IE:Name              LIKE(C2IE:Name)                !List box control field - type derived from field
+C2IE:ID                LIKE(C2IE:ID)                  !Related join file key field - type derived from field
+tpyC2IE:ID             LIKE(tpyC2IE:ID)               !Related join file key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+BRW9::View:Browse    VIEW(c2ieTaskOrg)
+                       PROJECT(c2ieTO:ID)
+                       PROJECT(c2ieTO:C2IE)
+                       JOIN(P,'UniP:ID=c2ieTO:Parent')
+                         PROJECT(UniP:Code)
+                       END
+                       JOIN(C1,'UniC1:ID=c2ieTO:Child1')
+                         PROJECT(UniC1:Code)
+                       END
+                       JOIN(C2,'UniC2:ID=c2ieTO:Child2')
+                         PROJECT(UniC2:Code)
+                       END
+                       JOIN(C3,'UniC3:ID=c2ieTO:Child3')
+                         PROJECT(UniC3:Code)
+                       END
+                     END
+Queue:Browse         QUEUE                            !Queue declaration for browse/combo box using ?List
+UniP:Code              LIKE(UniP:Code)                !List box control field - type derived from field
+UniC1:Code             LIKE(UniC1:Code)               !List box control field - type derived from field
+UniC2:Code             LIKE(UniC2:Code)               !List box control field - type derived from field
+UniC3:Code             LIKE(UniC3:Code)               !List box control field - type derived from field
+c2ieTO:ID              LIKE(c2ieTO:ID)                !Primary key field - type derived from field
+c2ieTO:C2IE            LIKE(c2ieTO:C2IE)              !Browse key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+BRW10::View:Browse   VIEW(c2ieUnits)
+                       PROJECT(c2ieUni:Hostility)
+                       PROJECT(c2ieUni:ID)
+                       PROJECT(c2ieUni:C2IE)
+                       PROJECT(c2ieUni:Unit)
+                       JOIN(Uni:PKID,c2ieUni:Unit)
+                         PROJECT(Uni:Code)
+                         PROJECT(Uni:Name)
+                         PROJECT(Uni:ID)
+                         PROJECT(Uni:BSOType)
+                         JOIN(tpyBSO:PKID,Uni:BSOType)
+                           PROJECT(tpyBSO:Code)
+                           PROJECT(tpyBSO:ID)
+                         END
+                       END
+                       JOIN(tpyHstl:PKID,c2ieUni:Hostility)
+                         PROJECT(tpyHstl:Code)
+                         PROJECT(tpyHstl:ID)
+                       END
+                     END
+Queue:Browse:2       QUEUE                            !Queue declaration for browse/combo box using ?List:2
+tpyBSO:Code            LIKE(tpyBSO:Code)              !List box control field - type derived from field
+Uni:Code               LIKE(Uni:Code)                 !List box control field - type derived from field
+Uni:Name               LIKE(Uni:Name)                 !List box control field - type derived from field
+c2ieUni:Hostility      LIKE(c2ieUni:Hostility)        !List box control field - type derived from field
+tpyHstl:Code           LIKE(tpyHstl:Code)             !List box control field - type derived from field
+c2ieUni:ID             LIKE(c2ieUni:ID)               !Primary key field - type derived from field
+c2ieUni:C2IE           LIKE(c2ieUni:C2IE)             !Browse key field - type derived from field
+Uni:ID                 LIKE(Uni:ID)                   !Related join file key field - type derived from field
+tpyBSO:ID              LIKE(tpyBSO:ID)                !Related join file key field - type derived from field
+tpyHstl:ID             LIKE(tpyHstl:ID)               !Related join file key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+BRW11::View:Browse   VIEW(c2ieUnitsPositions)
+                       PROJECT(c2ieUniPos:xPos)
+                       PROJECT(c2ieUniPos:yPos)
+                       PROJECT(c2ieUniPos:ID)
+                       PROJECT(c2ieUniPos:c2ieUnit)
+                     END
+Queue:Browse:3       QUEUE                            !Queue declaration for browse/combo box using ?List:3
+c2ieUniPos:xPos        LIKE(c2ieUniPos:xPos)          !List box control field - type derived from field
+c2ieUniPos:yPos        LIKE(c2ieUniPos:yPos)          !List box control field - type derived from field
+c2ieUniPos:ID          LIKE(c2ieUniPos:ID)            !Primary key field - type derived from field
+c2ieUniPos:c2ieUnit    LIKE(c2ieUniPos:c2ieUnit)      !Browse key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+QuickWindow          WINDOW('COP App'),AT(,,799,346),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
+  RESIZE,CENTER,GRAY,IMM,MDI,HLP('OverlayEditorApp2'),SYSTEM
+                       LIST,AT(10,30,130,124),USE(?Browse:1),HVSCROLL,FORMAT('0R(2)|M~ID~C(0)@n-10.0@0R(2)|M~C' & |
+  '2IP Pck~C(0)@n-10.0@0R(2)|M~ID~C(0)@n-10.0@[40R(2)|M~C2IE Type~C(0)@s20@100R(2)|M~C2' & |
+  'IE Name~C(0)@s100@]|~C2IE (Information Element)~'),FROM(Queue:Browse:1),IMM,MSG('Browsing t' & |
+  'he C2IPContent file')
+                       BUTTON('&Insert'),AT(9,156,37,14),USE(?Insert:4),LEFT,FLAT,MSG('Insert a Record'),TIP('Insert a Record')
+                       BUTTON('&Change'),AT(39,156,37,14),USE(?Change:4),LEFT,DEFAULT,FLAT,MSG('Change the Record'), |
+  TIP('Change the Record')
+                       BUTTON('&Delete'),AT(79,156,36,14),USE(?Delete:4),LEFT,FLAT,MSG('Delete the Record'),TIP('Delete the Record')
+                       LIST,AT(9,194,281,100),USE(?List),DECIMAL(12),HVSCROLL,FORMAT('[60L(2)|M~1stOrdEch~C(0)' & |
+  '@s20@60L(2)|M~1stOrdSubOrd~C(0)@s20@60L(2)|M~2ndOrdSubOrd~C(0)@s20@60L(2)|M~3rddOrdS' & |
+  'ubOrd~C(0)@s20@]|~TASKORG~'),FROM(Queue:Browse),IMM,VCR
+                       BUTTON('Move to Overlay'),AT(369,280),USE(?BUTTON_MoveToOverlay)
+                       LIST,AT(143,30,205,124),USE(?List:2),HVSCROLL,FORMAT('[40L(2)|M~BSO Type~C(0)@s20@40L(2' & |
+  ')|M~BSO Code~C(0)@s20@80L(2)|M~BSO Name~C(0)@s100@0L(2)|M~Hostility~D(12)@n-10.0@]|~' & |
+  'BSO~40L(2)|M~Hostility~C(0)@s20@'),FROM(Queue:Browse:2),IMM,VCR
+                       BUTTON('&Insert'),AT(144,158,42,12),USE(?Insert)
+                       BUTTON('&Change'),AT(185,158,42,12),USE(?Change)
+                       BUTTON('&Delete'),AT(228,158,42,12),USE(?Delete)
+                       LIST,AT(353,30,82,124),USE(?List:3),DECIMAL(12),FORMAT('40L(2)|M~xPos~C(0)@n-10.0@40L(2' & |
+  ')|M~yPos~C(0)@n-10.0@'),FROM(Queue:Browse:3),IMM
+                       BUTTON('&Insert'),AT(353,160,42,12),USE(?Insert:2)
+                       BUTTON('&Change'),AT(353,170,42,12),USE(?Change:2)
+                       BUTTON('&Delete'),AT(394,170,42,12),USE(?Delete:2)
+                       BUTTON('Define Action'),AT(369,298),USE(?BUTTON1)
+                       BUTTON('Action Properties'),AT(353,193),USE(?BUTTON_ActProp)
+                       BUTTON('&Close'),AT(568,329,49,14),USE(?Close),LEFT,ICON('WACLOSE.ICO'),FLAT,MSG('Close Window'), |
+  TIP('Close Window')
+                       BUTTON('&Help'),AT(621,329,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+  STD(STD:Help),TIP('See Help Window')
+                       IMAGE,AT(442,2,355,322),USE(?Draw)
+                       PROMPT('Name:'),AT(9,9),USE(?sCOPName:Prompt)
+                       ENTRY(@s100),AT(50,8,385,10),USE(sCOPName),FONT(,,,FONT:regular)
+                     END
+
+ThisWindow           CLASS(WindowManager)
+Init                   PROCEDURE(),BYTE,PROC,DERIVED
+Kill                   PROCEDURE(),BYTE,PROC,DERIVED
+Run                    PROCEDURE(USHORT Number,BYTE Request),BYTE,PROC,DERIVED
+TakeAccepted           PROCEDURE(),BYTE,PROC,DERIVED
+                     END
+
+Toolbar              ToolbarClass
+BRWC2IPContent       CLASS(BrowseClass)                    ! Browse using ?Browse:1
+Q                      &Queue:Browse:1                !Reference to browse queue
+Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+TakeNewSelection       PROCEDURE(),DERIVED
+                     END
+
+BRW1::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRW1::Sort0:StepClass StepRealClass                        ! Default Step Manager
+BRWC2IETaskorg       CLASS(BrowseClass)                    ! Browse using ?List
+Q                      &Queue:Browse                  !Reference to browse queue
+                     END
+
+BRW9::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRWC2IEBSOs          CLASS(BrowseClass)                    ! Browse using ?List:2
+Q                      &Queue:Browse:2                !Reference to browse queue
+Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+TakeNewSelection       PROCEDURE(),DERIVED
+                     END
+
+BRW10::Sort0:Locator StepLocatorClass                      ! Default Locator
+BRWBOSPos            CLASS(BrowseClass)                    ! Browse using ?List:3
+Q                      &Queue:Browse:3                !Reference to browse queue
+Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+                     END
+
+BRW11::Sort0:Locator StepLocatorClass                      ! Default Locator
+BRW10::EIPManager    BrowseEIPManager                      ! Browse EIP Manager for Browse using ?List:2
+EditInPlace::tpyBSO:Code EditEntryClass                    ! Edit-in-place class for field tpyBSO:Code
+EditInPlace::Uni:Code EditEntryClass                       ! Edit-in-place class for field Uni:Code
+EditInPlace::Uni:Name EditEntryClass                       ! Edit-in-place class for field Uni:Name
+EditInPlace::c2ieUni:Hostility EditEntryClass              ! Edit-in-place class for field c2ieUni:Hostility
+EditInPlace::tpyHstl:Code EditEntryClass                   ! Edit-in-place class for field tpyHstl:Code
+BRW11::EIPManager    BrowseEIPManager                      ! Browse EIP Manager for Browse using ?List:3
+EditInPlace::c2ieUniPos:xPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:xPos
+EditInPlace::c2ieUniPos:yPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:yPos
+Resizer              CLASS(WindowResizeClass)
+Init                   PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+                     END
+
+! ----- DrwOverlay --------------------------------------------------------------------------
+DrwOverlay           Class(Draw)
+    ! derived method declarations
+                     End  ! DrwOverlay
+! ----- end DrwOverlay -----------------------------------------------------------------------
+
+  CODE
+  GlobalResponse = ThisWindow.Run()                        ! Opens the window and starts an Accept Loop
+
+!---------------------------------------------------------------------------
+DefineListboxStyle ROUTINE
+!|
+!| This routine create all the styles to be shared in this window
+!| It`s called after the window open
+!|
+!---------------------------------------------------------------------------
+_newCOPC2IP         ROUTINE
+DATA
+CODE
+    
+
+        IF LEN(CLIP(sCOPName))>0 THEN
+            ! Create default OVERLAY C2IE
+            Access:_C2IEs.PrimeAutoInc()
+            nC2IERef    = _C2IE:ID            
+            tpyC2IE:Code    = 'OVERLAY'
+            IF Access:type_C2IE.Fetch(tpyC2IE:KCode) = Level:Benign THEN
+                _C2IE:Type  = tpyC2IE:ID
+            END
+            _C2IE:Name  = sCOPName
+            IF Access:_C2IEs.TryInsert() = Level:Benign THEN        
+                ! Create COP C2IP
+                Access:_C2IPs.PrimeAutoInc()
+                nC2IPRef    = _C2IP:ID
+                selC2IPRef  = nC2IPRef
+                tpyC2IP:Code     = 'COP'
+                IF Access:type_C2IP.Fetch(tpyC2IP:KCode) = Level:Benign THEN
+                    _C2IP:Type  = tpyC2IP:ID
+                END
+                _C2IP:Name  = sCOPName
+                
+                IF Access:_C2IPs.TryInsert() = Level:Benign THEN
+                    ! Create association C2IP - C2IE
+                    
+                    Access:_C2IPContent.PrimeAutoInc()
+                    _C2IPCt:C2IPPackage = nC2IPRef
+                    _C2IPCt:C2IEInstance    = nC2IERef
+                    IF Access:_C2IPContent.TryInsert() = Level:Benign THEN
+                        !MESSAGE('COP created')
+                        
+                        ! Add the new C2IP to the current C2IP Explorer
+                        Access:C2IPExplorer.PrimeAutoInc()
+                        C2IPExp:Organization    = pOrgRef                
+                        C2IPExp:C2IP            = nC2IPRef
+                        C2IPExp:Mission         = pMissionRef
+                        
+                        IF Access:C2IPExplorer.TryInsert() = Level:Benign THEN
+                            !MESSAGE('C2IP COP created')
+                        END
+                        
+                    END
+                    
+                END
+                
+            END
+            
+
+        END
+    
+    EXIT
+    
+_attachTASKORGC2IP  ROUTINE
+DATA
+CODE
+    
+    ! attach TASKORG C2IP
+    Access:_C2IPContent.PrimeAutoInc()
+    _C2IPCt:C2IPPackage = nC2IPRef
+    
+    
+    ! reference C2IE associated to the C2iP
+    C2IPCt:C2IPPackage = pTASKORGC2IPRef
+    IF Access:C2IPContent.TryFetch(C2IPCt:KC2IP) = Level:Benign THEN
+        _C2IPCt:C2IEInstance    = C2IPCt:C2IEInstance
+    END
+    
+                    IF Access:_C2IPContent.TryInsert() = Level:Benign THEN
+                        !MESSAGE('COP created')                                               
+                        
+                    END
+    EXIT
+    
+_drawUnits          ROUTINE
+    DATA
+
+    CODE
+    
+        DrwOverlay.Blank(COLOR:White)
+        DrwOverlay.Display()    
+        
+    ! loop C2IP Content (list of C2IEs)
+    SET(_C2IPContent)
+    LOOP
+        IF Access:_C2IPContent.Next() = Level:Benign THEN
+            IF _C2IPCt:C2IPPackage = selC2IPRef THEN
+                selC2IERef  = _C2IPCt:C2IEInstance
+                
+                ! Determine C2IE type
+                ! Locate C2IE in C2IEs table and find out C2IE type
+                _C2IE:ID    = _C2IPCt:C2IEInstance
+                IF Access:_C2IEs.TryFetch(_C2IE:PKID) = Level:Benign THEN
+                    ! Evaluate C2IE type
+                    ! Locate C2IE type in type_C2IE table
+                    tpyC2IE:ID = _C2IE:Type
+                    IF Access:type_C2IE.TryFetch(tpyC2IE:PKID) = Level:Benign THEN
+                        sC2IETypeCode= tpyC2IE:Code
+                        CASE tpyC2IE:Code
+                        OF 'OVERLAY'
+                            ! Computer the number of Overlays
+                            IF nOvrlRef < 20 THEN
+                                ! increase the C2IE references (of type OVERLAY)
+                                nOvrlRef  = nOvrlRef + 1
+                                vOvrlRef[nOvrlRef] = _C2IE:ID
+                            END
+                                                        
+                            ! Add C2IE Name to Options Menu
+                            IF LEN(CLIP(sMoveToOvrlOptMenu))<>0 THEN                            
+                                sMoveToOvrlOptMenu  = CLIP(sMoveToOvrlOptMenu) & '|' & CLIP(_C2IE:Name)
+                            ELSE
+                                sMoveToOvrlOptMenu  = CLIP(_C2IE:Name)
+                            END
+                            
+                        OF 'TASKORG'
+                        OF 'COP'
+                        ELSE
+                            
+                        END
+                        
+                    END                                
+                END                                
+                
+                ! loop C2IE Units (list of Units/list of BSOs)
+                SET(_c2ieUnits)
+                LOOP
+                    IF Access:_c2ieUnits.Next() = Level:Benign THEN
+                        IF _c2ieUni:C2IE = selC2IERef THEN
+                            ! Display BSO code/short name
+                            ! Determine BSO type code 
+                            ! Determine BSO hostility code                                                        
+                            
+                            ! Determine BSO Hostility code
+                            tpyHstl:ID  = _c2ieUni:Hostility
+                            IF Access:type_Hostility.TryFetch(tpyHstl:PKID) = Level:Benign THEN
+                                sBSOHostilityCode   = CLIP(tpyHstl:Code)
+                            END                            
+                            
+                            ! look for BSO in the BSO table
+                            _Uni:ID = _c2ieUni:Unit
+                            IF Access:_Units.TryFetch(_Uni:PKID) = Level:Benign THEN
+                                ! BSO found
+                                ! Determine BSO code/short name
+                                sBSOCode    = _Uni:Code
+                                !DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, _Uni:Code)
+                                !MESSAGE('found ' & _Uni:Code)
+                                
+                                ! Determine BSO type code / Unit/Actions/Tactical graphics, aso
+                                tpyBSO:ID = _Uni:BSOType                                
+                                IF Access:type_BSO.TryFetch(tpyBSO:PKID) = Level:Benign THEN
+                                    sBSOTypeCode    = CLIP(tpyBSO:Code)
+                                END                                                                                                
+                            END
+                            
+                            ! Determine positions
+                            _c2ieUniPos:c2ieUnit = _c2ieUni:ID
+                            IF Access:_c2ieUnitsPositions.TryFetch(_c2ieUniPos:Kc2ieUnit) = Level:Benign THEN                            
+                                ! Draw depending on the BSO Type
+                                CASE CLIP(sBSOTypeCode)
+                                OF 'Unit'
+                                    ! Draw depending on the BSO used Hostility
+                                    ! Check hostility
+                                    CASE CLIP(sBSOHostilityCode)
+                                    OF 'Friendly'
+                                        !Friendly
+                                        DrwOverlay.Box(_c2ieUniPos:xPos, _c2ieUniPos:yPos, 50, 30, COLOR:Aqua)                        
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    OF 'Enemy'
+                                        !Enemy
+                                        DrwOverlay.Box(_c2ieUniPos:xPos, _c2ieUniPos:yPos, 50, 30, COLOR:Red)                        
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    ELSE
+                                        !Default friendly
+                                        DrwOverlay.Box(_c2ieUniPos:xPos, _c2ieUniPos:yPos, 50, 30, COLOR:Aqua)                        
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    END
+                                OF 'Action'
+                                    ! Determine Action type - TBD
+                                    
+                                    ! Determine Action Drawing Positions
+                                    _FillActionVectorPositions(_c2ieUniPos:xPos, _c2ieUniPos:yPos, vActPoints)
+                                    
+                                    CASE CLIP(sBSOHostilityCode)
+                                    OF 'Friendly'
+                                        ! Friendly
+                                        DrwOverlay.Polygon(vActPoints, COLOR:Aqua, 7)
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    OF 'Enemy'
+                                        ! Enemy
+                                        DrwOverlay.Polygon(vActPoints, COLOR:Red, 7)
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    ELSE
+                                        ! default Friendly
+                                        DrwOverlay.Polygon(vActPoints, COLOR:Aqua, 7)
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    END                                    
+                                    
+                                OF 'TactGraph'
+                                    ! Draw depending on the BSO used Hostility
+                                    ! Check hostility
+                                    CASE CLIP(sBSOHostilityCode)
+                                    OF 'Friendly'
+                                        !Friendly
+                                        DrwOverlay.Ellipse(_c2ieUniPos:xPos, _c2ieUniPos:yPos, 50, 30, COLOR:Aqua)                        
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    OF 'Enemy'
+                                        !Enemy
+                                        DrwOverlay.Ellipse(_c2ieUniPos:xPos, _c2ieUniPos:yPos, 50, 30, COLOR:Red)                        
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    ELSE
+                                        !Default friendly
+                                        DrwOverlay.Ellipse(_c2ieUniPos:xPos, _c2ieUniPos:yPos, 50, 30, COLOR:Aqua)                        
+                                        ! Draw BSO Name
+                                        DrwOverlay.Show(_c2ieUniPos:xPos + 5, _c2ieUniPos:yPos + 11, sBSOCode)
+                                    END
+                                END                                                                                                                              
+                                
+                            END
+                            
+                                                
+                        END
+                    ELSE
+                        BREAK
+                    END
+                END
+            END
+        ELSE
+            BREAK                
+        END
+    END              
+    
+        DrwOverlay.Display()
+    EXIT
+    
+
+ThisWindow.Init PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  GlobalErrors.SetProcedureName('COPApp')
+  SELF.Request = GlobalRequest                             ! Store the incoming request
+  ReturnValue = PARENT.Init()
+  IF ReturnValue THEN RETURN ReturnValue.
+  SELF.FirstField = ?Browse:1
+  SELF.VCRRequest &= VCRRequest
+  SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
+  CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
+  IF SELF.Request = SelectRecord
+     SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
+  ELSE
+     SELF.AddItem(?Close,RequestCompleted)                 ! Add the close control to the window manger
+  END
+  Relate:C1.Open                                           ! File C1 used by this procedure, so make sure it's RelationManager is open
+  Relate:C2.Open                                           ! File C2 used by this procedure, so make sure it's RelationManager is open
+  Relate:C2IPContent.SetOpenRelated()
+  Relate:C2IPContent.Open                                  ! File C2IPContent used by this procedure, so make sure it's RelationManager is open
+  Relate:C3.Open                                           ! File C3 used by this procedure, so make sure it's RelationManager is open
+  Relate:P.Open                                            ! File P used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IEs.Open                                       ! File _C2IEs used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IPContent.Open                                 ! File _C2IPContent used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IPs.Open                                       ! File _C2IPs used by this procedure, so make sure it's RelationManager is open
+  Relate:_Units.Open                                       ! File _Units used by this procedure, so make sure it's RelationManager is open
+  Relate:_c2ieUnits.Open                                   ! File _c2ieUnits used by this procedure, so make sure it's RelationManager is open
+  Relate:_c2ieUnitsPositions.Open                          ! File _c2ieUnitsPositions used by this procedure, so make sure it's RelationManager is open
+  Relate:type_BSO.Open                                     ! File type_BSO used by this procedure, so make sure it's RelationManager is open
+  Access:type_C2IP.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
+  Access:type_C2IE.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
+  Access:type_Hostility.UseFile                            ! File referenced in 'Other Files' so need to inform it's FileManager
+  Access:C2IPs.UseFile                                     ! File referenced in 'Other Files' so need to inform it's FileManager
+  SELF.FilesOpened = True
+  ! passed parameters
+  selC2IPRef  = pC2IPRef
+  BRWC2IPContent.Init(?Browse:1,Queue:Browse:1.ViewPosition,BRW1::View:Browse,Queue:Browse:1,Relate:C2IPContent,SELF) ! Initialize the browse manager
+  BRWC2IETaskorg.Init(?List,Queue:Browse.ViewPosition,BRW9::View:Browse,Queue:Browse,Relate:c2ieTaskOrg,SELF) ! Initialize the browse manager
+  BRWC2IEBSOs.Init(?List:2,Queue:Browse:2.ViewPosition,BRW10::View:Browse,Queue:Browse:2,Relate:c2ieUnits,SELF) ! Initialize the browse manager
+  BRWBOSPos.Init(?List:3,Queue:Browse:3.ViewPosition,BRW11::View:Browse,Queue:Browse:3,Relate:c2ieUnitsPositions,SELF) ! Initialize the browse manager
+  SELF.Open(QuickWindow)                                   ! Open window
+    QuickWindow{PROP:Buffer} = 1 ! Remove flicker when animating.
+    DrwOverlay.Init(?Draw)
+  Do DefineListboxStyle
+  BRWC2IPContent.Q &= Queue:Browse:1
+  BRW1::Sort0:StepClass.Init(+ScrollSort:AllowAlpha)       ! Moveable thumb based upon C2IPCt:C2IPPackage for sort order 1
+  BRWC2IPContent.AddSortOrder(BRW1::Sort0:StepClass,C2IPCt:KC2IP) ! Add the sort order for C2IPCt:KC2IP for sort order 1
+  BRWC2IPContent.AddRange(C2IPCt:C2IPPackage,selC2IPRef)   ! Add single value range limit for sort order 1
+  BRWC2IPContent.AddLocator(BRW1::Sort0:Locator)           ! Browse has a locator for sort order 1
+  BRW1::Sort0:Locator.Init(,C2IPCt:C2IPPackage,1,BRWC2IPContent) ! Initialize the browse locator using  using key: C2IPCt:KC2IP , C2IPCt:C2IPPackage
+  BRWC2IPContent.AddField(C2IPCt:ID,BRWC2IPContent.Q.C2IPCt:ID) ! Field C2IPCt:ID is a hot field or requires assignment from browse
+  BRWC2IPContent.AddField(C2IPCt:C2IPPackage,BRWC2IPContent.Q.C2IPCt:C2IPPackage) ! Field C2IPCt:C2IPPackage is a hot field or requires assignment from browse
+  BRWC2IPContent.AddField(C2IPCt:C2IEInstance,BRWC2IPContent.Q.C2IPCt:C2IEInstance) ! Field C2IPCt:C2IEInstance is a hot field or requires assignment from browse
+  BRWC2IPContent.AddField(tpyC2IE:Code,BRWC2IPContent.Q.tpyC2IE:Code) ! Field tpyC2IE:Code is a hot field or requires assignment from browse
+  BRWC2IPContent.AddField(C2IE:Name,BRWC2IPContent.Q.C2IE:Name) ! Field C2IE:Name is a hot field or requires assignment from browse
+  BRWC2IPContent.AddField(C2IE:ID,BRWC2IPContent.Q.C2IE:ID) ! Field C2IE:ID is a hot field or requires assignment from browse
+  BRWC2IPContent.AddField(tpyC2IE:ID,BRWC2IPContent.Q.tpyC2IE:ID) ! Field tpyC2IE:ID is a hot field or requires assignment from browse
+  BRWC2IETaskorg.Q &= Queue:Browse
+  BRWC2IETaskorg.AddSortOrder(,c2ieTO:KC2IE)               ! Add the sort order for c2ieTO:KC2IE for sort order 1
+  BRWC2IETaskorg.AddRange(c2ieTO:C2IE,selC2IERef)          ! Add single value range limit for sort order 1
+  BRWC2IETaskorg.AddLocator(BRW9::Sort0:Locator)           ! Browse has a locator for sort order 1
+  BRW9::Sort0:Locator.Init(,c2ieTO:C2IE,1,BRWC2IETaskorg)  ! Initialize the browse locator using  using key: c2ieTO:KC2IE , c2ieTO:C2IE
+  BRWC2IETaskorg.AddField(UniP:Code,BRWC2IETaskorg.Q.UniP:Code) ! Field UniP:Code is a hot field or requires assignment from browse
+  BRWC2IETaskorg.AddField(UniC1:Code,BRWC2IETaskorg.Q.UniC1:Code) ! Field UniC1:Code is a hot field or requires assignment from browse
+  BRWC2IETaskorg.AddField(UniC2:Code,BRWC2IETaskorg.Q.UniC2:Code) ! Field UniC2:Code is a hot field or requires assignment from browse
+  BRWC2IETaskorg.AddField(UniC3:Code,BRWC2IETaskorg.Q.UniC3:Code) ! Field UniC3:Code is a hot field or requires assignment from browse
+  BRWC2IETaskorg.AddField(c2ieTO:ID,BRWC2IETaskorg.Q.c2ieTO:ID) ! Field c2ieTO:ID is a hot field or requires assignment from browse
+  BRWC2IETaskorg.AddField(c2ieTO:C2IE,BRWC2IETaskorg.Q.c2ieTO:C2IE) ! Field c2ieTO:C2IE is a hot field or requires assignment from browse
+  BRWC2IEBSOs.Q &= Queue:Browse:2
+  BRWC2IEBSOs.AddSortOrder(,c2ieUni:KC2IE)                 ! Add the sort order for c2ieUni:KC2IE for sort order 1
+  BRWC2IEBSOs.AddRange(c2ieUni:C2IE,selC2IERef)            ! Add single value range limit for sort order 1
+  BRWC2IEBSOs.AddLocator(BRW10::Sort0:Locator)             ! Browse has a locator for sort order 1
+  BRW10::Sort0:Locator.Init(,c2ieUni:C2IE,1,BRWC2IEBSOs)   ! Initialize the browse locator using  using key: c2ieUni:KC2IE , c2ieUni:C2IE
+  BRWC2IEBSOs.AddField(tpyBSO:Code,BRWC2IEBSOs.Q.tpyBSO:Code) ! Field tpyBSO:Code is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(Uni:Code,BRWC2IEBSOs.Q.Uni:Code)    ! Field Uni:Code is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(Uni:Name,BRWC2IEBSOs.Q.Uni:Name)    ! Field Uni:Name is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(c2ieUni:Hostility,BRWC2IEBSOs.Q.c2ieUni:Hostility) ! Field c2ieUni:Hostility is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(tpyHstl:Code,BRWC2IEBSOs.Q.tpyHstl:Code) ! Field tpyHstl:Code is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(c2ieUni:ID,BRWC2IEBSOs.Q.c2ieUni:ID) ! Field c2ieUni:ID is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(c2ieUni:C2IE,BRWC2IEBSOs.Q.c2ieUni:C2IE) ! Field c2ieUni:C2IE is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(Uni:ID,BRWC2IEBSOs.Q.Uni:ID)        ! Field Uni:ID is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(tpyBSO:ID,BRWC2IEBSOs.Q.tpyBSO:ID)  ! Field tpyBSO:ID is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(tpyHstl:ID,BRWC2IEBSOs.Q.tpyHstl:ID) ! Field tpyHstl:ID is a hot field or requires assignment from browse
+  BRWBOSPos.Q &= Queue:Browse:3
+  BRWBOSPos.AddSortOrder(,c2ieUniPos:Kc2ieUnit)            ! Add the sort order for c2ieUniPos:Kc2ieUnit for sort order 1
+  BRWBOSPos.AddRange(c2ieUniPos:c2ieUnit,selC2IEBSORef)    ! Add single value range limit for sort order 1
+  BRWBOSPos.AddLocator(BRW11::Sort0:Locator)               ! Browse has a locator for sort order 1
+  BRW11::Sort0:Locator.Init(,c2ieUniPos:c2ieUnit,1,BRWBOSPos) ! Initialize the browse locator using  using key: c2ieUniPos:Kc2ieUnit , c2ieUniPos:c2ieUnit
+  BRWBOSPos.AddField(c2ieUniPos:xPos,BRWBOSPos.Q.c2ieUniPos:xPos) ! Field c2ieUniPos:xPos is a hot field or requires assignment from browse
+  BRWBOSPos.AddField(c2ieUniPos:yPos,BRWBOSPos.Q.c2ieUniPos:yPos) ! Field c2ieUniPos:yPos is a hot field or requires assignment from browse
+  BRWBOSPos.AddField(c2ieUniPos:ID,BRWBOSPos.Q.c2ieUniPos:ID) ! Field c2ieUniPos:ID is a hot field or requires assignment from browse
+  BRWBOSPos.AddField(c2ieUniPos:c2ieUnit,BRWBOSPos.Q.c2ieUniPos:c2ieUnit) ! Field c2ieUniPos:c2ieUnit is a hot field or requires assignment from browse
+  Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
+  SELF.AddItem(Resizer)                                    ! Add resizer to window manager
+  INIMgr.Fetch('COPApp',QuickWindow)                       ! Restore window settings from non-volatile store
+  Resizer.Resize                                           ! Reset required after window size altered by INI manager
+  BRWC2IPContent.AskProcedure = 1                          ! Will call: U_c2ipContent
+  BRWC2IPContent.AddToolbarTarget(Toolbar)                 ! Browse accepts toolbar control
+  BRWC2IPContent.ToolbarItem.HelpButton = ?Help
+  BRWC2IETaskorg.AddToolbarTarget(Toolbar)                 ! Browse accepts toolbar control
+  BRWC2IETaskorg.ToolbarItem.HelpButton = ?Help
+  BRWC2IEBSOs.AddToolbarTarget(Toolbar)                    ! Browse accepts toolbar control
+  BRWC2IEBSOs.ToolbarItem.HelpButton = ?Help
+  BRWBOSPos.AddToolbarTarget(Toolbar)                      ! Browse accepts toolbar control
+  BRWBOSPos.ToolbarItem.HelpButton = ?Help
+  SELF.SetAlerts()
+  ! Create COP C2IP
+  
+  IF pC2IPRef =0 THEN
+      ! New COP C2IP
+      sCOPName = ''
+      LOOP 10 TIMES
+          sCOPName = CLIP(sCOPName) & CHR(RANDOM(97, 122))    
+      END
+  
+      ! create new COP C2IP
+      DO _newCOPC2IP
+      
+      IF pTASKORGC2IPRef <> 0 THEN
+          ! Attach TASKORG C2IP to the new COP C2IP
+          DO _attachTASKORGC2IP
+      END
+  END
+  
+  BRWC2IPContent.ResetFromFile()
+  
+  
+  
+  
+  
+  
+  ! Display C2IP Name
+  
+  IF pC2IPRef <> 0 THEN
+      C2IP:ID = selC2IPRef
+      IF Access:C2IPs.TryFetch(C2IP:PKID) = Level:Benign THEN
+          selC2IPName = C2IP:Name
+          QuickWindow{PROP:Text}='COP App (' & CLIP(selC2IPName) & '.c2ip)'
+          
+          sCOPName    = C2IP:Name
+          DISPLAY(sCOPName)
+      END
+  END
+  ! default inits
+  sMoveToOvrlOptMenu  = ''
+  
+  ! reset conter of C2IP Content references
+  nOvrlRef  = 0
+  ! Display Overlay Units
+  
+  DO _DrawUnits
+  RETURN ReturnValue
+
+
+ThisWindow.Kill PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+          DrwOverlay.Kill()
+  ReturnValue = PARENT.Kill()
+  IF ReturnValue THEN RETURN ReturnValue.
+  IF SELF.FilesOpened
+    Relate:C1.Close
+    Relate:C2.Close
+    Relate:C2IPContent.Close
+    Relate:C3.Close
+    Relate:P.Close
+    Relate:_C2IEs.Close
+    Relate:_C2IPContent.Close
+    Relate:_C2IPs.Close
+    Relate:_Units.Close
+    Relate:_c2ieUnits.Close
+    Relate:_c2ieUnitsPositions.Close
+    Relate:type_BSO.Close
+  END
+  IF SELF.Opened
+    INIMgr.Update('COPApp',QuickWindow)                    ! Save window data to non-volatile store
+  END
+  GlobalErrors.SetProcedureName
+  RETURN ReturnValue
+
+
+ThisWindow.Run PROCEDURE(USHORT Number,BYTE Request)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Run(Number,Request)
+  IF SELF.Request = ViewRecord
+    ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
+  ELSE
+    GlobalRequest = Request
+    EXECUTE Number
+      U_c2ipContent
+      U_c2ieBSOs
+      U_c2ieBSOs
+    END
+    ReturnValue = GlobalResponse
+  END
+  RETURN ReturnValue
+
+
+ThisWindow.TakeAccepted PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+Looped BYTE
+  CODE
+  LOOP                                                     ! This method receive all EVENT:Accepted's
+    IF Looped
+      RETURN Level:Notify
+    ELSE
+      Looped = 1
+    END
+  ReturnValue = PARENT.TakeAccepted()
+    CASE ACCEPTED()
+    OF ?BUTTON_MoveToOverlay
+      ThisWindow.Update()
+      ! Move to Overlay Options Menu
+      !optionsMenu#     = POPUP('Option1|Option2',,,)
+      nMoveToOvrlSelection    = POPUP(CLIP(sMoveToOvrlOptMenu),,,)
+      
+      !MESSAGE('Overlay ' & vOvrlRef[nMoveToOvrlSelection])
+      
+      Access:_c2ieUnits.PrimeAutoInc()
+      _c2ieUni:C2IE  = vOvrlRef[nMoveToOvrlSelection]
+      _c2ieUni:Unit = selBSORef
+      _c2ieUni:Hostility  = selBSOHostility
+      IF Access:_c2ieUnits.TryInsert() = Level:Benign THEN
+      ELSE
+          !Access:_c2ieUnits.Throw(Msg:InsertFailed)       !handle the error
+          Access:_c2ieUnits.CancelAutoInc ()
+      
+      END
+      
+      
+      
+    OF ?BUTTON_ActProp
+      ThisWindow.Update()
+      ! View Action Properties
+      
+      sBSOTypeCode    = BRWC2IEBSOs.q.tpyBSO:Code
+      
+      CASE CLIP(sBSOTypeCode)
+      OF 'Unit'
+      OF 'Action'
+          !GlobalRequest = ChangeRecord
+          B_c2ieActionDetails()
+      ELSE
+          ! nothing to do
+      END
+    OF ?Close
+      ThisWindow.Update()
+      ! Save COP C2IP Name
+      _C2IP:ID    = nC2IPRef
+      IF Access:_C2IPs.Fetch(_C2IP:PKID)  = Level:Benign THEN
+          _C2IP:Name  = sCOPName
+          IF Access:_C2IPs.TryUpdate() = Level:Benign THEN
+              ! COP C2IP Name saved succesfully
+          END
+          
+      END
+      
+    END
+    RETURN ReturnValue
+  END
+  ReturnValue = Level:Fatal
+  RETURN ReturnValue
+
+
+BRWC2IPContent.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+
+  CODE
+  PARENT.Init(ListBox,Posit,V,Q,RM,WM)
+  IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
+    SELF.InsertControl=?Insert:4
+    SELF.ChangeControl=?Change:4
+    SELF.DeleteControl=?Delete:4
+  END
+
+
+BRWC2IPContent.TakeNewSelection PROCEDURE
+
+  CODE
+  PARENT.TakeNewSelection
+  ! C2IE reference
+  
+  selC2IERef  = BRWC2IPContent.q.C2IE:ID
+  BRWC2IETaskorg.ResetFromFile()
+
+
+BRWC2IEBSOs.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+
+  CODE
+  PARENT.Init(ListBox,Posit,V,Q,RM,WM)
+  SELF.EIP &= BRW10::EIPManager                            ! Set the EIP manager
+  SELF.AddEditControl(EditInPlace::tpyBSO:Code,1)
+  SELF.AddEditControl(EditInPlace::Uni:Code,2)
+  SELF.AddEditControl(EditInPlace::Uni:Name,3)
+  SELF.AddEditControl(EditInPlace::c2ieUni:Hostility,4)
+  SELF.AddEditControl(EditInPlace::tpyHstl:Code,5)
+  SELF.DeleteAction = EIPAction:Always
+  SELF.ArrowAction = EIPAction:Default+EIPAction:Remain+EIPAction:RetainColumn
+  IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
+    SELF.InsertControl=?Insert
+    SELF.ChangeControl=?Change
+    SELF.DeleteControl=?Delete
+  END
+
+
+BRWC2IEBSOs.TakeNewSelection PROCEDURE
+
+  CODE
+  PARENT.TakeNewSelection
+  ! selected BSO
+  selC2IEBSORef   = BRWC2IEBSOs.q.c2ieUni:ID
+  selBSORef   = BRWC2IEBSOs.q.Uni:ID
+  selBSOHostility = BRWC2IEBSOs.q.c2ieUni:Hostility
+
+
+BRWBOSPos.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+
+  CODE
+  PARENT.Init(ListBox,Posit,V,Q,RM,WM)
+  SELF.EIP &= BRW11::EIPManager                            ! Set the EIP manager
+  SELF.AddEditControl(EditInPlace::c2ieUniPos:xPos,1)
+  SELF.AddEditControl(EditInPlace::c2ieUniPos:yPos,2)
+  SELF.DeleteAction = EIPAction:Always
+  SELF.ArrowAction = EIPAction:Default+EIPAction:Remain+EIPAction:RetainColumn
+  IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
+    SELF.InsertControl=?Insert:2
+    SELF.ChangeControl=?Change:2
+    SELF.DeleteControl=?Delete:2
+  END
 
 
 Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)

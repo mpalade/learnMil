@@ -1,5 +1,5 @@
 [UNNAMED]
-+SessionDate=08.11.2018
++SessionDate=16.11.2018
 crc32v2=2866742915
 +CurrentKey=Record Order
 ENV File Path=
@@ -10,7 +10,7 @@ C2IE:KTYPE=C2IE:KTYPE
 Record Number=47R(2)~Rec No~C(0)@N_12@Y?Rec No:
 C2IE:ID=43R(2)~C2ie:Id~C(0)@N-14@?C2ie:Id:
 C2IE:TYPE=58R(2)~C2ie:Type~C(0)@N-14@?C2ie:Type:
-C2IE:NAME=62L(2)~C2ie:Name~C(0)?C2ie:Name:
+C2IE:NAME=387L(2)~C2ie:Name~C(0)?C2ie:Name:
 Columns=4
 Column1=RECORD NUMBER
 Column2=C2IE:ID

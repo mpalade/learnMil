@@ -128,12 +128,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
+  SELF.AddUpdateFile(Access:c2ieActionResources)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(c2ieActRes:Record,History::c2ieActRes:Record)
   SELF.AddHistoryField(?c2ieActRes:ID,1)
   SELF.AddHistoryField(?c2ieActRes:c2ieActionDetail,2)
   SELF.AddHistoryField(?c2ieActRes:c2ieBSO,3)
-  SELF.AddUpdateFile(Access:c2ieActionResources)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:_c2ieBSO_Resources.Open                           ! File _c2ieBSO_Resources used by this procedure, so make sure it's RelationManager is open
   Relate:c2ieActionResources.SetOpenRelated()
@@ -526,12 +526,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
+  SELF.AddUpdateFile(Access:c2ieActionObjectives)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(c2ieActObj:Record,History::c2ieActObj:Record)
   SELF.AddHistoryField(?c2ieActObj:ID,1)
   SELF.AddHistoryField(?c2ieActObj:c2ieActionDetail,2)
   SELF.AddHistoryField(?c2ieActObj:c2ieBSO,3)
-  SELF.AddUpdateFile(Access:c2ieActionObjectives)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:_c2ieBSO_Objectives.Open                          ! File _c2ieBSO_Objectives used by this procedure, so make sure it's RelationManager is open
   Relate:c2ieActionObjectives.Open                         ! File c2ieActionObjectives used by this procedure, so make sure it's RelationManager is open
@@ -1136,12 +1136,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
+  SELF.AddUpdateFile(Access:myOrganization)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(myOrg:Record,History::myOrg:Record)
   SELF.AddHistoryField(?myOrg:ID,1)
   SELF.AddHistoryField(?myOrg:Name,2)
   SELF.AddHistoryField(?myOrg:Code,3)
-  SELF.AddUpdateFile(Access:myOrganization)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:myOrganization.SetOpenRelated()
   Relate:myOrganization.Open                               ! File myOrganization used by this procedure, so make sure it's RelationManager is open
@@ -1533,12 +1533,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
+  SELF.AddUpdateFile(Access:OrgTOO)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgTOO:Record,History::OrgTOO:Record)
   SELF.AddHistoryField(?OrgTOO:ID,1)
   SELF.AddHistoryField(?OrgTOO:Organization,2)
   SELF.AddHistoryField(?OrgTOO:TheaterOfOperations,3)
-  SELF.AddUpdateFile(Access:OrgTOO)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:OrgTOO.SetOpenRelated()
   Relate:OrgTOO.Open                                       ! File OrgTOO used by this procedure, so make sure it's RelationManager is open
@@ -1833,6 +1833,8 @@ View_OrgMissions PROCEDURE
 
 CurrentTab           STRING(80)                            ! 
 ActionMessage        CSTRING(40)                           ! 
+nMissTaskOrgRef      DECIMAL(7)                            ! 
+nTASKORGC2IPRef      DECIMAL(7)                            ! 
 FDCB8::View:FileDropCombo VIEW(myOrganization)
                        PROJECT(myOrg:Name)
                        PROJECT(myOrg:ID)
@@ -1843,9 +1845,28 @@ FDCB9::View:FileDropCombo VIEW(MilMissions)
                      END
 BRW10::View:Browse   VIEW(MissionTASKORG)
                        PROJECT(MissTSK:ID)
-                       PROJECT(MissTSK:Mission)
                        PROJECT(MissTSK:TASKORGC2IP)
-                       JOIN(C2IP:PKID,MissTSK:TASKORGC2IP)
+                       PROJECT(MissTSK:Mission)
+                       JOIN(_C2IPTsk:PKID,MissTSK:TASKORGC2IP)
+                         PROJECT(_C2IPTsk:Name)
+                         PROJECT(_C2IPTsk:ID)
+                       END
+                     END
+Queue:Browse         QUEUE                            !Queue declaration for browse/combo box using ?List
+MissTSK:ID             LIKE(MissTSK:ID)               !List box control field - type derived from field
+MissTSK:TASKORGC2IP    LIKE(MissTSK:TASKORGC2IP)      !List box control field - type derived from field
+_C2IPTsk:Name          LIKE(_C2IPTsk:Name)            !List box control field - type derived from field
+MissTSK:Mission        LIKE(MissTSK:Mission)          !Browse key field - type derived from field
+_C2IPTsk:ID            LIKE(_C2IPTsk:ID)              !Related join file key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+BRW12::View:Browse   VIEW(C2IPExplorer)
+                       PROJECT(C2IPExp:Mission)
+                       PROJECT(C2IPExp:ID)
+                       PROJECT(C2IPExp:Organization)
+                       PROJECT(C2IPExp:C2IP)
+                       JOIN(C2IP:PKID,C2IPExp:C2IP)
                          PROJECT(C2IP:Name)
                          PROJECT(C2IP:ID)
                          PROJECT(C2IP:Type)
@@ -1855,11 +1876,12 @@ BRW10::View:Browse   VIEW(MissionTASKORG)
                          END
                        END
                      END
-Queue:Browse         QUEUE                            !Queue declaration for browse/combo box using ?List
+Queue:Browse:1       QUEUE                            !Queue declaration for browse/combo box using ?List:2
+C2IPExp:Mission        LIKE(C2IPExp:Mission)          !List box control field - type derived from field
 C2IP:Name              LIKE(C2IP:Name)                !List box control field - type derived from field
 tpyC2IP:Code           LIKE(tpyC2IP:Code)             !List box control field - type derived from field
-MissTSK:ID             LIKE(MissTSK:ID)               !Primary key field - type derived from field
-MissTSK:Mission        LIKE(MissTSK:Mission)          !Browse key field - type derived from field
+C2IPExp:ID             LIKE(C2IPExp:ID)               !Primary key field - type derived from field
+C2IPExp:Organization   LIKE(C2IPExp:Organization)     !Browse key field - type derived from field
 C2IP:ID                LIKE(C2IP:ID)                  !Related join file key field - type derived from field
 tpyC2IP:ID             LIKE(tpyC2IP:ID)               !Related join file key field - type derived from field
 Mark                   BYTE                           !Entry's marked status
@@ -1900,12 +1922,18 @@ QuickWindow          WINDOW('View Mission'),AT(,,417,273),FONT('Microsoft Sans S
   TIP('Cancel operation')
                        BUTTON('&Help'),AT(366,257,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
   STD(STD:Help),TIP('See Help Window')
-                       LIST,AT(6,66,195,59),USE(?List),FORMAT('[100L(2)|M~TASKORG C2IP Name~C(0)@s100@40L(2)|M' & |
-  '~TASKORG C2IP Type~C(0)@s20@]|~TASKORG~'),FROM(Queue:Browse),IMM
+                       LIST,AT(6,66,195,59),USE(?List),FORMAT('0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0' & |
+  '@[400L(2)|M~Name~C(0)@s100@]|~TASKORG~'),FROM(Queue:Browse),IMM
                        BUTTON('&Insert'),AT(5,129,42,12),USE(?Insert)
                        BUTTON('&Change'),AT(47,129,42,12),USE(?Change)
                        BUTTON('&Delete'),AT(89,129,42,12),USE(?Delete)
-                       BUTTON('View in TaskOrg Editor App'),AT(133,129),USE(?BUTTON1)
+                       BUTTON('View TaskOrg'),AT(4,257),USE(?BUTTON2)
+                       BUTTON('View COP'),AT(68,257),USE(?BUTTON3)
+                       BUTTON('View MilDocs'),AT(120,257),USE(?BUTTON1)
+                       LIST,AT(206,66,207,59),USE(?List:2),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[100L(2)|M~C2IP Nam' & |
+  'e~C(0)@s100@40L(2)|M~C2IP Type~C(0)@s20@]|~C2IP Explorer~'),FROM(Queue:Browse:1),IMM
+                       BUTTON('Create COP'),AT(205,127),USE(?BUTTON4)
+                       BUTTON('View'),AT(263,127,54),USE(?BUTTON5)
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -1931,12 +1959,18 @@ FDCB9                CLASS(FileDropComboClass)             ! File drop combo man
 Q                      &Queue:FileDropCombo:1         !Reference to browse queue type
                      END
 
-BRW10                CLASS(BrowseClass)                    ! Browse using ?List
+BRW_MissTaskOrg      CLASS(BrowseClass)                    ! Browse using ?List
 Q                      &Queue:Browse                  !Reference to browse queue
 Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+TakeNewSelection       PROCEDURE(),DERIVED
                      END
 
 BRW10::Sort0:Locator StepLocatorClass                      ! Default Locator
+BRW_MissC2IPs        CLASS(BrowseClass)                    ! Browse using ?List:2
+Q                      &Queue:Browse:1                !Reference to browse queue
+                     END
+
+BRW12::Sort0:Locator StepLocatorClass                      ! Default Locator
 CurCtrlFeq          LONG
 FieldColorQueue     QUEUE
 Feq                   LONG
@@ -1984,15 +2018,15 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
+  SELF.AddUpdateFile(Access:OrgMissions)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgMiss:Record,History::OrgMiss:Record)
   SELF.AddHistoryField(?OrgMiss:ID,1)
   SELF.AddHistoryField(?OrgMiss:Organization,2)
   SELF.AddHistoryField(?OrgMiss:Mission,3)
-  SELF.AddUpdateFile(Access:OrgMissions)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
-  Relate:MilMissions.SetOpenRelated()
-  Relate:MilMissions.Open                                  ! File MilMissions used by this procedure, so make sure it's RelationManager is open
+  Relate:C2IPExplorer.SetOpenRelated()
+  Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
   SELF.Primary &= Relate:OrgMissions
   IF SELF.Request = ViewRecord AND NOT SELF.BatchProcessing ! Setup actions for ViewOnly Mode
@@ -2007,7 +2041,8 @@ ReturnValue          BYTE,AUTO
     SELF.OkControl = ?OK
     IF SELF.PrimeUpdate() THEN RETURN Level:Notify.
   END
-  BRW10.Init(?List,Queue:Browse.ViewPosition,BRW10::View:Browse,Queue:Browse,Relate:MissionTASKORG,SELF) ! Initialize the browse manager
+  BRW_MissTaskOrg.Init(?List,Queue:Browse.ViewPosition,BRW10::View:Browse,Queue:Browse,Relate:MissionTASKORG,SELF) ! Initialize the browse manager
+  BRW_MissC2IPs.Init(?List:2,Queue:Browse:1.ViewPosition,BRW12::View:Browse,Queue:Browse:1,Relate:C2IPExplorer,SELF) ! Initialize the browse manager
   SELF.Open(QuickWindow)                                   ! Open window
   Do DefineListboxStyle
   IF SELF.Request = ViewRecord                             ! Configure controls for View Only mode
@@ -2019,21 +2054,36 @@ ReturnValue          BYTE,AUTO
     DISABLE(?Insert)
     DISABLE(?Change)
     DISABLE(?Delete)
+    DISABLE(?BUTTON2)
+    DISABLE(?BUTTON3)
     DISABLE(?BUTTON1)
+    DISABLE(?BUTTON4)
+    DISABLE(?BUTTON5)
   END
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
-  BRW10.Q &= Queue:Browse
-  BRW10.AddSortOrder(,MissTSK:KMission)                    ! Add the sort order for MissTSK:KMission for sort order 1
-  BRW10.AddRange(MissTSK:Mission,Relate:MissionTASKORG,Relate:OrgMissions) ! Add file relationship range limit for sort order 1
-  BRW10.AddLocator(BRW10::Sort0:Locator)                   ! Browse has a locator for sort order 1
-  BRW10::Sort0:Locator.Init(,MissTSK:Mission,1,BRW10)      ! Initialize the browse locator using  using key: MissTSK:KMission , MissTSK:Mission
-  BRW10.AddField(C2IP:Name,BRW10.Q.C2IP:Name)              ! Field C2IP:Name is a hot field or requires assignment from browse
-  BRW10.AddField(tpyC2IP:Code,BRW10.Q.tpyC2IP:Code)        ! Field tpyC2IP:Code is a hot field or requires assignment from browse
-  BRW10.AddField(MissTSK:ID,BRW10.Q.MissTSK:ID)            ! Field MissTSK:ID is a hot field or requires assignment from browse
-  BRW10.AddField(MissTSK:Mission,BRW10.Q.MissTSK:Mission)  ! Field MissTSK:Mission is a hot field or requires assignment from browse
-  BRW10.AddField(C2IP:ID,BRW10.Q.C2IP:ID)                  ! Field C2IP:ID is a hot field or requires assignment from browse
-  BRW10.AddField(tpyC2IP:ID,BRW10.Q.tpyC2IP:ID)            ! Field tpyC2IP:ID is a hot field or requires assignment from browse
+  BRW_MissTaskOrg.Q &= Queue:Browse
+  BRW_MissTaskOrg.AddSortOrder(,MissTSK:KMission)          ! Add the sort order for MissTSK:KMission for sort order 1
+  BRW_MissTaskOrg.AddRange(MissTSK:Mission,Relate:MissionTASKORG,Relate:OrgMissions) ! Add file relationship range limit for sort order 1
+  BRW_MissTaskOrg.AddLocator(BRW10::Sort0:Locator)         ! Browse has a locator for sort order 1
+  BRW10::Sort0:Locator.Init(,MissTSK:Mission,1,BRW_MissTaskOrg) ! Initialize the browse locator using  using key: MissTSK:KMission , MissTSK:Mission
+  BRW_MissTaskOrg.AddField(MissTSK:ID,BRW_MissTaskOrg.Q.MissTSK:ID) ! Field MissTSK:ID is a hot field or requires assignment from browse
+  BRW_MissTaskOrg.AddField(MissTSK:TASKORGC2IP,BRW_MissTaskOrg.Q.MissTSK:TASKORGC2IP) ! Field MissTSK:TASKORGC2IP is a hot field or requires assignment from browse
+  BRW_MissTaskOrg.AddField(_C2IPTsk:Name,BRW_MissTaskOrg.Q._C2IPTsk:Name) ! Field _C2IPTsk:Name is a hot field or requires assignment from browse
+  BRW_MissTaskOrg.AddField(MissTSK:Mission,BRW_MissTaskOrg.Q.MissTSK:Mission) ! Field MissTSK:Mission is a hot field or requires assignment from browse
+  BRW_MissTaskOrg.AddField(_C2IPTsk:ID,BRW_MissTaskOrg.Q._C2IPTsk:ID) ! Field _C2IPTsk:ID is a hot field or requires assignment from browse
+  BRW_MissC2IPs.Q &= Queue:Browse:1
+  BRW_MissC2IPs.AddSortOrder(,C2IPExp:KOrganization)       ! Add the sort order for C2IPExp:KOrganization for sort order 1
+  BRW_MissC2IPs.AddRange(C2IPExp:Organization,OrgMiss:Organization) ! Add single value range limit for sort order 1
+  BRW_MissC2IPs.AddLocator(BRW12::Sort0:Locator)           ! Browse has a locator for sort order 1
+  BRW12::Sort0:Locator.Init(,C2IPExp:Organization,1,BRW_MissC2IPs) ! Initialize the browse locator using  using key: C2IPExp:KOrganization , C2IPExp:Organization
+  BRW_MissC2IPs.AddField(C2IPExp:Mission,BRW_MissC2IPs.Q.C2IPExp:Mission) ! Field C2IPExp:Mission is a hot field or requires assignment from browse
+  BRW_MissC2IPs.AddField(C2IP:Name,BRW_MissC2IPs.Q.C2IP:Name) ! Field C2IP:Name is a hot field or requires assignment from browse
+  BRW_MissC2IPs.AddField(tpyC2IP:Code,BRW_MissC2IPs.Q.tpyC2IP:Code) ! Field tpyC2IP:Code is a hot field or requires assignment from browse
+  BRW_MissC2IPs.AddField(C2IPExp:ID,BRW_MissC2IPs.Q.C2IPExp:ID) ! Field C2IPExp:ID is a hot field or requires assignment from browse
+  BRW_MissC2IPs.AddField(C2IPExp:Organization,BRW_MissC2IPs.Q.C2IPExp:Organization) ! Field C2IPExp:Organization is a hot field or requires assignment from browse
+  BRW_MissC2IPs.AddField(C2IP:ID,BRW_MissC2IPs.Q.C2IP:ID)  ! Field C2IP:ID is a hot field or requires assignment from browse
+  BRW_MissC2IPs.AddField(tpyC2IP:ID,BRW_MissC2IPs.Q.tpyC2IP:ID) ! Field tpyC2IP:ID is a hot field or requires assignment from browse
   INIMgr.Fetch('View_OrgMissions',QuickWindow)             ! Restore window settings from non-volatile store
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
   ToolBarForm.HelpButton=?Help
@@ -2046,7 +2096,8 @@ ReturnValue          BYTE,AUTO
   FDCB8.AddUpdateField(myOrg:ID,OrgMiss:Organization)
   ThisWindow.AddItem(FDCB8.WindowComponent)
   FDCB8.DefaultFill = 0
-  FDCB9.Init(Miss:Name,?Miss:Name,Queue:FileDropCombo:1.ViewPosition,FDCB9::View:FileDropCombo,Queue:FileDropCombo:1,Relate:MilMissions,ThisWindow,GlobalErrors,0,1,0)
+  FDCB9.Init(Miss:Name,?Miss:Name,Queue:FileDropCombo:1.ViewPosition,FDCB9::View:FileDropCombo,Queue:FileDropCombo:1,Relate:MilMissions,ThisWindow,GlobalErrors,1,1,0)
+  FDCB9.AskProcedure = 1
   FDCB9.Q &= Queue:FileDropCombo:1
   FDCB9.AddSortOrder(Miss:PKID)
   FDCB9.AddField(Miss:Name,FDCB9.Q.Miss:Name) !List box control field - type derived from field
@@ -2054,9 +2105,11 @@ ReturnValue          BYTE,AUTO
   FDCB9.AddUpdateField(Miss:ID,OrgMiss:Mission)
   ThisWindow.AddItem(FDCB9.WindowComponent)
   FDCB9.DefaultFill = 0
-  BRW10.AskProcedure = 1                                   ! Will call: U_MissionTASKORG
-  BRW10.AddToolbarTarget(Toolbar)                          ! Browse accepts toolbar control
-  BRW10.ToolbarItem.HelpButton = ?Help
+  BRW_MissTaskOrg.AskProcedure = 2                         ! Will call: U_MissionTASKORG
+  BRW_MissTaskOrg.AddToolbarTarget(Toolbar)                ! Browse accepts toolbar control
+  BRW_MissTaskOrg.ToolbarItem.HelpButton = ?Help
+  BRW_MissC2IPs.AddToolbarTarget(Toolbar)                  ! Browse accepts toolbar control
+  BRW_MissC2IPs.ToolbarItem.HelpButton = ?Help
   SELF.SetAlerts()
   RETURN ReturnValue
 
@@ -2069,7 +2122,7 @@ ReturnValue          BYTE,AUTO
   ReturnValue = PARENT.Kill()
   IF ReturnValue THEN RETURN ReturnValue.
   IF SELF.FilesOpened
-    Relate:MilMissions.Close
+    Relate:C2IPExplorer.Close
   END
   IF SELF.Opened
     INIMgr.Update('View_OrgMissions',QuickWindow)          ! Save window data to non-volatile store
@@ -2100,7 +2153,10 @@ ReturnValue          BYTE,AUTO
     ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
   ELSE
     GlobalRequest = Request
-    U_MissionTASKORG
+    EXECUTE Number
+      U_Missions
+      U_MissionTASKORG
+    END
     ReturnValue = GlobalResponse
   END
   RETURN ReturnValue
@@ -2120,11 +2176,24 @@ Looped BYTE
     END
   ReturnValue = PARENT.TakeAccepted()
     CASE ACCEPTED()
+    OF ?Miss:Name
+      FDCB9.TakeAccepted()
     OF ?OK
       ThisWindow.Update()
       IF SELF.Request = ViewRecord AND NOT SELF.BatchProcessing THEN
          POST(EVENT:CloseWindow)
       END
+    OF ?BUTTON4
+      ThisWindow.Update()
+      ! COPApp
+      
+      COPApp(0, OrgMiss:Organization, nMissTaskOrgRef, nTASKORGC2IPRef)
+    OF ?BUTTON5
+      ThisWindow.Update()
+      ! COPApp
+      
+      ! View current selected C2IP from C2IP Explorer
+      COPApp(BRW_MissC2IPs.q.C2IP:ID, OrgMiss:Organization, nMissTaskOrgRef, nTASKORGC2IPRef)
     END
     RETURN ReturnValue
   END
@@ -2140,7 +2209,7 @@ Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize
   SELF.SetParentDefaults()                                 ! Calculate default control parent-child relationships based upon their positions on the window
 
 
-BRW10.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+BRW_MissTaskOrg.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
 
   CODE
   PARENT.Init(ListBox,Posit,V,Q,RM,WM)
@@ -2149,6 +2218,16 @@ BRW10.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager
     SELF.ChangeControl=?Change
     SELF.DeleteControl=?Delete
   END
+
+
+BRW_MissTaskOrg.TakeNewSelection PROCEDURE
+
+  CODE
+  PARENT.TakeNewSelection
+  ! Mission TASKORG Reference
+  
+  nMissTaskOrgRef  = BRW_MissTaskOrg.q.MissTSK:ID
+  nTASKORGC2IPRef  = BRW_MissTaskOrg.q.MissTSK:TASKORGC2IP
 
 !!! <summary>
 !!! Generated from procedure template - Window

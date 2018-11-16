@@ -9,6 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		learnMil.app = learnMil.app
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{472100F9-2B37-4642-90CF-7E553EF91F42}"
+	ProjectSection(SolutionItems) = postProject
+		leanMilNotes.docx = leanMilNotes.docx
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,5 +24,8 @@ Global
 		{50ACA5E7-B6CC-428D-86E4-E57243EF7DD2}.Debug|Win32.ActiveCfg = Debug|Win32
 		{50ACA5E7-B6CC-428D-86E4-E57243EF7DD2}.Release|Win32.Build.0 = Release|Win32
 		{50ACA5E7-B6CC-428D-86E4-E57243EF7DD2}.Release|Win32.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{472100F9-2B37-4642-90CF-7E553EF91F42} = {{2150E333-8FDC-42A3-9474-1A3956D46DE8}}
 	EndGlobalSection
 EndGlobal
