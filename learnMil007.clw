@@ -159,12 +159,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
+  SELF.AddUpdateFile(Access:MissionTASKORG)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
   SELF.AddHistoryField(?MissTSK:Mission,2)
   SELF.AddHistoryField(?MissTSK:TASKORGC2IP,3)
-  SELF.AddUpdateFile(Access:MissionTASKORG)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
@@ -368,9 +368,10 @@ ReturnValue          BYTE,AUTO
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
   Relate:_C2IEs.Open                                       ! File _C2IEs used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IPContent.SetOpenRelated()
   Relate:_C2IPContent.Open                                 ! File _C2IPContent used by this procedure, so make sure it's RelationManager is open
-  Relate:_C2IPs.Open                                       ! File _C2IPs used by this procedure, so make sure it's RelationManager is open
   Access:type_C2IP.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
+  Access:_C2IPs.UseFile                                    ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_C2IE.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   SELF.FilesOpened = True
   SELF.Open(QuickWindow)                                   ! Open window
@@ -449,7 +450,6 @@ ReturnValue          BYTE,AUTO
     Relate:C2IPExplorer.Close
     Relate:_C2IEs.Close
     Relate:_C2IPContent.Close
-    Relate:_C2IPs.Close
   END
   IF SELF.Opened
     INIMgr.Update('create_COP',QuickWindow)                ! Save window data to non-volatile store
@@ -995,13 +995,14 @@ ReturnValue          BYTE,AUTO
   Relate:C3.Open                                           ! File C3 used by this procedure, so make sure it's RelationManager is open
   Relate:P.Open                                            ! File P used by this procedure, so make sure it's RelationManager is open
   Relate:_C2IEs.Open                                       ! File _C2IEs used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IPContent.SetOpenRelated()
   Relate:_C2IPContent.Open                                 ! File _C2IPContent used by this procedure, so make sure it's RelationManager is open
-  Relate:_C2IPs.Open                                       ! File _C2IPs used by this procedure, so make sure it's RelationManager is open
   Relate:_Units.Open                                       ! File _Units used by this procedure, so make sure it's RelationManager is open
   Relate:_c2ieUnits.Open                                   ! File _c2ieUnits used by this procedure, so make sure it's RelationManager is open
   Relate:_c2ieUnitsPositions.Open                          ! File _c2ieUnitsPositions used by this procedure, so make sure it's RelationManager is open
   Relate:type_BSO.Open                                     ! File type_BSO used by this procedure, so make sure it's RelationManager is open
   Access:type_C2IP.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
+  Access:_C2IPs.UseFile                                    ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_C2IE.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_Hostility.UseFile                            ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:C2IPs.UseFile                                     ! File referenced in 'Other Files' so need to inform it's FileManager
@@ -1142,7 +1143,6 @@ ReturnValue          BYTE,AUTO
     Relate:P.Close
     Relate:_C2IEs.Close
     Relate:_C2IPContent.Close
-    Relate:_C2IPs.Close
     Relate:_Units.Close
     Relate:_c2ieUnits.Close
     Relate:_c2ieUnitsPositions.Close
@@ -1320,8 +1320,11 @@ Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize
 !!! Generated from procedure template - Window
 !!! ORBAT - TASKORG Transfers
 !!! </summary>
-ORBAT_TASKORGTransfers PROCEDURE 
+View_ORBAT_TASKORGTransfers PROCEDURE 
 
+selC2IEORBATRef      DECIMAL(7)                            ! 
+selC2IETASKORGRef    DECIMAL(7)                            ! 
+sNewTaskOrgName      STRING(100)                           ! 
 BRW5::View:Browse    VIEW(_C2IP_ORBATs)
                        PROJECT(_C2IP_Orbats:Name)
                        PROJECT(_C2IP_Orbats:ID)
@@ -1342,6 +1345,88 @@ _C2IPTsk:ID            LIKE(_C2IPTsk:ID)              !Primary key field - type 
 Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
+BRW7::View:Browse    VIEW(C2IPContent)
+                       PROJECT(C2IPCt:ID)
+                       PROJECT(C2IPCt:C2IPPackage)
+                       PROJECT(C2IPCt:C2IEInstance)
+                       JOIN(_C2IEORB:PKID,C2IPCt:C2IEInstance)
+                         PROJECT(_C2IEORB:ID)
+                         PROJECT(_C2IEORB:Name)
+                       END
+                     END
+Queue:Browse:2       QUEUE                            !Queue declaration for browse/combo box using ?List:3
+_C2IEORB:ID            LIKE(_C2IEORB:ID)              !List box control field - type derived from field
+_C2IEORB:Name          LIKE(_C2IEORB:Name)            !List box control field - type derived from field
+C2IPCt:ID              LIKE(C2IPCt:ID)                !Primary key field - type derived from field
+C2IPCt:C2IPPackage     LIKE(C2IPCt:C2IPPackage)       !Browse key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+BRW8::View:Browse    VIEW(_C2IPContent)
+                       PROJECT(_C2IPCt:C2IEInstance)
+                       PROJECT(_C2IPCt:ID)
+                       PROJECT(_C2IPCt:C2IPPackage)
+                       JOIN(_C2IE_TASKORGs,'_C2IETSK:ID=_C2IPCt:C2IEInstance')
+                         PROJECT(_C2IETSK:ID)
+                         PROJECT(_C2IETSK:Name)
+                       END
+                     END
+Queue:Browse:3       QUEUE                            !Queue declaration for browse/combo box using ?List:4
+_C2IETSK:ID            LIKE(_C2IETSK:ID)              !List box control field - type derived from field
+_C2IETSK:Name          LIKE(_C2IETSK:Name)            !List box control field - type derived from field
+_C2IPCt:C2IEInstance   LIKE(_C2IPCt:C2IEInstance)     !Browse hot field - type derived from field
+_C2IPCt:ID             LIKE(_C2IPCt:ID)               !Primary key field - type derived from field
+_C2IPCt:C2IPPackage    LIKE(_C2IPCt:C2IPPackage)      !Browse key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+BRW9::View:Browse    VIEW(_c2ieBSO_ORBATs)
+                       PROJECT(_c2ieBSOORB:C2IE)
+                       PROJECT(_c2ieBSOORB:ID)
+                       PROJECT(_c2ieBSOORB:Unit)
+                       JOIN(Uni:PKID,_c2ieBSOORB:Unit)
+                         PROJECT(Uni:Code)
+                         PROJECT(Uni:Name)
+                         PROJECT(Uni:ID)
+                       END
+                     END
+Queue:Browse:4       QUEUE                            !Queue declaration for browse/combo box using ?List:5
+_c2ieBSOORB:C2IE       LIKE(_c2ieBSOORB:C2IE)         !List box control field - type derived from field
+Uni:Code               LIKE(Uni:Code)                 !List box control field - type derived from field
+Uni:Name               LIKE(Uni:Name)                 !List box control field - type derived from field
+_c2ieBSOORB:ID         LIKE(_c2ieBSOORB:ID)           !Primary key field - type derived from field
+Uni:ID                 LIKE(Uni:ID)                   !Related join file key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+BRW10::View:Browse   VIEW(_c2ieBSO_TASKORGs)
+                       PROJECT(_c2ieBSOTSK:C2IE)
+                       PROJECT(_c2ieBSOTSK:ID)
+                       PROJECT(_c2ieBSOTSK:Unit)
+                       JOIN(_Uni:PKID,_c2ieBSOTSK:Unit)
+                         PROJECT(_Uni:Code)
+                         PROJECT(_Uni:Name)
+                         PROJECT(_Uni:ID)
+                       END
+                       JOIN(c2iUniTrf:Kc2ieUnit,_c2ieBSOTSK:ID)
+                         PROJECT(c2iUniTrf:C2IE_From)
+                         JOIN(_C2IEFromTrf:PKID,c2iUniTrf:C2IE_From)
+                           PROJECT(_C2IEFromTrf:Name)
+                           PROJECT(_C2IEFromTrf:ID)
+                         END
+                       END
+                     END
+Queue:Browse:5       QUEUE                            !Queue declaration for browse/combo box using ?List:6
+_c2ieBSOTSK:C2IE       LIKE(_c2ieBSOTSK:C2IE)         !List box control field - type derived from field
+_Uni:Code              LIKE(_Uni:Code)                !List box control field - type derived from field
+_Uni:Name              LIKE(_Uni:Name)                !List box control field - type derived from field
+_C2IEFromTrf:Name      LIKE(_C2IEFromTrf:Name)        !List box control field - type derived from field
+_c2ieBSOTSK:ID         LIKE(_c2ieBSOTSK:ID)           !Primary key field - type derived from field
+_Uni:ID                LIKE(_Uni:ID)                  !Related join file key field - type derived from field
+_C2IEFromTrf:ID        LIKE(_C2IEFromTrf:ID)          !Related join file key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
 QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,523,346),FONT('Microsoft Sans Serif',8,,FONT:regular, |
   CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,HLP('ORBAT_TASKORGTransfers'),SYSTEM
                        BUTTON('&OK'),AT(367,330,49,14),USE(?Ok),LEFT,ICON('WAOK.ICO'),FLAT,MSG('Accept operation'), |
@@ -1354,11 +1439,29 @@ QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,523,346),FONT('Mic
   IMM
                        LIST,AT(180,12,150,100),USE(?List:2),FORMAT('100L(2)|M~TaskOrg Name~C(0)@s100@'),FROM(Queue:Browse:1), |
   IMM
+                       LIST,AT(3,117,150,50),USE(?List:3),FORMAT('0L(2)|M~ID~D(12)@n-10.0@100L(2)|M~TASKORG C2' & |
+  'IE Name~C(0)@s100@'),FROM(Queue:Browse:2),IMM
+                       LIST,AT(180,117,150,50),USE(?List:4),FORMAT('0L(2)|M~ID~D(12)@n-10.0@100L(2)|M~TASKORG ' & |
+  'C2IE Name~C(0)@s100@'),FROM(Queue:Browse:3),IMM
+                       LIST,AT(3,172,150,100),USE(?List:5),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[80L(2)|M~Code~C(0)' & |
+  '@s20@100L(2)|M~Name~C(0)@s100@]|~Unit~'),FROM(Queue:Browse:4),IMM
+                       LIST,AT(180,172,341,100),USE(?List:6),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[80L(2)|M~Code~C(' & |
+  '0)@s20@100L(2)|M~Name~C(0)@s100@]|~Unit~[100L(2)|M~Name~C(0)@s100@]|~TASKORG C2IP Source~'), |
+  FROM(Queue:Browse:5),IMM
+                       BUTTON('Create TaskOrg'),AT(335,276),USE(?BUTTON1)
+                       BUTTON('Move to TaskOrg'),AT(2,276),USE(?BUTTON2)
+                       BUTTON('&Insert'),AT(179,295,42,12),USE(?Insert)
+                       BUTTON('&Change'),AT(222,295,42,12),USE(?Change)
+                       BUTTON('&Delete'),AT(263,295,42,12),USE(?Delete)
+                       PROMPT('TaskOrg Name:'),AT(179,276),USE(?sNewTaskOrgName:Prompt)
+                       ENTRY(@s100),AT(234,276,96,10),USE(sNewTaskOrgName)
                      END
 
 ThisWindow           CLASS(WindowManager)
 Init                   PROCEDURE(),BYTE,PROC,DERIVED
 Kill                   PROCEDURE(),BYTE,PROC,DERIVED
+Run                    PROCEDURE(USHORT Number,BYTE Request),BYTE,PROC,DERIVED
+TakeAccepted           PROCEDURE(),BYTE,PROC,DERIVED
                      END
 
 Toolbar              ToolbarClass
@@ -1366,7 +1469,7 @@ Resizer              CLASS(WindowResizeClass)
 Init                   PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
                      END
 
-BRW5                 CLASS(BrowseClass)                    ! Browse using ?List
+BRW_C2IPORBAT        CLASS(BrowseClass)                    ! Browse using ?List
 Q                      &Queue:Browse                  !Reference to browse queue
                      END
 
@@ -1376,6 +1479,29 @@ Q                      &Queue:Browse:1                !Reference to browse queue
                      END
 
 BRW6::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRW_C2IEORBAT        CLASS(BrowseClass)                    ! Browse using ?List:3
+Q                      &Queue:Browse:2                !Reference to browse queue
+TakeNewSelection       PROCEDURE(),DERIVED
+                     END
+
+BRW7::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRW_C2IETASKORG      CLASS(BrowseClass)                    ! Browse using ?List:4
+Q                      &Queue:Browse:3                !Reference to browse queue
+TakeNewSelection       PROCEDURE(),DERIVED
+                     END
+
+BRW8::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRW_BSOORBAT         CLASS(BrowseClass)                    ! Browse using ?List:5
+Q                      &Queue:Browse:4                !Reference to browse queue
+                     END
+
+BRW9::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRW_BSOTASKORG       CLASS(BrowseClass)                    ! Browse using ?List:6
+Q                      &Queue:Browse:5                !Reference to browse queue
+Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+                     END
+
+BRW10::Sort0:Locator StepLocatorClass                      ! Default Locator
 
   CODE
   GlobalResponse = ThisWindow.Run()                        ! Opens the window and starts an Accept Loop
@@ -1393,7 +1519,7 @@ ThisWindow.Init PROCEDURE
 ReturnValue          BYTE,AUTO
 
   CODE
-  GlobalErrors.SetProcedureName('ORBAT_TASKORGTransfers')
+  GlobalErrors.SetProcedureName('View_ORBAT_TASKORGTransfers')
   SELF.Request = GlobalRequest                             ! Store the incoming request
   ReturnValue = PARENT.Init()
   IF ReturnValue THEN RETURN ReturnValue.
@@ -1409,32 +1535,91 @@ ReturnValue          BYTE,AUTO
      SELF.AddItem(?Ok,RequestCompleted)                    ! Add the close control to the window manger
   END
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
-  Relate:_C2IP_ORBATs.Open                                 ! File _C2IP_ORBATs used by this procedure, so make sure it's RelationManager is open
+  Relate:C2IPContent.Open                                  ! File C2IPContent used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IE_TASKORGs.Open                               ! File _C2IE_TASKORGs used by this procedure, so make sure it's RelationManager is open
+  Relate:_C2IPContent.SetOpenRelated()
+  Relate:_C2IPContent.Open                                 ! File _C2IPContent used by this procedure, so make sure it's RelationManager is open
+  Relate:_c2ieBSO_ORBATs.Open                              ! File _c2ieBSO_ORBATs used by this procedure, so make sure it's RelationManager is open
+  Relate:_c2ieBSO_TASKORGs.Open                            ! File _c2ieBSO_TASKORGs used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
-  BRW5.Init(?List,Queue:Browse.ViewPosition,BRW5::View:Browse,Queue:Browse,Relate:_C2IP_ORBATs,SELF) ! Initialize the browse manager
+  BRW_C2IPORBAT.Init(?List,Queue:Browse.ViewPosition,BRW5::View:Browse,Queue:Browse,Relate:_C2IP_ORBATs,SELF) ! Initialize the browse manager
   BRW6.Init(?List:2,Queue:Browse:1.ViewPosition,BRW6::View:Browse,Queue:Browse:1,Relate:_C2IP_TaskOrgs,SELF) ! Initialize the browse manager
+  BRW_C2IEORBAT.Init(?List:3,Queue:Browse:2.ViewPosition,BRW7::View:Browse,Queue:Browse:2,Relate:C2IPContent,SELF) ! Initialize the browse manager
+  BRW_C2IETASKORG.Init(?List:4,Queue:Browse:3.ViewPosition,BRW8::View:Browse,Queue:Browse:3,Relate:_C2IPContent,SELF) ! Initialize the browse manager
+  BRW_BSOORBAT.Init(?List:5,Queue:Browse:4.ViewPosition,BRW9::View:Browse,Queue:Browse:4,Relate:_c2ieBSO_ORBATs,SELF) ! Initialize the browse manager
+  BRW_BSOTASKORG.Init(?List:6,Queue:Browse:5.ViewPosition,BRW10::View:Browse,Queue:Browse:5,Relate:_c2ieBSO_TASKORGs,SELF) ! Initialize the browse manager
   SELF.Open(QuickWindow)                                   ! Open window
   Do DefineListboxStyle
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
-  BRW5.Q &= Queue:Browse
-  BRW5.AddSortOrder(,_C2IP_Orbats:PKID)                    ! Add the sort order for _C2IP_Orbats:PKID for sort order 1
-  BRW5.AddLocator(BRW5::Sort0:Locator)                     ! Browse has a locator for sort order 1
-  BRW5::Sort0:Locator.Init(,_C2IP_Orbats:ID,1,BRW5)        ! Initialize the browse locator using  using key: _C2IP_Orbats:PKID , _C2IP_Orbats:ID
-  BRW5.AddField(_C2IP_Orbats:Name,BRW5.Q._C2IP_Orbats:Name) ! Field _C2IP_Orbats:Name is a hot field or requires assignment from browse
-  BRW5.AddField(_C2IP_Orbats:ID,BRW5.Q._C2IP_Orbats:ID)    ! Field _C2IP_Orbats:ID is a hot field or requires assignment from browse
+  BRW_C2IPORBAT.Q &= Queue:Browse
+  BRW_C2IPORBAT.AddSortOrder(,_C2IP_Orbats:PKID)           ! Add the sort order for _C2IP_Orbats:PKID for sort order 1
+  BRW_C2IPORBAT.AddLocator(BRW5::Sort0:Locator)            ! Browse has a locator for sort order 1
+  BRW5::Sort0:Locator.Init(,_C2IP_Orbats:ID,1,BRW_C2IPORBAT) ! Initialize the browse locator using  using key: _C2IP_Orbats:PKID , _C2IP_Orbats:ID
+  BRW_C2IPORBAT.AddField(_C2IP_Orbats:Name,BRW_C2IPORBAT.Q._C2IP_Orbats:Name) ! Field _C2IP_Orbats:Name is a hot field or requires assignment from browse
+  BRW_C2IPORBAT.AddField(_C2IP_Orbats:ID,BRW_C2IPORBAT.Q._C2IP_Orbats:ID) ! Field _C2IP_Orbats:ID is a hot field or requires assignment from browse
   BRW6.Q &= Queue:Browse:1
   BRW6.AddSortOrder(,_C2IPTsk:PKID)                        ! Add the sort order for _C2IPTsk:PKID for sort order 1
   BRW6.AddLocator(BRW6::Sort0:Locator)                     ! Browse has a locator for sort order 1
   BRW6::Sort0:Locator.Init(,_C2IPTsk:ID,1,BRW6)            ! Initialize the browse locator using  using key: _C2IPTsk:PKID , _C2IPTsk:ID
   BRW6.AddField(_C2IPTsk:Name,BRW6.Q._C2IPTsk:Name)        ! Field _C2IPTsk:Name is a hot field or requires assignment from browse
   BRW6.AddField(_C2IPTsk:ID,BRW6.Q._C2IPTsk:ID)            ! Field _C2IPTsk:ID is a hot field or requires assignment from browse
-  INIMgr.Fetch('ORBAT_TASKORGTransfers',QuickWindow)       ! Restore window settings from non-volatile store
+  BRW_C2IEORBAT.Q &= Queue:Browse:2
+  BRW_C2IEORBAT.AddSortOrder(,C2IPCt:KC2IP)                ! Add the sort order for C2IPCt:KC2IP for sort order 1
+  BRW_C2IEORBAT.AddRange(C2IPCt:C2IPPackage,Relate:C2IPContent,Relate:_C2IP_ORBATs) ! Add file relationship range limit for sort order 1
+  BRW_C2IEORBAT.AddLocator(BRW7::Sort0:Locator)            ! Browse has a locator for sort order 1
+  BRW7::Sort0:Locator.Init(,C2IPCt:C2IPPackage,1,BRW_C2IEORBAT) ! Initialize the browse locator using  using key: C2IPCt:KC2IP , C2IPCt:C2IPPackage
+  BRW_C2IEORBAT.AddField(_C2IEORB:ID,BRW_C2IEORBAT.Q._C2IEORB:ID) ! Field _C2IEORB:ID is a hot field or requires assignment from browse
+  BRW_C2IEORBAT.AddField(_C2IEORB:Name,BRW_C2IEORBAT.Q._C2IEORB:Name) ! Field _C2IEORB:Name is a hot field or requires assignment from browse
+  BRW_C2IEORBAT.AddField(C2IPCt:ID,BRW_C2IEORBAT.Q.C2IPCt:ID) ! Field C2IPCt:ID is a hot field or requires assignment from browse
+  BRW_C2IEORBAT.AddField(C2IPCt:C2IPPackage,BRW_C2IEORBAT.Q.C2IPCt:C2IPPackage) ! Field C2IPCt:C2IPPackage is a hot field or requires assignment from browse
+  BRW_C2IETASKORG.Q &= Queue:Browse:3
+  BRW_C2IETASKORG.AddSortOrder(,_C2IPCt:KC2IP)             ! Add the sort order for _C2IPCt:KC2IP for sort order 1
+  BRW_C2IETASKORG.AddRange(_C2IPCt:C2IPPackage,Relate:_C2IPContent,Relate:_C2IP_TaskOrgs) ! Add file relationship range limit for sort order 1
+  BRW_C2IETASKORG.AddLocator(BRW8::Sort0:Locator)          ! Browse has a locator for sort order 1
+  BRW8::Sort0:Locator.Init(,_C2IPCt:C2IPPackage,1,BRW_C2IETASKORG) ! Initialize the browse locator using  using key: _C2IPCt:KC2IP , _C2IPCt:C2IPPackage
+  BRW_C2IETASKORG.AddField(_C2IETSK:ID,BRW_C2IETASKORG.Q._C2IETSK:ID) ! Field _C2IETSK:ID is a hot field or requires assignment from browse
+  BRW_C2IETASKORG.AddField(_C2IETSK:Name,BRW_C2IETASKORG.Q._C2IETSK:Name) ! Field _C2IETSK:Name is a hot field or requires assignment from browse
+  BRW_C2IETASKORG.AddField(_C2IPCt:C2IEInstance,BRW_C2IETASKORG.Q._C2IPCt:C2IEInstance) ! Field _C2IPCt:C2IEInstance is a hot field or requires assignment from browse
+  BRW_C2IETASKORG.AddField(_C2IPCt:ID,BRW_C2IETASKORG.Q._C2IPCt:ID) ! Field _C2IPCt:ID is a hot field or requires assignment from browse
+  BRW_C2IETASKORG.AddField(_C2IPCt:C2IPPackage,BRW_C2IETASKORG.Q._C2IPCt:C2IPPackage) ! Field _C2IPCt:C2IPPackage is a hot field or requires assignment from browse
+  BRW_BSOORBAT.Q &= Queue:Browse:4
+  BRW_BSOORBAT.AddSortOrder(,_c2ieBSOORB:KC2IE)            ! Add the sort order for _c2ieBSOORB:KC2IE for sort order 1
+  BRW_BSOORBAT.AddRange(_c2ieBSOORB:C2IE,selC2IEORBATRef)  ! Add single value range limit for sort order 1
+  BRW_BSOORBAT.AddLocator(BRW9::Sort0:Locator)             ! Browse has a locator for sort order 1
+  BRW9::Sort0:Locator.Init(,_c2ieBSOORB:C2IE,1,BRW_BSOORBAT) ! Initialize the browse locator using  using key: _c2ieBSOORB:KC2IE , _c2ieBSOORB:C2IE
+  BRW_BSOORBAT.AddField(_c2ieBSOORB:C2IE,BRW_BSOORBAT.Q._c2ieBSOORB:C2IE) ! Field _c2ieBSOORB:C2IE is a hot field or requires assignment from browse
+  BRW_BSOORBAT.AddField(Uni:Code,BRW_BSOORBAT.Q.Uni:Code)  ! Field Uni:Code is a hot field or requires assignment from browse
+  BRW_BSOORBAT.AddField(Uni:Name,BRW_BSOORBAT.Q.Uni:Name)  ! Field Uni:Name is a hot field or requires assignment from browse
+  BRW_BSOORBAT.AddField(_c2ieBSOORB:ID,BRW_BSOORBAT.Q._c2ieBSOORB:ID) ! Field _c2ieBSOORB:ID is a hot field or requires assignment from browse
+  BRW_BSOORBAT.AddField(Uni:ID,BRW_BSOORBAT.Q.Uni:ID)      ! Field Uni:ID is a hot field or requires assignment from browse
+  BRW_BSOTASKORG.Q &= Queue:Browse:5
+  BRW_BSOTASKORG.AddSortOrder(,_c2ieBSOTSK:KC2IE)          ! Add the sort order for _c2ieBSOTSK:KC2IE for sort order 1
+  BRW_BSOTASKORG.AddRange(_c2ieBSOTSK:C2IE,selC2IETASKORGRef) ! Add single value range limit for sort order 1
+  BRW_BSOTASKORG.AddLocator(BRW10::Sort0:Locator)          ! Browse has a locator for sort order 1
+  BRW10::Sort0:Locator.Init(,_c2ieBSOTSK:C2IE,1,BRW_BSOTASKORG) ! Initialize the browse locator using  using key: _c2ieBSOTSK:KC2IE , _c2ieBSOTSK:C2IE
+  BRW_BSOTASKORG.AddField(_c2ieBSOTSK:C2IE,BRW_BSOTASKORG.Q._c2ieBSOTSK:C2IE) ! Field _c2ieBSOTSK:C2IE is a hot field or requires assignment from browse
+  BRW_BSOTASKORG.AddField(_Uni:Code,BRW_BSOTASKORG.Q._Uni:Code) ! Field _Uni:Code is a hot field or requires assignment from browse
+  BRW_BSOTASKORG.AddField(_Uni:Name,BRW_BSOTASKORG.Q._Uni:Name) ! Field _Uni:Name is a hot field or requires assignment from browse
+  BRW_BSOTASKORG.AddField(_C2IEFromTrf:Name,BRW_BSOTASKORG.Q._C2IEFromTrf:Name) ! Field _C2IEFromTrf:Name is a hot field or requires assignment from browse
+  BRW_BSOTASKORG.AddField(_c2ieBSOTSK:ID,BRW_BSOTASKORG.Q._c2ieBSOTSK:ID) ! Field _c2ieBSOTSK:ID is a hot field or requires assignment from browse
+  BRW_BSOTASKORG.AddField(_Uni:ID,BRW_BSOTASKORG.Q._Uni:ID) ! Field _Uni:ID is a hot field or requires assignment from browse
+  BRW_BSOTASKORG.AddField(_C2IEFromTrf:ID,BRW_BSOTASKORG.Q._C2IEFromTrf:ID) ! Field _C2IEFromTrf:ID is a hot field or requires assignment from browse
+  INIMgr.Fetch('View_ORBAT_TASKORGTransfers',QuickWindow)  ! Restore window settings from non-volatile store
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
-  BRW5.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
-  BRW5.ToolbarItem.HelpButton = ?Help
+  BRW_BSOTASKORG.AskProcedure = 1                          ! Will call: U__c2ieBSO_TASKORGs
+  BRW_C2IPORBAT.AddToolbarTarget(Toolbar)                  ! Browse accepts toolbar control
+  BRW_C2IPORBAT.ToolbarItem.HelpButton = ?Help
   BRW6.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
   BRW6.ToolbarItem.HelpButton = ?Help
+  BRW_C2IEORBAT.AddToolbarTarget(Toolbar)                  ! Browse accepts toolbar control
+  BRW_C2IEORBAT.ToolbarItem.HelpButton = ?Help
+  BRW_C2IETASKORG.AddToolbarTarget(Toolbar)                ! Browse accepts toolbar control
+  BRW_C2IETASKORG.ToolbarItem.HelpButton = ?Help
+  BRW_BSOORBAT.AddToolbarTarget(Toolbar)                   ! Browse accepts toolbar control
+  BRW_BSOORBAT.ToolbarItem.HelpButton = ?Help
+  BRW_BSOTASKORG.AddToolbarTarget(Toolbar)                 ! Browse accepts toolbar control
+  BRW_BSOTASKORG.ToolbarItem.HelpButton = ?Help
   SELF.SetAlerts()
   RETURN ReturnValue
 
@@ -1447,12 +1632,647 @@ ReturnValue          BYTE,AUTO
   ReturnValue = PARENT.Kill()
   IF ReturnValue THEN RETURN ReturnValue.
   IF SELF.FilesOpened
-    Relate:_C2IP_ORBATs.Close
+    Relate:C2IPContent.Close
+    Relate:_C2IE_TASKORGs.Close
+    Relate:_C2IPContent.Close
+    Relate:_c2ieBSO_ORBATs.Close
+    Relate:_c2ieBSO_TASKORGs.Close
   END
   IF SELF.Opened
-    INIMgr.Update('ORBAT_TASKORGTransfers',QuickWindow)    ! Save window data to non-volatile store
+    INIMgr.Update('View_ORBAT_TASKORGTransfers',QuickWindow) ! Save window data to non-volatile store
   END
   GlobalErrors.SetProcedureName
+  RETURN ReturnValue
+
+
+ThisWindow.Run PROCEDURE(USHORT Number,BYTE Request)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Run(Number,Request)
+  IF SELF.Request = ViewRecord
+    ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
+  ELSE
+    GlobalRequest = Request
+    U__c2ieBSO_TASKORGs
+    ReturnValue = GlobalResponse
+  END
+  RETURN ReturnValue
+
+
+ThisWindow.TakeAccepted PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+Looped BYTE
+  CODE
+  LOOP                                                     ! This method receive all EVENT:Accepted's
+    IF Looped
+      RETURN Level:Notify
+    ELSE
+      Looped = 1
+    END
+  ReturnValue = PARENT.TakeAccepted()
+    CASE ACCEPTED()
+    OF ?BUTTON1
+      ThisWindow.Update()
+      ! Call create New TaskOrg Object procedure
+      _createNewTaskOrgObject(CLIP(sNewTaskOrgName))
+    OF ?BUTTON2
+      ThisWindow.Update()
+      ! add BSO Transfer
+      
+      ! C2IP Orbat reference
+      ! C2IE Orbat reference
+      ! BSO Orbat reference
+      ! C2IE Taskorg reference
+      
+      !MESSAGE ('call ' & BRW_C2IPORBAT.q._C2IP_Orbats:ID & '---' & BRW_C2IEORBAT.q._C2IEORB:ID & '---' & BRW_BSOORBAT.q.Uni:ID & '---' & BRW_C2IETASKORG.q._C2IETSK:ID)
+      _addBSOTransferToTaskOrgObject(BRW_C2IPORBAT.q._C2IP_Orbats:ID, | 
+          BRW_C2IEORBAT.q._C2IEORB:ID, | 
+          BRW_BSOORBAT.q.Uni:ID, |
+          BRW_C2IETASKORG.q._C2IETSK:ID)
+          
+          
+          BRW_BSOTASKORG.ResetFromFile()
+    END
+    RETURN ReturnValue
+  END
+  ReturnValue = Level:Fatal
+  RETURN ReturnValue
+
+
+Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+
+
+  CODE
+  PARENT.Init(AppStrategy,SetWindowMinSize,SetWindowMaxSize)
+  SELF.SetParentDefaults()                                 ! Calculate default control parent-child relationships based upon their positions on the window
+
+
+BRW_C2IEORBAT.TakeNewSelection PROCEDURE
+
+  CODE
+  PARENT.TakeNewSelection
+  ! current selection selC2IEORBATRef
+  
+  selC2IEORBATRef = BRW_C2IEORBAT.q._C2IEORB:ID
+
+
+BRW_C2IETASKORG.TakeNewSelection PROCEDURE
+
+  CODE
+  PARENT.TakeNewSelection
+  ! current selection selC2IETASKORGRef
+  
+  selC2IETASKORGRef = BRW_C2IETASKORG.q._C2IETSK:ID
+
+
+BRW_BSOTASKORG.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+
+  CODE
+  PARENT.Init(ListBox,Posit,V,Q,RM,WM)
+  IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
+    SELF.InsertControl=?Insert
+    SELF.ChangeControl=?Change
+    SELF.DeleteControl=?Delete
+  END
+
+!!! <summary>
+!!! Generated from procedure template - Source
+!!! create New COP Object
+!!! </summary>
+_createNewCOPObject  PROCEDURE  (STRING pCOPName,ULONG pOrgRef,ULONG pMissionRef) ! Declare Procedure
+nC2IERef             DECIMAL(7)                            ! 
+nC2IPRef             DECIMAL(7)                            ! 
+
+  CODE
+! Create COP C2IP
+
+IF LEN(CLIP(pCOPName))>0 THEN
+    ! Create default OVERLAY C2IE
+    Access:_C2IEs.PrimeAutoInc()
+    nC2IERef    = _C2IE:ID
+    tpyC2IE:Code    = 'OVERLAY'
+    IF Access:type_C2IE.Fetch(tpyC2IE:KCode) = Level:Benign THEN
+        _C2IE:Type  = tpyC2IE:ID
+    END
+    _C2IE:Name  = pCOPName
+    IF Access:_C2IEs.TryInsert() = Level:Benign THEN        
+        ! Create COP C2IP
+        Access:_C2IPs.PrimeAutoInc()
+        nC2IPRef    = _C2IP:ID
+        tpyC2IP:Code     = 'COP'
+        IF Access:type_C2IP.Fetch(tpyC2IP:KCode) = Level:Benign THEN
+            _C2IP:Type  = tpyC2IP:ID
+        END
+        _C2IP:Name  = pCOPName
+        
+        IF Access:_C2IPs.TryInsert() = Level:Benign THEN
+            ! Create association C2IP - C2IE
+            
+            Access:_C2IPContent.PrimeAutoInc()
+            _C2IPCt:C2IPPackage = nC2IPRef
+            _C2IPCt:C2IEInstance    = nC2IERef
+            IF Access:_C2IPContent.TryInsert() = Level:Benign THEN
+                !MESSAGE('COP created')
+                
+                ! Add the new C2IP to the current C2IP Explorer
+                Access:C2IPExplorer.PrimeAutoInc()
+                C2IPExp:Organization    = pOrgRef                
+                C2IPExp:C2IP            = nC2IPRef
+                C2IPExp:Mission         = pMissionRef
+                
+                IF Access:C2IPExplorer.TryInsert() = Level:Benign THEN
+                    MESSAGE('C2IP COP created')
+                END
+                
+            END
+            
+        END
+        
+    END
+    
+
+END
+
+!!! <summary>
+!!! Generated from procedure template - Source
+!!! create New Taskorg Object
+!!! </summary>
+_createNewTaskOrgObject PROCEDURE  (STRING pTaskOrgName)   ! Declare Procedure
+nC2IERef             DECIMAL(7)                            ! 
+nC2IPRef             DECIMAL(7)                            ! 
+
+  CODE
+! Create TASKORG C2IP
+
+IF LEN(CLIP(pTaskOrgName))>0 THEN
+    ! Create default TASKORG C2IE
+    Access:_C2IEs.PrimeAutoInc()
+    nC2IERef    = _C2IE:ID
+    tpyC2IE:Code    = 'TASKORG'
+    IF Access:type_C2IE.Fetch(tpyC2IE:KCode) = Level:Benign THEN
+        _C2IE:Type  = tpyC2IE:ID
+    END
+    _C2IE:Name  = pTaskOrgName
+    IF Access:_C2IEs.TryInsert() = Level:Benign THEN        
+        ! Create TASKORG C2IP
+        Access:_C2IPs.PrimeAutoInc()
+        nC2IPRef    = _C2IP:ID
+        tpyC2IP:Code     = 'TASKORG'
+        IF Access:type_C2IP.Fetch(tpyC2IP:KCode) = Level:Benign THEN
+            _C2IP:Type  = tpyC2IP:ID
+        END
+        _C2IP:Name  = pTaskOrgName
+        
+        IF Access:_C2IPs.TryInsert() = Level:Benign THEN
+            ! Create association C2IP - C2IE
+            
+            Access:_C2IPContent.PrimeAutoInc()
+            _C2IPCt:C2IPPackage = nC2IPRef
+            _C2IPCt:C2IEInstance    = nC2IERef
+            IF Access:_C2IPContent.TryInsert() = Level:Benign THEN
+                MESSAGE('TaskOrg created')
+                
+                OMIT('__noCompile'_)
+                ! Add the new C2IP to the current C2IP Explorer
+                Access:C2IPExplorer.PrimeAutoInc()
+                C2IPExp:Organization    = pOrgRef                
+                C2IPExp:C2IP            = nC2IPRef
+                C2IPExp:Mission         = pMissionRef
+                
+                IF Access:C2IPExplorer.TryInsert() = Level:Benign THEN
+                    MESSAGE('C2IP COP created')
+                END
+                
+                __noCompile
+                
+            END
+            
+        END
+        
+    END
+    
+
+END
+
+!!! <summary>
+!!! Generated from procedure template - Source
+!!! add BSO Transfer to Taskorg Object
+!!! </summary>
+_addBSOTransferToTaskOrgObject PROCEDURE  (ULONG pC2IPRef, ULONG pC2IEFromRef, ULONG pBSORef, ULONG pC2IEToRef) ! Declare Procedure
+
+  CODE
+    ! add BSO Tranfer
+    
+    Access:_c2ieUnits.Open()
+    Access:c2ieUnitTransfer.Open()
+    
+    !MESSAGE('receoved ' & pC2IPRef & '---' & pC2IEFromRef & '---' & pBSORef & '---' & pC2IEToRef)
+
+    IF Access:_c2ieUnits.PrimeAutoInc() = Level:Benign THEN
+        _c2ieUni:C2IE   = pC2IEToRef
+        _c2ieUni:Unit   = pBSORef
+        _c2ieUni:Hostility  = 1
+        
+        IF Access:_c2ieUnits.TryInsert() = Level:Benign THEN
+            ! BSO inserted into C2IE list of Units/BSOs
+            
+            IF Access:c2ieUnitTransfer.PrimeAutoInc() = Level:Benign THEN
+                
+                c2iUniTrf:c2ieUnit    = _c2ieUni:ID
+                
+                c2iUniTrf:C2IE_From     = pC2IEFromRef
+                c2iUniTrf:C2IE_To       = pC2IEToRef
+            
+                c2iUniTrf:BSO_From    = pBSORef
+                c2iUniTrf:BSO_To      = _c2ieUni:Unit
+                
+                IF Access:c2ieUnitTransfer.TryInsert() = Level:Benign THEN
+                    !MESSAGE('BSO Transfer created')
+                ELSE
+                    MESSAGE('Access:c2ieUnitTransfer TryInsert error')
+                END
+            ELSE
+                MESSAGE('Access:c2ieUnitTransfer error prime insert')
+                
+            END
+        ELSE
+            MESSAGE('Access:_c2ieUnits TryInsert error')
+                        
+            
+        END
+    ELSE
+        MESSAGE('Access:_c2ieUnits error prime insert')
+    END
+
+    Access:c2ieUnitTransfer.Close()
+    Access:_c2ieUnits.Close()
+
+
+
+!!! <summary>
+!!! Generated from procedure template - Window
+!!! Browse the _c2ieBSO_TASKORGs file
+!!! </summary>
+B__c2ieBSO_TASKORGs PROCEDURE 
+
+CurrentTab           STRING(80)                            ! 
+BRW1::View:Browse    VIEW(_c2ieBSO_TASKORGs)
+                       PROJECT(_c2ieBSOTSK:ID)
+                       PROJECT(_c2ieBSOTSK:C2IE)
+                       PROJECT(_c2ieBSOTSK:Unit)
+                       PROJECT(_c2ieBSOTSK:Hostility)
+                     END
+Queue:Browse:1       QUEUE                            !Queue declaration for browse/combo box using ?Browse:1
+_c2ieBSOTSK:ID         LIKE(_c2ieBSOTSK:ID)           !List box control field - type derived from field
+_c2ieBSOTSK:C2IE       LIKE(_c2ieBSOTSK:C2IE)         !List box control field - type derived from field
+_c2ieBSOTSK:Unit       LIKE(_c2ieBSOTSK:Unit)         !List box control field - type derived from field
+_c2ieBSOTSK:Hostility  LIKE(_c2ieBSOTSK:Hostility)    !List box control field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+QuickWindow          WINDOW('Browse the _c2ieBSO_TASKORGs file'),AT(,,277,198),FONT('Microsoft Sans Serif',8,,FONT:regular, |
+  CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,MDI,HLP('B__c2ieBSO_TASKORGs'),SYSTEM
+                       LIST,AT(8,30,261,124),USE(?Browse:1),HVSCROLL,FORMAT('48R(2)|M~ID~C(0)@n-10.0@48R(2)|M~' & |
+  'ID~C(0)@n-10.0@48R(2)|M~ID~C(0)@n-10.0@48R(2)|M~ID~C(0)@n-10.0@'),FROM(Queue:Browse:1), |
+  IMM,MSG('Browsing the _c2ieBSO_TASKORGs file')
+                       BUTTON('&Select'),AT(8,158,49,14),USE(?Select:2),LEFT,ICON('WASELECT.ICO'),FLAT,MSG('Select the Record'), |
+  TIP('Select the Record')
+                       BUTTON('&View'),AT(61,158,49,14),USE(?View:3),LEFT,ICON('WAVIEW.ICO'),FLAT,MSG('View Record'), |
+  TIP('View Record')
+                       BUTTON('&Insert'),AT(114,158,49,14),USE(?Insert:4),LEFT,ICON('WAINSERT.ICO'),FLAT,MSG('Insert a Record'), |
+  TIP('Insert a Record')
+                       BUTTON('&Change'),AT(167,158,49,14),USE(?Change:4),LEFT,ICON('WACHANGE.ICO'),DEFAULT,FLAT, |
+  MSG('Change the Record'),TIP('Change the Record')
+                       BUTTON('&Delete'),AT(220,158,49,14),USE(?Delete:4),LEFT,ICON('WADELETE.ICO'),FLAT,MSG('Delete the Record'), |
+  TIP('Delete the Record')
+                       SHEET,AT(4,4,269,172),USE(?CurrentTab)
+                         TAB('&1) PKID'),USE(?Tab:2)
+                         END
+                       END
+                       BUTTON('&Close'),AT(171,180,49,14),USE(?Close),LEFT,ICON('WACLOSE.ICO'),FLAT,MSG('Close Window'), |
+  TIP('Close Window')
+                       BUTTON('&Help'),AT(224,180,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+  STD(STD:Help),TIP('See Help Window')
+                     END
+
+ThisWindow           CLASS(WindowManager)
+Init                   PROCEDURE(),BYTE,PROC,DERIVED
+Kill                   PROCEDURE(),BYTE,PROC,DERIVED
+Run                    PROCEDURE(USHORT Number,BYTE Request),BYTE,PROC,DERIVED
+                     END
+
+Toolbar              ToolbarClass
+BRW1                 CLASS(BrowseClass)                    ! Browse using ?Browse:1
+Q                      &Queue:Browse:1                !Reference to browse queue
+Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+                     END
+
+BRW1::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRW1::Sort0:StepClass StepRealClass                        ! Default Step Manager
+Resizer              CLASS(WindowResizeClass)
+Init                   PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+                     END
+
+
+  CODE
+  GlobalResponse = ThisWindow.Run()                        ! Opens the window and starts an Accept Loop
+
+!---------------------------------------------------------------------------
+DefineListboxStyle ROUTINE
+!|
+!| This routine create all the styles to be shared in this window
+!| It`s called after the window open
+!|
+!---------------------------------------------------------------------------
+
+ThisWindow.Init PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  GlobalErrors.SetProcedureName('B__c2ieBSO_TASKORGs')
+  SELF.Request = GlobalRequest                             ! Store the incoming request
+  ReturnValue = PARENT.Init()
+  IF ReturnValue THEN RETURN ReturnValue.
+  SELF.FirstField = ?Browse:1
+  SELF.VCRRequest &= VCRRequest
+  SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
+  CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
+  IF SELF.Request = SelectRecord
+     SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
+  ELSE
+     SELF.AddItem(?Close,RequestCompleted)                 ! Add the close control to the window manger
+  END
+  Relate:_c2ieBSO_TASKORGs.Open                            ! File _c2ieBSO_TASKORGs used by this procedure, so make sure it's RelationManager is open
+  SELF.FilesOpened = True
+  BRW1.Init(?Browse:1,Queue:Browse:1.ViewPosition,BRW1::View:Browse,Queue:Browse:1,Relate:_c2ieBSO_TASKORGs,SELF) ! Initialize the browse manager
+  SELF.Open(QuickWindow)                                   ! Open window
+  Do DefineListboxStyle
+  BRW1.Q &= Queue:Browse:1
+  BRW1::Sort0:StepClass.Init(+ScrollSort:AllowAlpha)       ! Moveable thumb based upon _c2ieBSOTSK:ID for sort order 1
+  BRW1.AddSortOrder(BRW1::Sort0:StepClass,_c2ieBSOTSK:PKID) ! Add the sort order for _c2ieBSOTSK:PKID for sort order 1
+  BRW1.AddLocator(BRW1::Sort0:Locator)                     ! Browse has a locator for sort order 1
+  BRW1::Sort0:Locator.Init(,_c2ieBSOTSK:ID,1,BRW1)         ! Initialize the browse locator using  using key: _c2ieBSOTSK:PKID , _c2ieBSOTSK:ID
+  BRW1.AddField(_c2ieBSOTSK:ID,BRW1.Q._c2ieBSOTSK:ID)      ! Field _c2ieBSOTSK:ID is a hot field or requires assignment from browse
+  BRW1.AddField(_c2ieBSOTSK:C2IE,BRW1.Q._c2ieBSOTSK:C2IE)  ! Field _c2ieBSOTSK:C2IE is a hot field or requires assignment from browse
+  BRW1.AddField(_c2ieBSOTSK:Unit,BRW1.Q._c2ieBSOTSK:Unit)  ! Field _c2ieBSOTSK:Unit is a hot field or requires assignment from browse
+  BRW1.AddField(_c2ieBSOTSK:Hostility,BRW1.Q._c2ieBSOTSK:Hostility) ! Field _c2ieBSOTSK:Hostility is a hot field or requires assignment from browse
+  Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
+  SELF.AddItem(Resizer)                                    ! Add resizer to window manager
+  INIMgr.Fetch('B__c2ieBSO_TASKORGs',QuickWindow)          ! Restore window settings from non-volatile store
+  Resizer.Resize                                           ! Reset required after window size altered by INI manager
+  BRW1.AskProcedure = 1                                    ! Will call: U__c2ieBSO_TASKORGs
+  BRW1.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
+  BRW1.ToolbarItem.HelpButton = ?Help
+  SELF.SetAlerts()
+  RETURN ReturnValue
+
+
+ThisWindow.Kill PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Kill()
+  IF ReturnValue THEN RETURN ReturnValue.
+  IF SELF.FilesOpened
+    Relate:_c2ieBSO_TASKORGs.Close
+  END
+  IF SELF.Opened
+    INIMgr.Update('B__c2ieBSO_TASKORGs',QuickWindow)       ! Save window data to non-volatile store
+  END
+  GlobalErrors.SetProcedureName
+  RETURN ReturnValue
+
+
+ThisWindow.Run PROCEDURE(USHORT Number,BYTE Request)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Run(Number,Request)
+  IF SELF.Request = ViewRecord
+    ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
+  ELSE
+    GlobalRequest = Request
+    U__c2ieBSO_TASKORGs
+    ReturnValue = GlobalResponse
+  END
+  RETURN ReturnValue
+
+
+BRW1.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+
+  CODE
+  SELF.SelectControl = ?Select:2
+  SELF.HideSelect = 1                                      ! Hide the select button when disabled
+  PARENT.Init(ListBox,Posit,V,Q,RM,WM)
+  IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
+    SELF.InsertControl=?Insert:4
+    SELF.ChangeControl=?Change:4
+    SELF.DeleteControl=?Delete:4
+  END
+  SELF.ViewControl = ?View:3                               ! Setup the control used to initiate view only mode
+
+
+Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+
+
+  CODE
+  PARENT.Init(AppStrategy,SetWindowMinSize,SetWindowMaxSize)
+  SELF.SetParentDefaults()                                 ! Calculate default control parent-child relationships based upon their positions on the window
+
+!!! <summary>
+!!! Generated from procedure template - Window
+!!! Form _c2ieBSO_TASKORGs
+!!! </summary>
+U__c2ieBSO_TASKORGs PROCEDURE 
+
+CurrentTab           STRING(80)                            ! 
+ActionMessage        CSTRING(40)                           ! 
+History::_c2ieBSOTSK:Record LIKE(_c2ieBSOTSK:RECORD),THREAD
+QuickWindow          WINDOW('Form _c2ieBSO_TASKORGs'),AT(,,163,98),FONT('Microsoft Sans Serif',8,,FONT:regular, |
+  CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,MDI,HLP('U__c2ieBSO_TASKORGs'),SYSTEM
+                       SHEET,AT(4,4,155,72),USE(?CurrentTab)
+                         TAB('&1) General'),USE(?Tab:1)
+                           PROMPT('ID:'),AT(8,20),USE(?c2ieUni:ID:Prompt),TRN
+                           ENTRY(@n-10.0),AT(61,20,48,10),USE(_c2ieBSOTSK:ID),DECIMAL(12)
+                           PROMPT('ID:'),AT(8,34),USE(?c2ieUni:C2IE:Prompt),TRN
+                           ENTRY(@n-10.0),AT(61,34,48,10),USE(_c2ieBSOTSK:C2IE),DECIMAL(12)
+                           PROMPT('ID:'),AT(8,48),USE(?c2ieUni:Unit:Prompt),TRN
+                           ENTRY(@n-10.0),AT(61,48,48,10),USE(_c2ieBSOTSK:Unit),DECIMAL(12),REQ
+                           PROMPT('ID:'),AT(8,62),USE(?c2ieUni:Hostility:Prompt),TRN
+                           ENTRY(@n-10.0),AT(61,62,48,10),USE(_c2ieBSOTSK:Hostility),DECIMAL(12)
+                         END
+                       END
+                       BUTTON('&OK'),AT(4,80,49,14),USE(?OK),LEFT,ICON('WAOK.ICO'),DEFAULT,FLAT,MSG('Accept dat' & |
+  'a and close the window'),TIP('Accept data and close the window')
+                       BUTTON('&Cancel'),AT(57,80,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel operation'), |
+  TIP('Cancel operation')
+                       BUTTON('&Help'),AT(110,80,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+  STD(STD:Help),TIP('See Help Window')
+                     END
+
+ThisWindow           CLASS(WindowManager)
+Ask                    PROCEDURE(),DERIVED
+Init                   PROCEDURE(),BYTE,PROC,DERIVED
+Kill                   PROCEDURE(),BYTE,PROC,DERIVED
+Run                    PROCEDURE(),BYTE,PROC,DERIVED
+TakeAccepted           PROCEDURE(),BYTE,PROC,DERIVED
+                     END
+
+Toolbar              ToolbarClass
+ToolbarForm          ToolbarUpdateClass                    ! Form Toolbar Manager
+Resizer              CLASS(WindowResizeClass)
+Init                   PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+                     END
+
+CurCtrlFeq          LONG
+FieldColorQueue     QUEUE
+Feq                   LONG
+OldColor              LONG
+                    END
+
+  CODE
+  GlobalResponse = ThisWindow.Run()                        ! Opens the window and starts an Accept Loop
+
+!---------------------------------------------------------------------------
+DefineListboxStyle ROUTINE
+!|
+!| This routine create all the styles to be shared in this window
+!| It`s called after the window open
+!|
+!---------------------------------------------------------------------------
+
+ThisWindow.Ask PROCEDURE
+
+  CODE
+  CASE SELF.Request                                        ! Configure the action message text
+  OF ViewRecord
+    ActionMessage = 'View Record'
+  OF InsertRecord
+    ActionMessage = 'Record Will Be Added'
+  OF ChangeRecord
+    ActionMessage = 'Record Will Be Changed'
+  END
+  QuickWindow{PROP:Text} = ActionMessage                   ! Display status message in title bar
+  PARENT.Ask
+
+
+ThisWindow.Init PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  GlobalErrors.SetProcedureName('U__c2ieBSO_TASKORGs')
+  SELF.Request = GlobalRequest                             ! Store the incoming request
+  ReturnValue = PARENT.Init()
+  IF ReturnValue THEN RETURN ReturnValue.
+  SELF.FirstField = ?c2ieUni:ID:Prompt
+  SELF.VCRRequest &= VCRRequest
+  SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
+  CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
+  SELF.AddUpdateFile(Access:_c2ieBSO_TASKORGs)
+  SELF.HistoryKey = CtrlH
+  SELF.AddHistoryFile(_c2ieBSOTSK:Record,History::_c2ieBSOTSK:Record)
+  SELF.AddHistoryField(?_c2ieBSOTSK:ID,1)
+  SELF.AddHistoryField(?_c2ieBSOTSK:C2IE,2)
+  SELF.AddHistoryField(?_c2ieBSOTSK:Unit,3)
+  SELF.AddHistoryField(?_c2ieBSOTSK:Hostility,4)
+  SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
+  Relate:_c2ieBSO_TASKORGs.Open                            ! File _c2ieBSO_TASKORGs used by this procedure, so make sure it's RelationManager is open
+  SELF.FilesOpened = True
+  SELF.Primary &= Relate:_c2ieBSO_TASKORGs
+  IF SELF.Request = ViewRecord AND NOT SELF.BatchProcessing ! Setup actions for ViewOnly Mode
+    SELF.InsertAction = Insert:None
+    SELF.DeleteAction = Delete:None
+    SELF.ChangeAction = Change:None
+    SELF.CancelAction = Cancel:Cancel
+    SELF.OkControl = 0
+  ELSE
+    SELF.ChangeAction = Change:Caller                      ! Changes allowed
+    SELF.CancelAction = Cancel:Cancel+Cancel:Query         ! Confirm cancel
+    SELF.OkControl = ?OK
+    IF SELF.PrimeUpdate() THEN RETURN Level:Notify.
+  END
+  SELF.Open(QuickWindow)                                   ! Open window
+  Do DefineListboxStyle
+  IF SELF.Request = ViewRecord                             ! Configure controls for View Only mode
+    ?_c2ieBSOTSK:ID{PROP:ReadOnly} = True
+    ?_c2ieBSOTSK:C2IE{PROP:ReadOnly} = True
+    ?_c2ieBSOTSK:Unit{PROP:ReadOnly} = True
+    ?_c2ieBSOTSK:Hostility{PROP:ReadOnly} = True
+  END
+  Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
+  SELF.AddItem(Resizer)                                    ! Add resizer to window manager
+  INIMgr.Fetch('U__c2ieBSO_TASKORGs',QuickWindow)          ! Restore window settings from non-volatile store
+  Resizer.Resize                                           ! Reset required after window size altered by INI manager
+  ToolBarForm.HelpButton=?Help
+  SELF.AddItem(ToolbarForm)
+  SELF.SetAlerts()
+  RETURN ReturnValue
+
+
+ThisWindow.Kill PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Kill()
+  IF ReturnValue THEN RETURN ReturnValue.
+  IF SELF.FilesOpened
+    Relate:_c2ieBSO_TASKORGs.Close
+  END
+  IF SELF.Opened
+    INIMgr.Update('U__c2ieBSO_TASKORGs',QuickWindow)       ! Save window data to non-volatile store
+  END
+  GlobalErrors.SetProcedureName
+  RETURN ReturnValue
+
+
+ThisWindow.Run PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Run()
+  IF SELF.Request = ViewRecord                             ! In View Only mode always signal RequestCancelled
+    ReturnValue = RequestCancelled
+  END
+  RETURN ReturnValue
+
+
+ThisWindow.TakeAccepted PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+Looped BYTE
+  CODE
+  LOOP                                                     ! This method receive all EVENT:Accepted's
+    IF Looped
+      RETURN Level:Notify
+    ELSE
+      Looped = 1
+    END
+  ReturnValue = PARENT.TakeAccepted()
+    CASE ACCEPTED()
+    OF ?OK
+      ThisWindow.Update()
+      IF SELF.Request = ViewRecord AND NOT SELF.BatchProcessing THEN
+         POST(EVENT:CloseWindow)
+      END
+    END
+    RETURN ReturnValue
+  END
+  ReturnValue = Level:Fatal
   RETURN ReturnValue
 
 
