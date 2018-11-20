@@ -159,12 +159,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:MissionTASKORG)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
   SELF.AddHistoryField(?MissTSK:Mission,2)
   SELF.AddHistoryField(?MissTSK:TASKORGC2IP,3)
+  SELF.AddUpdateFile(Access:MissionTASKORG)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
@@ -1307,6 +1307,153 @@ BRWBOSPos.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationMan
     SELF.ChangeControl=?Change:2
     SELF.DeleteControl=?Delete:2
   END
+
+
+Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+
+
+  CODE
+  PARENT.Init(AppStrategy,SetWindowMinSize,SetWindowMaxSize)
+  SELF.SetParentDefaults()                                 ! Calculate default control parent-child relationships based upon their positions on the window
+
+!!! <summary>
+!!! Generated from procedure template - Window
+!!! ORBAT - TASKORG Transfers
+!!! </summary>
+ORBAT_TASKORGTransfers PROCEDURE 
+
+BRW5::View:Browse    VIEW(_C2IP_ORBATs)
+                       PROJECT(_C2IP_Orbats:Name)
+                       PROJECT(_C2IP_Orbats:ID)
+                     END
+Queue:Browse         QUEUE                            !Queue declaration for browse/combo box using ?List
+_C2IP_Orbats:Name      LIKE(_C2IP_Orbats:Name)        !List box control field - type derived from field
+_C2IP_Orbats:ID        LIKE(_C2IP_Orbats:ID)          !Primary key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+BRW6::View:Browse    VIEW(_C2IP_TaskOrgs)
+                       PROJECT(_C2IPTsk:Name)
+                       PROJECT(_C2IPTsk:ID)
+                     END
+Queue:Browse:1       QUEUE                            !Queue declaration for browse/combo box using ?List:2
+_C2IPTsk:Name          LIKE(_C2IPTsk:Name)            !List box control field - type derived from field
+_C2IPTsk:ID            LIKE(_C2IPTsk:ID)              !Primary key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,523,346),FONT('Microsoft Sans Serif',8,,FONT:regular, |
+  CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,HLP('ORBAT_TASKORGTransfers'),SYSTEM
+                       BUTTON('&OK'),AT(367,330,49,14),USE(?Ok),LEFT,ICON('WAOK.ICO'),FLAT,MSG('Accept operation'), |
+  TIP('Accept Operation')
+                       BUTTON('&Cancel'),AT(419,330,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel Operation'), |
+  TIP('Cancel Operation')
+                       BUTTON('&Help'),AT(472,330,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+  STD(STD:Help),TIP('See Help Window')
+                       LIST,AT(3,12,150,100),USE(?List),FORMAT('100L(2)|M~ORBAT Name~C(0)@s100@'),FROM(Queue:Browse), |
+  IMM
+                       LIST,AT(180,12,150,100),USE(?List:2),FORMAT('100L(2)|M~TaskOrg Name~C(0)@s100@'),FROM(Queue:Browse:1), |
+  IMM
+                     END
+
+ThisWindow           CLASS(WindowManager)
+Init                   PROCEDURE(),BYTE,PROC,DERIVED
+Kill                   PROCEDURE(),BYTE,PROC,DERIVED
+                     END
+
+Toolbar              ToolbarClass
+Resizer              CLASS(WindowResizeClass)
+Init                   PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+                     END
+
+BRW5                 CLASS(BrowseClass)                    ! Browse using ?List
+Q                      &Queue:Browse                  !Reference to browse queue
+                     END
+
+BRW5::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRW6                 CLASS(BrowseClass)                    ! Browse using ?List:2
+Q                      &Queue:Browse:1                !Reference to browse queue
+                     END
+
+BRW6::Sort0:Locator  StepLocatorClass                      ! Default Locator
+
+  CODE
+  GlobalResponse = ThisWindow.Run()                        ! Opens the window and starts an Accept Loop
+
+!---------------------------------------------------------------------------
+DefineListboxStyle ROUTINE
+!|
+!| This routine create all the styles to be shared in this window
+!| It`s called after the window open
+!|
+!---------------------------------------------------------------------------
+
+ThisWindow.Init PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  GlobalErrors.SetProcedureName('ORBAT_TASKORGTransfers')
+  SELF.Request = GlobalRequest                             ! Store the incoming request
+  ReturnValue = PARENT.Init()
+  IF ReturnValue THEN RETURN ReturnValue.
+  SELF.FirstField = ?Ok
+  SELF.VCRRequest &= VCRRequest
+  SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
+  CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
+  IF SELF.Request = SelectRecord
+     SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
+  ELSE
+     SELF.AddItem(?Ok,RequestCompleted)                    ! Add the close control to the window manger
+  END
+  SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
+  Relate:_C2IP_ORBATs.Open                                 ! File _C2IP_ORBATs used by this procedure, so make sure it's RelationManager is open
+  SELF.FilesOpened = True
+  BRW5.Init(?List,Queue:Browse.ViewPosition,BRW5::View:Browse,Queue:Browse,Relate:_C2IP_ORBATs,SELF) ! Initialize the browse manager
+  BRW6.Init(?List:2,Queue:Browse:1.ViewPosition,BRW6::View:Browse,Queue:Browse:1,Relate:_C2IP_TaskOrgs,SELF) ! Initialize the browse manager
+  SELF.Open(QuickWindow)                                   ! Open window
+  Do DefineListboxStyle
+  Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
+  SELF.AddItem(Resizer)                                    ! Add resizer to window manager
+  BRW5.Q &= Queue:Browse
+  BRW5.AddSortOrder(,_C2IP_Orbats:PKID)                    ! Add the sort order for _C2IP_Orbats:PKID for sort order 1
+  BRW5.AddLocator(BRW5::Sort0:Locator)                     ! Browse has a locator for sort order 1
+  BRW5::Sort0:Locator.Init(,_C2IP_Orbats:ID,1,BRW5)        ! Initialize the browse locator using  using key: _C2IP_Orbats:PKID , _C2IP_Orbats:ID
+  BRW5.AddField(_C2IP_Orbats:Name,BRW5.Q._C2IP_Orbats:Name) ! Field _C2IP_Orbats:Name is a hot field or requires assignment from browse
+  BRW5.AddField(_C2IP_Orbats:ID,BRW5.Q._C2IP_Orbats:ID)    ! Field _C2IP_Orbats:ID is a hot field or requires assignment from browse
+  BRW6.Q &= Queue:Browse:1
+  BRW6.AddSortOrder(,_C2IPTsk:PKID)                        ! Add the sort order for _C2IPTsk:PKID for sort order 1
+  BRW6.AddLocator(BRW6::Sort0:Locator)                     ! Browse has a locator for sort order 1
+  BRW6::Sort0:Locator.Init(,_C2IPTsk:ID,1,BRW6)            ! Initialize the browse locator using  using key: _C2IPTsk:PKID , _C2IPTsk:ID
+  BRW6.AddField(_C2IPTsk:Name,BRW6.Q._C2IPTsk:Name)        ! Field _C2IPTsk:Name is a hot field or requires assignment from browse
+  BRW6.AddField(_C2IPTsk:ID,BRW6.Q._C2IPTsk:ID)            ! Field _C2IPTsk:ID is a hot field or requires assignment from browse
+  INIMgr.Fetch('ORBAT_TASKORGTransfers',QuickWindow)       ! Restore window settings from non-volatile store
+  Resizer.Resize                                           ! Reset required after window size altered by INI manager
+  BRW5.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
+  BRW5.ToolbarItem.HelpButton = ?Help
+  BRW6.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
+  BRW6.ToolbarItem.HelpButton = ?Help
+  SELF.SetAlerts()
+  RETURN ReturnValue
+
+
+ThisWindow.Kill PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Kill()
+  IF ReturnValue THEN RETURN ReturnValue.
+  IF SELF.FilesOpened
+    Relate:_C2IP_ORBATs.Close
+  END
+  IF SELF.Opened
+    INIMgr.Update('ORBAT_TASKORGTransfers',QuickWindow)    ! Save window data to non-volatile store
+  END
+  GlobalErrors.SetProcedureName
+  RETURN ReturnValue
 
 
 Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
