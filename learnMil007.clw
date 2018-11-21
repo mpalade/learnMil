@@ -156,15 +156,15 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?MissTSK:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:MissionTASKORG)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
   SELF.AddHistoryField(?MissTSK:Mission,2)
   SELF.AddHistoryField(?MissTSK:TASKORGC2IP,3)
+  SELF.AddUpdateFile(Access:MissionTASKORG)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
@@ -357,9 +357,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -980,9 +980,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1526,9 +1526,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -2001,9 +2001,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -2177,16 +2177,16 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieUni:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:_c2ieBSO_TASKORGs)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(_c2ieBSOTSK:Record,History::_c2ieBSOTSK:Record)
   SELF.AddHistoryField(?_c2ieBSOTSK:ID,1)
   SELF.AddHistoryField(?_c2ieBSOTSK:C2IE,2)
   SELF.AddHistoryField(?_c2ieBSOTSK:Unit,3)
   SELF.AddHistoryField(?_c2ieBSOTSK:Hostility,4)
+  SELF.AddUpdateFile(Access:_c2ieBSO_TASKORGs)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:_c2ieBSO_TASKORGs.Open                            ! File _c2ieBSO_TASKORGs used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True

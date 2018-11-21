@@ -106,12 +106,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:TheaterOfOps)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(TOO:Record,History::TOO:Record)
   SELF.AddHistoryField(?TOO:ID,1)
   SELF.AddHistoryField(?TOO:Name,2)
   SELF.AddHistoryField(?TOO:Code,3)
+  SELF.AddUpdateFile(Access:TheaterOfOps)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:TheaterOfOps.Open                                 ! File TheaterOfOps used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
@@ -665,12 +665,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:MilMissions)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(Miss:Record,History::Miss:Record)
   SELF.AddHistoryField(?Miss:ID,1)
   SELF.AddHistoryField(?Miss:Name,2)
   SELF.AddHistoryField(?Miss:Code,3)
+  SELF.AddUpdateFile(Access:MilMissions)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:MilMissions.Open                                  ! File MilMissions used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
@@ -856,12 +856,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:OrgMissions)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgMiss:Record,History::OrgMiss:Record)
   SELF.AddHistoryField(?OrgMiss:ID,1)
   SELF.AddHistoryField(?OrgMiss:Organization,2)
   SELF.AddHistoryField(?OrgMiss:Mission,3)
+  SELF.AddUpdateFile(Access:OrgMissions)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:OrgMissions.Open                                  ! File OrgMissions used by this procedure, so make sure it's RelationManager is open
   SELF.FilesOpened = True
@@ -1258,12 +1258,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:C2IPExplorer)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(C2IPExp:Record,History::C2IPExp:Record)
   SELF.AddHistoryField(?C2IPExp:ID,1)
   SELF.AddHistoryField(?C2IPExp:Organization,2)
   SELF.AddHistoryField(?C2IPExp:C2IP,3)
+  SELF.AddUpdateFile(Access:C2IPExplorer)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IPExplorer.SetOpenRelated()
   Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
@@ -1689,12 +1689,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:myOrgORBAT)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(myOrgORB:Record,History::myOrgORB:Record)
   SELF.AddHistoryField(?myOrgORB:ID,1)
   SELF.AddHistoryField(?myOrgORB:Organization,2)
   SELF.AddHistoryField(?myOrgORB:ORBATC2IP,3)
+  SELF.AddUpdateFile(Access:myOrgORBAT)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IPExplorer.SetOpenRelated()
   Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open

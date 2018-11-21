@@ -128,12 +128,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:c2ieActionResources)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(c2ieActRes:Record,History::c2ieActRes:Record)
   SELF.AddHistoryField(?c2ieActRes:ID,1)
   SELF.AddHistoryField(?c2ieActRes:c2ieActionDetail,2)
   SELF.AddHistoryField(?c2ieActRes:c2ieBSO,3)
+  SELF.AddUpdateFile(Access:c2ieActionResources)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:_c2ieBSO_Resources.Open                           ! File _c2ieBSO_Resources used by this procedure, so make sure it's RelationManager is open
   Relate:c2ieActionResources.SetOpenRelated()
@@ -526,12 +526,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:c2ieActionObjectives)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(c2ieActObj:Record,History::c2ieActObj:Record)
   SELF.AddHistoryField(?c2ieActObj:ID,1)
   SELF.AddHistoryField(?c2ieActObj:c2ieActionDetail,2)
   SELF.AddHistoryField(?c2ieActObj:c2ieBSO,3)
+  SELF.AddUpdateFile(Access:c2ieActionObjectives)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:_c2ieBSO_Objectives.Open                          ! File _c2ieBSO_Objectives used by this procedure, so make sure it's RelationManager is open
   Relate:c2ieActionObjectives.Open                         ! File c2ieActionObjectives used by this procedure, so make sure it's RelationManager is open
@@ -1136,12 +1136,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:myOrganization)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(myOrg:Record,History::myOrg:Record)
   SELF.AddHistoryField(?myOrg:ID,1)
   SELF.AddHistoryField(?myOrg:Name,2)
   SELF.AddHistoryField(?myOrg:Code,3)
+  SELF.AddUpdateFile(Access:myOrganization)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:myOrganization.SetOpenRelated()
   Relate:myOrganization.Open                               ! File myOrganization used by this procedure, so make sure it's RelationManager is open
@@ -1533,12 +1533,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:OrgTOO)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgTOO:Record,History::OrgTOO:Record)
   SELF.AddHistoryField(?OrgTOO:ID,1)
   SELF.AddHistoryField(?OrgTOO:Organization,2)
   SELF.AddHistoryField(?OrgTOO:TheaterOfOperations,3)
+  SELF.AddUpdateFile(Access:OrgTOO)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:OrgTOO.SetOpenRelated()
   Relate:OrgTOO.Open                                       ! File OrgTOO used by this procedure, so make sure it's RelationManager is open
@@ -2018,12 +2018,12 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
   SELF.AddItem(Toolbar)
-  SELF.AddUpdateFile(Access:OrgMissions)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgMiss:Record,History::OrgMiss:Record)
   SELF.AddHistoryField(?OrgMiss:ID,1)
   SELF.AddHistoryField(?OrgMiss:Organization,2)
   SELF.AddHistoryField(?OrgMiss:Mission,3)
+  SELF.AddUpdateFile(Access:OrgMissions)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IPExplorer.SetOpenRelated()
   Relate:C2IPExplorer.Open                                 ! File C2IPExplorer used by this procedure, so make sure it's RelationManager is open
