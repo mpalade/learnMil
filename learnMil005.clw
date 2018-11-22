@@ -125,9 +125,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieActRes:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(c2ieActRes:Record,History::c2ieActRes:Record)
   SELF.AddHistoryField(?c2ieActRes:ID,1)
@@ -329,9 +329,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -523,9 +523,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieActObj:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(c2ieActObj:Record,History::c2ieActObj:Record)
   SELF.AddHistoryField(?c2ieActObj:ID,1)
@@ -851,9 +851,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1111,11 +1111,11 @@ ThisWindow.Ask PROCEDURE
   CODE
   CASE SELF.Request                                        ! Configure the action message text
   OF ViewRecord
-    ActionMessage = 'View Record'
+    ActionMessage = 'View Organization'
   OF InsertRecord
-    ActionMessage = 'Record Will Be Added'
+    ActionMessage = 'Define New Organization'
   OF ChangeRecord
-    ActionMessage = 'Record Will Be Changed'
+    ActionMessage = 'Modify Organization'
   END
   QuickWindow{PROP:Text} = ActionMessage                   ! Display status message in title bar
   PARENT.Ask
@@ -1133,9 +1133,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?myOrg:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(myOrg:Record,History::myOrg:Record)
   SELF.AddHistoryField(?myOrg:ID,1)
@@ -1324,9 +1324,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1508,11 +1508,11 @@ ThisWindow.Ask PROCEDURE
   CODE
   CASE SELF.Request                                        ! Configure the action message text
   OF ViewRecord
-    ActionMessage = 'View Record'
+    ActionMessage = 'View Theater Of Operations (TOO)'
   OF InsertRecord
-    ActionMessage = 'Record Will Be Added'
+    ActionMessage = 'Define New Theater Of Operations (TOO)'
   OF ChangeRecord
-    ActionMessage = 'Record Will Be Changed'
+    ActionMessage = 'Modify Theater Of Operations (TOO)'
   END
   QuickWindow{PROP:Text} = ActionMessage                   ! Display status message in title bar
   PARENT.Ask
@@ -1530,9 +1530,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?OrgTOO:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgTOO:Record,History::OrgTOO:Record)
   SELF.AddHistoryField(?OrgTOO:ID,1)
@@ -1739,9 +1739,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1933,7 +1933,6 @@ QuickWindow          WINDOW('View Mission'),AT(,,417,273),FONT('Microsoft Sans S
                        LIST,AT(206,66,207,59),USE(?List:2),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[100L(2)|M~C2IP Nam' & |
   'e~C(0)@s100@40L(2)|M~C2IP Type~C(0)@s20@]|~C2IP Explorer~'),FROM(Queue:Browse:1),IMM
                        BUTTON('Create COP'),AT(205,127),USE(?BUTTON4)
-                       BUTTON('View'),AT(263,127,54),USE(?BUTTON5)
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -1993,11 +1992,11 @@ ThisWindow.Ask PROCEDURE
   CODE
   CASE SELF.Request                                        ! Configure the action message text
   OF ViewRecord
-    ActionMessage = 'View Record'
+    ActionMessage = 'View Organization''s Missions'
   OF InsertRecord
-    ActionMessage = 'Record Will Be Added'
+    ActionMessage = 'Define New Mission'
   OF ChangeRecord
-    ActionMessage = 'Record Will Be Changed'
+    ActionMessage = 'Modify Mission'
   END
   QuickWindow{PROP:Text} = ActionMessage                   ! Display status message in title bar
   PARENT.Ask
@@ -2015,9 +2014,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?OrgMiss:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgMiss:Record,History::OrgMiss:Record)
   SELF.AddHistoryField(?OrgMiss:ID,1)
@@ -2058,7 +2057,6 @@ ReturnValue          BYTE,AUTO
     DISABLE(?BUTTON3)
     DISABLE(?BUTTON1)
     DISABLE(?BUTTON4)
-    DISABLE(?BUTTON5)
   END
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
@@ -2183,17 +2181,17 @@ Looped BYTE
       IF SELF.Request = ViewRecord AND NOT SELF.BatchProcessing THEN
          POST(EVENT:CloseWindow)
       END
-    OF ?BUTTON4
-      ThisWindow.Update()
-      ! COPApp
-      
-      COPApp(0, OrgMiss:Organization, nMissTaskOrgRef, nTASKORGC2IPRef)
-    OF ?BUTTON5
+    OF ?BUTTON3
       ThisWindow.Update()
       ! COPApp
       
       ! View current selected C2IP from C2IP Explorer
       COPApp(BRW_MissC2IPs.q.C2IP:ID, OrgMiss:Organization, nMissTaskOrgRef, nTASKORGC2IPRef)
+    OF ?BUTTON4
+      ThisWindow.Update()
+      ! COPApp
+      
+      COPApp(0, OrgMiss:Organization, nMissTaskOrgRef, nTASKORGC2IPRef)
     END
     RETURN ReturnValue
   END
@@ -2315,9 +2313,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE

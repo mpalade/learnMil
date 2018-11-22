@@ -16,6 +16,7 @@
                        INCLUDE('LEARNMIL002.INC'),ONCE        !Req'd for module callout resolution
                        INCLUDE('LEARNMIL003.INC'),ONCE        !Req'd for module callout resolution
                        INCLUDE('LEARNMIL004.INC'),ONCE        !Req'd for module callout resolution
+                       INCLUDE('LEARNMIL008.INC'),ONCE        !Req'd for module callout resolution
                      END
 
 
@@ -134,11 +135,11 @@ ThisWindow.Ask PROCEDURE
   CODE
   CASE SELF.Request                                        ! Configure the action message text
   OF ViewRecord
-    ActionMessage = 'View Record'
+    ActionMessage = 'View Mission''s TaskOrg'
   OF InsertRecord
-    ActionMessage = 'Record Will Be Added'
+    ActionMessage = 'Define New TaskOrg'
   OF ChangeRecord
-    ActionMessage = 'Record Will Be Changed'
+    ActionMessage = 'Modify TaskOrg'
   END
   QuickWindow{PROP:Text} = ActionMessage                   ! Display status message in title bar
   PARENT.Ask
@@ -1000,6 +1001,8 @@ ReturnValue          BYTE,AUTO
   Relate:_Units.Open                                       ! File _Units used by this procedure, so make sure it's RelationManager is open
   Relate:_c2ieUnits.Open                                   ! File _c2ieUnits used by this procedure, so make sure it's RelationManager is open
   Relate:_c2ieUnitsPositions.Open                          ! File _c2ieUnitsPositions used by this procedure, so make sure it's RelationManager is open
+  Relate:c2ieUnits.SetOpenRelated()
+  Relate:c2ieUnits.Open                                    ! File c2ieUnits used by this procedure, so make sure it's RelationManager is open
   Relate:type_BSO.Open                                     ! File type_BSO used by this procedure, so make sure it's RelationManager is open
   Access:type_C2IP.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:_C2IPs.UseFile                                    ! File referenced in 'Other Files' so need to inform it's FileManager
@@ -1146,6 +1149,7 @@ ReturnValue          BYTE,AUTO
     Relate:_Units.Close
     Relate:_c2ieUnits.Close
     Relate:_c2ieUnitsPositions.Close
+    Relate:c2ieUnits.Close
     Relate:type_BSO.Close
   END
   IF SELF.Opened
@@ -2274,6 +2278,178 @@ Looped BYTE
   END
   ReturnValue = Level:Fatal
   RETURN ReturnValue
+
+
+Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+
+
+  CODE
+  PARENT.Init(AppStrategy,SetWindowMinSize,SetWindowMaxSize)
+  SELF.SetParentDefaults()                                 ! Calculate default control parent-child relationships based upon their positions on the window
+
+!!! <summary>
+!!! Generated from procedure template - Window
+!!! Browse the type_StdEqp file
+!!! </summary>
+B_typeStdEq PROCEDURE 
+
+CurrentTab           STRING(80)                            ! 
+BRW1::View:Browse    VIEW(type_StdEqp)
+                       PROJECT(tpyStdEqp:ID)
+                       PROJECT(tpyStdEqp:Name)
+                       PROJECT(tpyStdEqp:Code)
+                     END
+Queue:Browse:1       QUEUE                            !Queue declaration for browse/combo box using ?Browse:1
+tpyStdEqp:ID           LIKE(tpyStdEqp:ID)             !List box control field - type derived from field
+tpyStdEqp:Name         LIKE(tpyStdEqp:Name)           !List box control field - type derived from field
+tpyStdEqp:Code         LIKE(tpyStdEqp:Code)           !List box control field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
+QuickWindow          WINDOW('Browse the type_StdEqp file'),AT(,,277,198),FONT('Microsoft Sans Serif',8,,FONT:regular, |
+  CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,MDI,HLP('B_typeStdEq'),SYSTEM
+                       LIST,AT(8,30,261,124),USE(?Browse:1),HVSCROLL,FORMAT('48R(2)|M~ID~C(0)@n-10.0@80L(2)|M~' & |
+  'Name~L(2)@s100@80L(2)|M~Code~L(2)@s20@'),FROM(Queue:Browse:1),IMM,MSG('Browsing the ' & |
+  'type_StdEqp file')
+                       BUTTON('&Select'),AT(8,158,49,14),USE(?Select:2),LEFT,ICON('WASELECT.ICO'),FLAT,MSG('Select the Record'), |
+  TIP('Select the Record')
+                       BUTTON('&View'),AT(61,158,49,14),USE(?View:3),LEFT,ICON('WAVIEW.ICO'),FLAT,MSG('View Record'), |
+  TIP('View Record')
+                       BUTTON('&Insert'),AT(114,158,49,14),USE(?Insert:4),LEFT,ICON('WAINSERT.ICO'),FLAT,MSG('Insert a Record'), |
+  TIP('Insert a Record')
+                       BUTTON('&Change'),AT(167,158,49,14),USE(?Change:4),LEFT,ICON('WACHANGE.ICO'),DEFAULT,FLAT, |
+  MSG('Change the Record'),TIP('Change the Record')
+                       BUTTON('&Delete'),AT(220,158,49,14),USE(?Delete:4),LEFT,ICON('WADELETE.ICO'),FLAT,MSG('Delete the Record'), |
+  TIP('Delete the Record')
+                       SHEET,AT(4,4,269,172),USE(?CurrentTab)
+                         TAB('&1) PKID'),USE(?Tab:2)
+                         END
+                       END
+                       BUTTON('&Close'),AT(171,180,49,14),USE(?Close),LEFT,ICON('WACLOSE.ICO'),FLAT,MSG('Close Window'), |
+  TIP('Close Window')
+                       BUTTON('&Help'),AT(224,180,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+  STD(STD:Help),TIP('See Help Window')
+                     END
+
+ThisWindow           CLASS(WindowManager)
+Init                   PROCEDURE(),BYTE,PROC,DERIVED
+Kill                   PROCEDURE(),BYTE,PROC,DERIVED
+Run                    PROCEDURE(USHORT Number,BYTE Request),BYTE,PROC,DERIVED
+                     END
+
+Toolbar              ToolbarClass
+BRW1                 CLASS(BrowseClass)                    ! Browse using ?Browse:1
+Q                      &Queue:Browse:1                !Reference to browse queue
+Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+                     END
+
+BRW1::Sort0:Locator  StepLocatorClass                      ! Default Locator
+BRW1::Sort0:StepClass StepRealClass                        ! Default Step Manager
+Resizer              CLASS(WindowResizeClass)
+Init                   PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+                     END
+
+
+  CODE
+  GlobalResponse = ThisWindow.Run()                        ! Opens the window and starts an Accept Loop
+
+!---------------------------------------------------------------------------
+DefineListboxStyle ROUTINE
+!|
+!| This routine create all the styles to be shared in this window
+!| It`s called after the window open
+!|
+!---------------------------------------------------------------------------
+
+ThisWindow.Init PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  GlobalErrors.SetProcedureName('B_typeStdEq')
+  SELF.Request = GlobalRequest                             ! Store the incoming request
+  ReturnValue = PARENT.Init()
+  IF ReturnValue THEN RETURN ReturnValue.
+  SELF.FirstField = ?Browse:1
+  SELF.VCRRequest &= VCRRequest
+  SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
+  CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
+  CLEAR(GlobalResponse)
+  IF SELF.Request = SelectRecord
+     SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
+  ELSE
+     SELF.AddItem(?Close,RequestCompleted)                 ! Add the close control to the window manger
+  END
+  Relate:type_StdEqp.Open                                  ! File type_StdEqp used by this procedure, so make sure it's RelationManager is open
+  SELF.FilesOpened = True
+  BRW1.Init(?Browse:1,Queue:Browse:1.ViewPosition,BRW1::View:Browse,Queue:Browse:1,Relate:type_StdEqp,SELF) ! Initialize the browse manager
+  SELF.Open(QuickWindow)                                   ! Open window
+  Do DefineListboxStyle
+  BRW1.Q &= Queue:Browse:1
+  BRW1::Sort0:StepClass.Init(+ScrollSort:AllowAlpha)       ! Moveable thumb based upon tpyStdEqp:ID for sort order 1
+  BRW1.AddSortOrder(BRW1::Sort0:StepClass,tpyStdEqp:PKID)  ! Add the sort order for tpyStdEqp:PKID for sort order 1
+  BRW1.AddLocator(BRW1::Sort0:Locator)                     ! Browse has a locator for sort order 1
+  BRW1::Sort0:Locator.Init(,tpyStdEqp:ID,1,BRW1)           ! Initialize the browse locator using  using key: tpyStdEqp:PKID , tpyStdEqp:ID
+  BRW1.AddField(tpyStdEqp:ID,BRW1.Q.tpyStdEqp:ID)          ! Field tpyStdEqp:ID is a hot field or requires assignment from browse
+  BRW1.AddField(tpyStdEqp:Name,BRW1.Q.tpyStdEqp:Name)      ! Field tpyStdEqp:Name is a hot field or requires assignment from browse
+  BRW1.AddField(tpyStdEqp:Code,BRW1.Q.tpyStdEqp:Code)      ! Field tpyStdEqp:Code is a hot field or requires assignment from browse
+  Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
+  SELF.AddItem(Resizer)                                    ! Add resizer to window manager
+  INIMgr.Fetch('B_typeStdEq',QuickWindow)                  ! Restore window settings from non-volatile store
+  Resizer.Resize                                           ! Reset required after window size altered by INI manager
+  BRW1.AskProcedure = 1                                    ! Will call: U_typeStdEq
+  BRW1.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
+  BRW1.ToolbarItem.HelpButton = ?Help
+  SELF.SetAlerts()
+  RETURN ReturnValue
+
+
+ThisWindow.Kill PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Kill()
+  IF ReturnValue THEN RETURN ReturnValue.
+  IF SELF.FilesOpened
+    Relate:type_StdEqp.Close
+  END
+  IF SELF.Opened
+    INIMgr.Update('B_typeStdEq',QuickWindow)               ! Save window data to non-volatile store
+  END
+  GlobalErrors.SetProcedureName
+  RETURN ReturnValue
+
+
+ThisWindow.Run PROCEDURE(USHORT Number,BYTE Request)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Run(Number,Request)
+  IF SELF.Request = ViewRecord
+    ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
+  ELSE
+    GlobalRequest = Request
+    U_typeStdEq
+    ReturnValue = GlobalResponse
+  END
+  RETURN ReturnValue
+
+
+BRW1.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+
+  CODE
+  SELF.SelectControl = ?Select:2
+  SELF.HideSelect = 1                                      ! Hide the select button when disabled
+  PARENT.Init(ListBox,Posit,V,Q,RM,WM)
+  IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
+    SELF.InsertControl=?Insert:4
+    SELF.ChangeControl=?Change:4
+    SELF.DeleteControl=?Delete:4
+  END
+  SELF.ViewControl = ?View:3                               ! Setup the control used to initiate view only mode
 
 
 Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)

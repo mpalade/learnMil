@@ -8,6 +8,54 @@ learnMil_BC2:DctKill    PROCEDURE()
 learnMil_BC2:FilesInit  PROCEDURE()
   END
 
+Hide:Access:TaCon    CLASS(FileManager),TYPE               ! FileManager for TaCon
+Init                   PROCEDURE(),DERIVED
+Kill                   PROCEDURE(),DERIVED
+UseFile                PROCEDURE(BYTE UseType = UseType:Uses),BYTE,PROC,DERIVED
+                     END
+
+
+Hide:Relate:TaCon    CLASS(RelationManager),TYPE           ! RelationManager for TaCon
+Init                   PROCEDURE
+Kill                   PROCEDURE(),DERIVED
+                     END
+
+Hide:Access:Supported CLASS(FileManager),TYPE              ! FileManager for Supported
+Init                   PROCEDURE(),DERIVED
+Kill                   PROCEDURE(),DERIVED
+UseFile                PROCEDURE(BYTE UseType = UseType:Uses),BYTE,PROC,DERIVED
+                     END
+
+
+Hide:Relate:Supported CLASS(RelationManager),TYPE          ! RelationManager for Supported
+Init                   PROCEDURE
+Kill                   PROCEDURE(),DERIVED
+                     END
+
+Hide:Access:Supporting CLASS(FileManager),TYPE             ! FileManager for Supporting
+Init                   PROCEDURE(),DERIVED
+Kill                   PROCEDURE(),DERIVED
+UseFile                PROCEDURE(BYTE UseType = UseType:Uses),BYTE,PROC,DERIVED
+                     END
+
+
+Hide:Relate:Supporting CLASS(RelationManager),TYPE         ! RelationManager for Supporting
+Init                   PROCEDURE
+Kill                   PROCEDURE(),DERIVED
+                     END
+
+Hide:Access:P        CLASS(FileManager),TYPE               ! FileManager for P
+Init                   PROCEDURE(),DERIVED
+Kill                   PROCEDURE(),DERIVED
+UseFile                PROCEDURE(BYTE UseType = UseType:Uses),BYTE,PROC,DERIVED
+                     END
+
+
+Hide:Relate:P        CLASS(RelationManager),TYPE           ! RelationManager for P
+Init                   PROCEDURE
+Kill                   PROCEDURE(),DERIVED
+                     END
+
 Hide:Access:Adm      CLASS(FileManager),TYPE               ! FileManager for Adm
 Init                   PROCEDURE(),DERIVED
 Kill                   PROCEDURE(),DERIVED
@@ -210,59 +258,15 @@ DeferedAddRelations    PROCEDURE(),DERIVED
 Kill                   PROCEDURE(),DERIVED
                      END
 
-Hide:Access:_C2IE_TASKORGs CLASS(FileManager),TYPE         ! FileManager for _C2IE_TASKORGs
-Init                   PROCEDURE(),DERIVED
-Kill                   PROCEDURE(),DERIVED
-UseFile                PROCEDURE(BYTE UseType = UseType:Uses),BYTE,PROC,DERIVED
-                     END
 
-
-Hide:Relate:_C2IE_TASKORGs CLASS(RelationManager),TYPE     ! RelationManager for _C2IE_TASKORGs
-Init                   PROCEDURE
-DeferedAddRelations    PROCEDURE(),DERIVED
-Kill                   PROCEDURE(),DERIVED
-                     END
-
-Hide:Access:_c2ieBSO_ORBATs CLASS(FileManager),TYPE        ! FileManager for _c2ieBSO_ORBATs
-Init                   PROCEDURE(),DERIVED
-Kill                   PROCEDURE(),DERIVED
-UseFile                PROCEDURE(BYTE UseType = UseType:Uses),BYTE,PROC,DERIVED
-                     END
-
-
-Hide:Relate:_c2ieBSO_ORBATs CLASS(RelationManager),TYPE    ! RelationManager for _c2ieBSO_ORBATs
-Init                   PROCEDURE
-DeferedAddRelations    PROCEDURE(),DERIVED
-Kill                   PROCEDURE(),DERIVED
-                     END
-
-Hide:Access:_c2ieBSO_TASKORGs CLASS(FileManager),TYPE      ! FileManager for _c2ieBSO_TASKORGs
-Init                   PROCEDURE(),DERIVED
-Kill                   PROCEDURE(),DERIVED
-UseFile                PROCEDURE(BYTE UseType = UseType:Uses),BYTE,PROC,DERIVED
-                     END
-
-
-Hide:Relate:_c2ieBSO_TASKORGs CLASS(RelationManager),TYPE  ! RelationManager for _c2ieBSO_TASKORGs
-Init                   PROCEDURE
-DeferedAddRelations    PROCEDURE(),DERIVED
-Kill                   PROCEDURE(),DERIVED
-                     END
-
-Hide:Access:_C2IEsFromTransfers CLASS(FileManager),TYPE    ! FileManager for _C2IEsFromTransfers
-Init                   PROCEDURE(),DERIVED
-Kill                   PROCEDURE(),DERIVED
-UseFile                PROCEDURE(BYTE UseType = UseType:Uses),BYTE,PROC,DERIVED
-                     END
-
-
-Hide:Relate:_C2IEsFromTransfers CLASS(RelationManager),TYPE ! RelationManager for _C2IEsFromTransfers
-Init                   PROCEDURE
-DeferedAddRelations    PROCEDURE(),DERIVED
-Kill                   PROCEDURE(),DERIVED
-                     END
-
-
+_Hide:Access:TaCon   &Hide:Access:TaCon,AUTO,THREAD
+_Hide:Relate:TaCon   &Hide:Relate:TaCon,AUTO,THREAD
+_Hide:Access:Supported &Hide:Access:Supported,AUTO,THREAD
+_Hide:Relate:Supported &Hide:Relate:Supported,AUTO,THREAD
+_Hide:Access:Supporting &Hide:Access:Supporting,AUTO,THREAD
+_Hide:Relate:Supporting &Hide:Relate:Supporting,AUTO,THREAD
+_Hide:Access:P       &Hide:Access:P,AUTO,THREAD
+_Hide:Relate:P       &Hide:Relate:P,AUTO,THREAD
 _Hide:Access:Adm     &Hide:Access:Adm,AUTO,THREAD
 _Hide:Relate:Adm     &Hide:Relate:Adm,AUTO,THREAD
 _Hide:Access:_Units  &Hide:Access:_Units,AUTO,THREAD
@@ -295,18 +299,18 @@ _Hide:Access:_C2IP_ORBATs &Hide:Access:_C2IP_ORBATs,AUTO,THREAD
 _Hide:Relate:_C2IP_ORBATs &Hide:Relate:_C2IP_ORBATs,AUTO,THREAD
 _Hide:Access:_C2IE_ORBATs &Hide:Access:_C2IE_ORBATs,AUTO,THREAD
 _Hide:Relate:_C2IE_ORBATs &Hide:Relate:_C2IE_ORBATs,AUTO,THREAD
-_Hide:Access:_C2IE_TASKORGs &Hide:Access:_C2IE_TASKORGs,AUTO,THREAD
-_Hide:Relate:_C2IE_TASKORGs &Hide:Relate:_C2IE_TASKORGs,AUTO,THREAD
-_Hide:Access:_c2ieBSO_ORBATs &Hide:Access:_c2ieBSO_ORBATs,AUTO,THREAD
-_Hide:Relate:_c2ieBSO_ORBATs &Hide:Relate:_c2ieBSO_ORBATs,AUTO,THREAD
-_Hide:Access:_c2ieBSO_TASKORGs &Hide:Access:_c2ieBSO_TASKORGs,AUTO,THREAD
-_Hide:Relate:_c2ieBSO_TASKORGs &Hide:Relate:_c2ieBSO_TASKORGs,AUTO,THREAD
-_Hide:Access:_C2IEsFromTransfers &Hide:Access:_C2IEsFromTransfers,AUTO,THREAD
-_Hide:Relate:_C2IEsFromTransfers &Hide:Relate:_C2IEsFromTransfers,AUTO,THREAD
 
 
 learnMil_BC2:DctInit PROCEDURE()
   CODE
+  _Hide:Access:TaCon &= NEW(Hide:Access:TaCon)
+  _Hide:Relate:TaCon &= NEW(Hide:Relate:TaCon)
+  _Hide:Access:Supported &= NEW(Hide:Access:Supported)
+  _Hide:Relate:Supported &= NEW(Hide:Relate:Supported)
+  _Hide:Access:Supporting &= NEW(Hide:Access:Supporting)
+  _Hide:Relate:Supporting &= NEW(Hide:Relate:Supporting)
+  _Hide:Access:P &= NEW(Hide:Access:P)
+  _Hide:Relate:P &= NEW(Hide:Relate:P)
   _Hide:Access:Adm &= NEW(Hide:Access:Adm)
   _Hide:Relate:Adm &= NEW(Hide:Relate:Adm)
   _Hide:Access:_Units &= NEW(Hide:Access:_Units)
@@ -339,14 +343,10 @@ learnMil_BC2:DctInit PROCEDURE()
   _Hide:Relate:_C2IP_ORBATs &= NEW(Hide:Relate:_C2IP_ORBATs)
   _Hide:Access:_C2IE_ORBATs &= NEW(Hide:Access:_C2IE_ORBATs)
   _Hide:Relate:_C2IE_ORBATs &= NEW(Hide:Relate:_C2IE_ORBATs)
-  _Hide:Access:_C2IE_TASKORGs &= NEW(Hide:Access:_C2IE_TASKORGs)
-  _Hide:Relate:_C2IE_TASKORGs &= NEW(Hide:Relate:_C2IE_TASKORGs)
-  _Hide:Access:_c2ieBSO_ORBATs &= NEW(Hide:Access:_c2ieBSO_ORBATs)
-  _Hide:Relate:_c2ieBSO_ORBATs &= NEW(Hide:Relate:_c2ieBSO_ORBATs)
-  _Hide:Access:_c2ieBSO_TASKORGs &= NEW(Hide:Access:_c2ieBSO_TASKORGs)
-  _Hide:Relate:_c2ieBSO_TASKORGs &= NEW(Hide:Relate:_c2ieBSO_TASKORGs)
-  _Hide:Access:_C2IEsFromTransfers &= NEW(Hide:Access:_C2IEsFromTransfers)
-  _Hide:Relate:_C2IEsFromTransfers &= NEW(Hide:Relate:_C2IEsFromTransfers)
+  Relate:TaCon &= _Hide:Relate:TaCon
+  Relate:Supported &= _Hide:Relate:Supported
+  Relate:Supporting &= _Hide:Relate:Supporting
+  Relate:P &= _Hide:Relate:P
   Relate:Adm &= _Hide:Relate:Adm
   Relate:_Units &= _Hide:Relate:_Units
   Relate:_UnitsPositions &= _Hide:Relate:_UnitsPositions
@@ -363,14 +363,14 @@ learnMil_BC2:DctInit PROCEDURE()
   Relate:_C2IP_TaskOrgs &= _Hide:Relate:_C2IP_TaskOrgs
   Relate:_C2IP_ORBATs &= _Hide:Relate:_C2IP_ORBATs
   Relate:_C2IE_ORBATs &= _Hide:Relate:_C2IE_ORBATs
-  Relate:_C2IE_TASKORGs &= _Hide:Relate:_C2IE_TASKORGs
-  Relate:_c2ieBSO_ORBATs &= _Hide:Relate:_c2ieBSO_ORBATs
-  Relate:_c2ieBSO_TASKORGs &= _Hide:Relate:_c2ieBSO_TASKORGs
-  Relate:_C2IEsFromTransfers &= _Hide:Relate:_C2IEsFromTransfers
 
 
 learnMil_BC2:FilesInit PROCEDURE()
   CODE
+  _Hide:Relate:TaCon.Init
+  _Hide:Relate:Supported.Init
+  _Hide:Relate:Supporting.Init
+  _Hide:Relate:P.Init
   _Hide:Relate:Adm.Init
   _Hide:Relate:_Units.Init
   _Hide:Relate:_UnitsPositions.Init
@@ -387,14 +387,18 @@ learnMil_BC2:FilesInit PROCEDURE()
   _Hide:Relate:_C2IP_TaskOrgs.Init
   _Hide:Relate:_C2IP_ORBATs.Init
   _Hide:Relate:_C2IE_ORBATs.Init
-  _Hide:Relate:_C2IE_TASKORGs.Init
-  _Hide:Relate:_c2ieBSO_ORBATs.Init
-  _Hide:Relate:_c2ieBSO_TASKORGs.Init
-  _Hide:Relate:_C2IEsFromTransfers.Init
 
 
 learnMil_BC2:DctKill PROCEDURE()
   CODE
+  _Hide:Relate:TaCon.Kill
+  DISPOSE(_Hide:Relate:TaCon)
+  _Hide:Relate:Supported.Kill
+  DISPOSE(_Hide:Relate:Supported)
+  _Hide:Relate:Supporting.Kill
+  DISPOSE(_Hide:Relate:Supporting)
+  _Hide:Relate:P.Kill
+  DISPOSE(_Hide:Relate:P)
   _Hide:Relate:Adm.Kill
   DISPOSE(_Hide:Relate:Adm)
   _Hide:Relate:_Units.Kill
@@ -427,14 +431,242 @@ learnMil_BC2:DctKill PROCEDURE()
   DISPOSE(_Hide:Relate:_C2IP_ORBATs)
   _Hide:Relate:_C2IE_ORBATs.Kill
   DISPOSE(_Hide:Relate:_C2IE_ORBATs)
-  _Hide:Relate:_C2IE_TASKORGs.Kill
-  DISPOSE(_Hide:Relate:_C2IE_TASKORGs)
-  _Hide:Relate:_c2ieBSO_ORBATs.Kill
-  DISPOSE(_Hide:Relate:_c2ieBSO_ORBATs)
-  _Hide:Relate:_c2ieBSO_TASKORGs.Kill
-  DISPOSE(_Hide:Relate:_c2ieBSO_TASKORGs)
-  _Hide:Relate:_C2IEsFromTransfers.Kill
-  DISPOSE(_Hide:Relate:_C2IEsFromTransfers)
+
+
+Hide:Relate:TaCon.Init PROCEDURE()
+  CODE
+  _Hide:Access:TaCon.Init
+  SELF.Init(Access:TaCon,1)
+  SELF.SetAlias(Relate:Units)
+
+
+Hide:Access:TaCon.Init PROCEDURE
+
+  CODE
+  SELF.Initialized = False
+  SELF.Buffer &= UniTaCon:Record
+  SELF.AliasedFile &= Access:Units                         !This is a File Alias, so assign aliased file manager
+  SELF.FileNameValue = 'TaCon'
+  SELF.SetErrors(GlobalErrors)
+  SELF.File &= TaCon
+  PARENT.Init
+  Access:TaCon &= SELF
+
+
+Hide:Access:TaCon.Kill PROCEDURE
+
+  CODE
+  PARENT.Kill
+  Access:TaCon &= NULL                                     ! File manager has been destroyed to assign null, it is an error to reference this after this point
+
+
+Hide:Access:TaCon.UseFile PROCEDURE(BYTE UseType = UseType:Uses)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  IF UseType ~= UseType:Initialize
+    SELF.UseFile(UseType:Initialize)                       !Recursive call to ensure initialization takes place
+  END
+  IF UseType = UseType:Initialize AND ~SELF.Initialized
+    SELF.InUseFile = True
+    SELF.Init(TaCon,GlobalErrors)
+    SELF.Create = 1
+    SELF.LockRecover = 10
+    SELF.AddKey(UniTaCon:PKID,'UniTaCon:PKID',1)
+    SELF.AddKey(UniTaCon:KName,'UniTaCon:KName',0)
+    SELF.AddKey(UniTaCon:KCode,'UniTaCon:KCode',0)
+    SELF.AddKey(UniTaCon:KBSOType,'UniTaCon:KBSOType',0)
+  END
+                                                           !SELF.InUseFile will be set to False in PARENT
+  ReturnValue = PARENT.UseFile(UseType)
+  RETURN ReturnValue
+
+
+Hide:Relate:TaCon.Kill PROCEDURE
+
+  CODE
+  _Hide:Access:TaCon.Kill                                  ! Kill the file manager
+  PARENT.Kill
+  Relate:TaCon &= NULL                                     ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
+  DISPOSE(_Hide:Access:TaCon)                              ! destroy the file manager
+
+
+Hide:Relate:Supported.Init PROCEDURE()
+  CODE
+  _Hide:Access:Supported.Init
+  SELF.Init(Access:Supported,1)
+  SELF.SetAlias(Relate:Units)
+
+
+Hide:Access:Supported.Init PROCEDURE
+
+  CODE
+  SELF.Initialized = False
+  SELF.Buffer &= UniSpted:Record
+  SELF.AliasedFile &= Access:Units                         !This is a File Alias, so assign aliased file manager
+  SELF.FileNameValue = 'Supported'
+  SELF.SetErrors(GlobalErrors)
+  SELF.File &= Supported
+  PARENT.Init
+  Access:Supported &= SELF
+
+
+Hide:Access:Supported.Kill PROCEDURE
+
+  CODE
+  PARENT.Kill
+  Access:Supported &= NULL                                 ! File manager has been destroyed to assign null, it is an error to reference this after this point
+
+
+Hide:Access:Supported.UseFile PROCEDURE(BYTE UseType = UseType:Uses)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  IF UseType ~= UseType:Initialize
+    SELF.UseFile(UseType:Initialize)                       !Recursive call to ensure initialization takes place
+  END
+  IF UseType = UseType:Initialize AND ~SELF.Initialized
+    SELF.InUseFile = True
+    SELF.Init(Supported,GlobalErrors)
+    SELF.Create = 1
+    SELF.LockRecover = 10
+    SELF.AddKey(UniSpted:PKID,'UniSpted:PKID',1)
+    SELF.AddKey(UniSpted:KName,'UniSpted:KName',0)
+    SELF.AddKey(UniSpted:KCode,'UniSpted:KCode',0)
+    SELF.AddKey(UniSpted:KBSOType,'UniSpted:KBSOType',0)
+  END
+                                                           !SELF.InUseFile will be set to False in PARENT
+  ReturnValue = PARENT.UseFile(UseType)
+  RETURN ReturnValue
+
+
+Hide:Relate:Supported.Kill PROCEDURE
+
+  CODE
+  _Hide:Access:Supported.Kill                              ! Kill the file manager
+  PARENT.Kill
+  Relate:Supported &= NULL                                 ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
+  DISPOSE(_Hide:Access:Supported)                          ! destroy the file manager
+
+
+Hide:Relate:Supporting.Init PROCEDURE()
+  CODE
+  _Hide:Access:Supporting.Init
+  SELF.Init(Access:Supporting,1)
+  SELF.SetAlias(Relate:Units)
+
+
+Hide:Access:Supporting.Init PROCEDURE
+
+  CODE
+  SELF.Initialized = False
+  SELF.Buffer &= UniSping:Record
+  SELF.AliasedFile &= Access:Units                         !This is a File Alias, so assign aliased file manager
+  SELF.FileNameValue = 'Supporting'
+  SELF.SetErrors(GlobalErrors)
+  SELF.File &= Supporting
+  PARENT.Init
+  Access:Supporting &= SELF
+
+
+Hide:Access:Supporting.Kill PROCEDURE
+
+  CODE
+  PARENT.Kill
+  Access:Supporting &= NULL                                ! File manager has been destroyed to assign null, it is an error to reference this after this point
+
+
+Hide:Access:Supporting.UseFile PROCEDURE(BYTE UseType = UseType:Uses)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  IF UseType ~= UseType:Initialize
+    SELF.UseFile(UseType:Initialize)                       !Recursive call to ensure initialization takes place
+  END
+  IF UseType = UseType:Initialize AND ~SELF.Initialized
+    SELF.InUseFile = True
+    SELF.Init(Supporting,GlobalErrors)
+    SELF.Create = 1
+    SELF.LockRecover = 10
+    SELF.AddKey(UniSping:PKID,'UniSping:PKID',1)
+    SELF.AddKey(UniSping:KName,'UniSping:KName',0)
+    SELF.AddKey(UniSping:KCode,'UniSping:KCode',0)
+    SELF.AddKey(UniSping:KBSOType,'UniSping:KBSOType',0)
+  END
+                                                           !SELF.InUseFile will be set to False in PARENT
+  ReturnValue = PARENT.UseFile(UseType)
+  RETURN ReturnValue
+
+
+Hide:Relate:Supporting.Kill PROCEDURE
+
+  CODE
+  _Hide:Access:Supporting.Kill                             ! Kill the file manager
+  PARENT.Kill
+  Relate:Supporting &= NULL                                ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
+  DISPOSE(_Hide:Access:Supporting)                         ! destroy the file manager
+
+
+Hide:Relate:P.Init PROCEDURE()
+  CODE
+  _Hide:Access:P.Init
+  SELF.Init(Access:P,1)
+  SELF.SetAlias(Relate:Units)
+
+
+Hide:Access:P.Init PROCEDURE
+
+  CODE
+  SELF.Initialized = False
+  SELF.Buffer &= UniP:Record
+  SELF.AliasedFile &= Access:Units                         !This is a File Alias, so assign aliased file manager
+  SELF.FileNameValue = 'P'
+  SELF.SetErrors(GlobalErrors)
+  SELF.File &= P
+  PARENT.Init
+  Access:P &= SELF
+
+
+Hide:Access:P.Kill PROCEDURE
+
+  CODE
+  PARENT.Kill
+  Access:P &= NULL                                         ! File manager has been destroyed to assign null, it is an error to reference this after this point
+
+
+Hide:Access:P.UseFile PROCEDURE(BYTE UseType = UseType:Uses)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  IF UseType ~= UseType:Initialize
+    SELF.UseFile(UseType:Initialize)                       !Recursive call to ensure initialization takes place
+  END
+  IF UseType = UseType:Initialize AND ~SELF.Initialized
+    SELF.InUseFile = True
+    SELF.Init(P,GlobalErrors)
+    SELF.Create = 1
+    SELF.LockRecover = 10
+    SELF.AddKey(UniP:PKID,'UniP:PKID',1)
+    SELF.AddKey(UniP:KName,'UniP:KName',0)
+    SELF.AddKey(UniP:KCode,'UniP:KCode',0)
+    SELF.AddKey(UniP:KBSOType,'UniP:KBSOType',0)
+  END
+                                                           !SELF.InUseFile will be set to False in PARENT
+  ReturnValue = PARENT.UseFile(UseType)
+  RETURN ReturnValue
+
+
+Hide:Relate:P.Kill PROCEDURE
+
+  CODE
+  _Hide:Access:P.Kill                                      ! Kill the file manager
+  PARENT.Kill
+  Relate:P &= NULL                                         ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
+  DISPOSE(_Hide:Access:P)                                  ! destroy the file manager
 
 
 Hide:Relate:Adm.Init PROCEDURE()
@@ -1503,294 +1735,4 @@ Hide:Relate:_C2IE_ORBATs.Kill PROCEDURE
   PARENT.Kill
   Relate:_C2IE_ORBATs &= NULL                              ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
   DISPOSE(_Hide:Access:_C2IE_ORBATs)                       ! destroy the file manager
-
-
-Hide:Relate:_C2IE_TASKORGs.Init PROCEDURE()
-  CODE
-  _Hide:Access:_C2IE_TASKORGs.Init
-  SELF.Init(Access:_C2IE_TASKORGs,1)
-  SELF.SetAlias(Relate:C2IEs)
-
-
-Hide:Access:_C2IE_TASKORGs.Init PROCEDURE
-
-  CODE
-  SELF.Initialized = False
-  SELF.Buffer &= _C2IETSK:Record
-  SELF.AliasedFile &= Access:C2IEs                         !This is a File Alias, so assign aliased file manager
-  SELF.FileNameValue = '_C2IE_TASKORGs'
-  SELF.SetErrors(GlobalErrors)
-  SELF.File &= _C2IE_TASKORGs
-  PARENT.Init
-  Access:_C2IE_TASKORGs &= SELF
-
-
-Hide:Access:_C2IE_TASKORGs.Kill PROCEDURE
-
-  CODE
-  PARENT.Kill
-  Access:_C2IE_TASKORGs &= NULL                            ! File manager has been destroyed to assign null, it is an error to reference this after this point
-
-
-Hide:Access:_C2IE_TASKORGs.UseFile PROCEDURE(BYTE UseType = UseType:Uses)
-
-ReturnValue          BYTE,AUTO
-
-  CODE
-  IF UseType ~= UseType:Initialize
-    SELF.UseFile(UseType:Initialize)                       !Recursive call to ensure initialization takes place
-  END
-  IF UseType = UseType:Initialize AND ~SELF.Initialized
-    SELF.InUseFile = True
-    SELF.Init(_C2IE_TASKORGs,GlobalErrors)
-    SELF.Create = 1
-    SELF.LockRecover = 10
-    SELF.AddKey(_C2IETSK:PKID,'_C2IETSK:PKID',1)
-    SELF.AddKey(_C2IETSK:KType,'_C2IETSK:KType',0)
-  END
-                                                           !SELF.InUseFile will be set to False in PARENT
-  ReturnValue = PARENT.UseFile(UseType)
-  RETURN ReturnValue
-
-
-Hide:Relate:_C2IE_TASKORGs.DeferedAddRelations PROCEDURE
-
-  CODE
-  DO AddRelations_1
-  
-  PARENT.DeferedAddRelations
-
-AddRelations_1 ROUTINE
-  SELF.AddRelation(Relate:C2IPContent,RI:None,RI:None,C2IPCt:KC2IE)
-  SELF.AddRelationLink(_C2IETSK:ID,C2IPCt:C2IEInstance)
-
-  SELF.AddRelation(Relate:_c2ieBSO_TASKORGs,RI:None,RI:None,_c2ieBSOTSK:KC2IE)
-  SELF.AddRelationLink(_C2IETSK:ID,_c2ieBSOTSK:C2IE)
-
-
-Hide:Relate:_C2IE_TASKORGs.Kill PROCEDURE
-
-  CODE
-  _Hide:Access:_C2IE_TASKORGs.Kill                         ! Kill the file manager
-  PARENT.Kill
-  Relate:_C2IE_TASKORGs &= NULL                            ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
-  DISPOSE(_Hide:Access:_C2IE_TASKORGs)                     ! destroy the file manager
-
-
-Hide:Relate:_c2ieBSO_ORBATs.Init PROCEDURE()
-  CODE
-  _Hide:Access:_c2ieBSO_ORBATs.Init
-  SELF.Init(Access:_c2ieBSO_ORBATs,1)
-  SELF.SetAlias(Relate:c2ieUnits)
-
-
-Hide:Access:_c2ieBSO_ORBATs.Init PROCEDURE
-
-  CODE
-  SELF.Initialized = False
-  SELF.Buffer &= _c2ieBSOORB:Record
-  SELF.AliasedFile &= Access:c2ieUnits                     !This is a File Alias, so assign aliased file manager
-  SELF.FileNameValue = '_c2ieBSO_ORBATs'
-  SELF.SetErrors(GlobalErrors)
-  SELF.File &= _c2ieBSO_ORBATs
-  PARENT.Init
-  Access:_c2ieBSO_ORBATs &= SELF
-
-
-Hide:Access:_c2ieBSO_ORBATs.Kill PROCEDURE
-
-  CODE
-  PARENT.Kill
-  Access:_c2ieBSO_ORBATs &= NULL                           ! File manager has been destroyed to assign null, it is an error to reference this after this point
-
-
-Hide:Access:_c2ieBSO_ORBATs.UseFile PROCEDURE(BYTE UseType = UseType:Uses)
-
-ReturnValue          BYTE,AUTO
-
-  CODE
-  IF UseType ~= UseType:Initialize
-    SELF.UseFile(UseType:Initialize)                       !Recursive call to ensure initialization takes place
-  END
-  IF UseType = UseType:Initialize AND ~SELF.Initialized
-    SELF.InUseFile = True
-    SELF.Init(_c2ieBSO_ORBATs,GlobalErrors)
-    SELF.Create = 1
-    SELF.LockRecover = 10
-    SELF.AddKey(_c2ieBSOORB:PKID,'_c2ieBSOORB:PKID',1)
-    SELF.AddKey(_c2ieBSOORB:KC2IEUnit,'_c2ieBSOORB:KC2IEUnit',0)
-    SELF.AddKey(_c2ieBSOORB:KC2IE,'_c2ieBSOORB:KC2IE',0)
-    SELF.AddKey(_c2ieBSOORB:KUnit,'_c2ieBSOORB:KUnit',0)
-    SELF.AddKey(_c2ieBSOORB:KHostility,'_c2ieBSOORB:KHostility',0)
-  END
-                                                           !SELF.InUseFile will be set to False in PARENT
-  ReturnValue = PARENT.UseFile(UseType)
-  RETURN ReturnValue
-
-
-Hide:Relate:_c2ieBSO_ORBATs.DeferedAddRelations PROCEDURE
-
-  CODE
-  DO AddRelations_1
-  
-  PARENT.DeferedAddRelations
-
-AddRelations_1 ROUTINE
-  SELF.AddRelation(Relate:_C2IE_ORBATs)
-
-  SELF.AddRelation(Relate:Units)
-
-
-Hide:Relate:_c2ieBSO_ORBATs.Kill PROCEDURE
-
-  CODE
-  _Hide:Access:_c2ieBSO_ORBATs.Kill                        ! Kill the file manager
-  PARENT.Kill
-  Relate:_c2ieBSO_ORBATs &= NULL                           ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
-  DISPOSE(_Hide:Access:_c2ieBSO_ORBATs)                    ! destroy the file manager
-
-
-Hide:Relate:_c2ieBSO_TASKORGs.Init PROCEDURE()
-  CODE
-  _Hide:Access:_c2ieBSO_TASKORGs.Init
-  SELF.Init(Access:_c2ieBSO_TASKORGs,1)
-  SELF.SetAlias(Relate:c2ieUnits)
-
-
-Hide:Access:_c2ieBSO_TASKORGs.Init PROCEDURE
-
-  CODE
-  SELF.Initialized = False
-  SELF.Buffer &= _c2ieBSOTSK:Record
-  SELF.AliasedFile &= Access:c2ieUnits                     !This is a File Alias, so assign aliased file manager
-  SELF.FileNameValue = '_c2ieBSO_TASKORGs'
-  SELF.SetErrors(GlobalErrors)
-  SELF.File &= _c2ieBSO_TASKORGs
-  PARENT.Init
-  Access:_c2ieBSO_TASKORGs &= SELF
-
-
-Hide:Access:_c2ieBSO_TASKORGs.Kill PROCEDURE
-
-  CODE
-  PARENT.Kill
-  Access:_c2ieBSO_TASKORGs &= NULL                         ! File manager has been destroyed to assign null, it is an error to reference this after this point
-
-
-Hide:Access:_c2ieBSO_TASKORGs.UseFile PROCEDURE(BYTE UseType = UseType:Uses)
-
-ReturnValue          BYTE,AUTO
-
-  CODE
-  IF UseType ~= UseType:Initialize
-    SELF.UseFile(UseType:Initialize)                       !Recursive call to ensure initialization takes place
-  END
-  IF UseType = UseType:Initialize AND ~SELF.Initialized
-    SELF.InUseFile = True
-    SELF.Init(_c2ieBSO_TASKORGs,GlobalErrors)
-    SELF.Create = 1
-    SELF.LockRecover = 10
-    SELF.AddKey(_c2ieBSOTSK:PKID,'_c2ieBSOTSK:PKID',1)
-    SELF.AddKey(_c2ieBSOTSK:KC2IEUnit,'_c2ieBSOTSK:KC2IEUnit',0)
-    SELF.AddKey(_c2ieBSOTSK:KC2IE,'_c2ieBSOTSK:KC2IE',0)
-    SELF.AddKey(_c2ieBSOTSK:KUnit,'_c2ieBSOTSK:KUnit',0)
-    SELF.AddKey(_c2ieBSOTSK:KHostility,'_c2ieBSOTSK:KHostility',0)
-  END
-                                                           !SELF.InUseFile will be set to False in PARENT
-  ReturnValue = PARENT.UseFile(UseType)
-  RETURN ReturnValue
-
-
-Hide:Relate:_c2ieBSO_TASKORGs.DeferedAddRelations PROCEDURE
-
-  CODE
-  DO AddRelations_1
-  
-  PARENT.DeferedAddRelations
-
-AddRelations_1 ROUTINE
-  SELF.AddRelation(Relate:_C2IE_TASKORGs)
-
-  SELF.AddRelation(Relate:_Units)
-
-  SELF.AddRelation(Relate:c2ieUnitTransfer,RI:None,RI:None,c2iUniTrf:Kc2ieUnit)
-  SELF.AddRelationLink(_c2ieBSOTSK:ID,c2iUniTrf:c2ieUnit)
-
-
-Hide:Relate:_c2ieBSO_TASKORGs.Kill PROCEDURE
-
-  CODE
-  _Hide:Access:_c2ieBSO_TASKORGs.Kill                      ! Kill the file manager
-  PARENT.Kill
-  Relate:_c2ieBSO_TASKORGs &= NULL                         ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
-  DISPOSE(_Hide:Access:_c2ieBSO_TASKORGs)                  ! destroy the file manager
-
-
-Hide:Relate:_C2IEsFromTransfers.Init PROCEDURE()
-  CODE
-  _Hide:Access:_C2IEsFromTransfers.Init
-  SELF.Init(Access:_C2IEsFromTransfers,1)
-  SELF.SetAlias(Relate:C2IEs)
-
-
-Hide:Access:_C2IEsFromTransfers.Init PROCEDURE
-
-  CODE
-  SELF.Initialized = False
-  SELF.Buffer &= _C2IEFromTrf:Record
-  SELF.AliasedFile &= Access:C2IEs                         !This is a File Alias, so assign aliased file manager
-  SELF.FileNameValue = '_C2IEsFromTransfers'
-  SELF.SetErrors(GlobalErrors)
-  SELF.File &= _C2IEsFromTransfers
-  PARENT.Init
-  Access:_C2IEsFromTransfers &= SELF
-
-
-Hide:Access:_C2IEsFromTransfers.Kill PROCEDURE
-
-  CODE
-  PARENT.Kill
-  Access:_C2IEsFromTransfers &= NULL                       ! File manager has been destroyed to assign null, it is an error to reference this after this point
-
-
-Hide:Access:_C2IEsFromTransfers.UseFile PROCEDURE(BYTE UseType = UseType:Uses)
-
-ReturnValue          BYTE,AUTO
-
-  CODE
-  IF UseType ~= UseType:Initialize
-    SELF.UseFile(UseType:Initialize)                       !Recursive call to ensure initialization takes place
-  END
-  IF UseType = UseType:Initialize AND ~SELF.Initialized
-    SELF.InUseFile = True
-    SELF.Init(_C2IEsFromTransfers,GlobalErrors)
-    SELF.Create = 1
-    SELF.LockRecover = 10
-    SELF.AddKey(_C2IEFromTrf:PKID,'_C2IEFromTrf:PKID',1)
-    SELF.AddKey(_C2IEFromTrf:KType,'_C2IEFromTrf:KType',0)
-  END
-                                                           !SELF.InUseFile will be set to False in PARENT
-  ReturnValue = PARENT.UseFile(UseType)
-  RETURN ReturnValue
-
-
-Hide:Relate:_C2IEsFromTransfers.DeferedAddRelations PROCEDURE
-
-  CODE
-  DO AddRelations_1
-  
-  PARENT.DeferedAddRelations
-
-AddRelations_1 ROUTINE
-  SELF.AddRelation(Relate:c2ieUnitTransfer,RI:None,RI:None,c2iUniTrf:KC2IE_From)
-  SELF.AddRelationLink(_C2IEFromTrf:ID,c2iUniTrf:C2IE_From)
-
-
-Hide:Relate:_C2IEsFromTransfers.Kill PROCEDURE
-
-  CODE
-  _Hide:Access:_C2IEsFromTransfers.Kill                    ! Kill the file manager
-  PARENT.Kill
-  Relate:_C2IEsFromTransfers &= NULL                       ! Assign NULL to the RelationManager's FileManager reference, it is an error to reference this after this point
-  DISPOSE(_Hide:Access:_C2IEsFromTransfers)                ! destroy the file manager
 
