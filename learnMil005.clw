@@ -1842,6 +1842,9 @@ FDCB8::View:FileDropCombo VIEW(myOrganization)
 FDCB9::View:FileDropCombo VIEW(MilMissions)
                        PROJECT(Miss:Name)
                        PROJECT(Miss:ID)
+                       JOIN(tpyMilOp:PKID,Miss:ID)
+                         PROJECT(tpyMilOp:ID)
+                       END
                      END
 BRW10::View:Browse   VIEW(MissionTASKORG)
                        PROJECT(MissTSK:ID)
@@ -1896,43 +1899,49 @@ ViewPosition           STRING(1024)                   !Entry's view position
 Queue:FileDropCombo:1 QUEUE                           !Queue declaration for browse/combo box using ?Miss:Name
 Miss:Name              LIKE(Miss:Name)                !List box control field - type derived from field
 Miss:ID                LIKE(Miss:ID)                  !Primary key field - type derived from field
+tpyMilOp:ID            LIKE(tpyMilOp:ID)              !Related join file key field - type derived from field
 Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
 History::OrgMiss:Record LIKE(OrgMiss:RECORD),THREAD
-QuickWindow          WINDOW('View Mission'),AT(,,417,273),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
+QuickWindow          WINDOW('View Mission'),AT(,,523,345),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
   RESIZE,CENTER,GRAY,IMM,MDI,HLP('U_OrgMissions'),SYSTEM
-                       SHEET,AT(4,4,411,58),USE(?CurrentTab)
-                         TAB('&1) General'),USE(?Tab:1)
-                           PROMPT('ID:'),AT(8,20),USE(?OrgMiss:ID:Prompt),TRN
-                           ENTRY(@n-10.0),AT(64,20,48,10),USE(OrgMiss:ID),DECIMAL(12)
-                           PROMPT('Organization:'),AT(8,34),USE(?OrgMiss:Organization:Prompt),TRN
-                           ENTRY(@n-10.0),AT(64,34,48,10),USE(OrgMiss:Organization),DECIMAL(12)
-                           PROMPT('Mission:'),AT(8,48),USE(?OrgMiss:Mission:Prompt),TRN
-                           ENTRY(@n-10.0),AT(64,48,48,10),USE(OrgMiss:Mission),DECIMAL(12)
-                           COMBO(@s100),AT(117,34,291,10),USE(myOrg:Name),DROP(5),FORMAT('400L(2)|M~Name~L(0)@s100@'), |
-  FROM(Queue:FileDropCombo),IMM
-                           COMBO(@s100),AT(117,48,291,9),USE(Miss:Name),DROP(5),FORMAT('400L(2)|M~Name~L(0)@s100@'),FROM(Queue:FileDropCombo:1), |
+                       PROMPT('Organization:'),AT(11,2),USE(?OrgMiss:Organization:Prompt),TRN
+                       PROMPT('Mission:'),AT(11,17),USE(?OrgMiss:Mission:Prompt),TRN
+                       ENTRY(@n-10.0),AT(67,2,48,10),USE(OrgMiss:Organization),DECIMAL(12),HIDE
+                       COMBO(@s100),AT(121,17,291,9),USE(Miss:Name),DROP(5),FORMAT('400L(2)|M~Name~L(0)@s100@'),FROM(Queue:FileDropCombo:1), |
   IMM
-                         END
-                       END
-                       BUTTON('&OK'),AT(260,257,49,14),USE(?OK),LEFT,ICON('WAOK.ICO'),DEFAULT,FLAT,MSG('Accept dat' & |
+                       COMBO(@s100),AT(121,2,291,10),USE(myOrg:Name),DROP(5),FORMAT('400L(2)|M~Name~L(0)@s100@'), |
+  FROM(Queue:FileDropCombo),IMM
+                       ENTRY(@n-10.0),AT(67,17,48,10),USE(OrgMiss:Mission),DECIMAL(12),HIDE
+                       BUTTON('&OK'),AT(366,329,49,14),USE(?OK),LEFT,ICON('WAOK.ICO'),DEFAULT,FLAT,MSG('Accept dat' & |
   'a and close the window'),TIP('Accept data and close the window')
-                       BUTTON('&Cancel'),AT(313,257,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel operation'), |
+                       BUTTON('&Cancel'),AT(419,329,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel operation'), |
   TIP('Cancel operation')
-                       BUTTON('&Help'),AT(366,257,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+                       BUTTON('&Help'),AT(472,329,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
   STD(STD:Help),TIP('See Help Window')
-                       LIST,AT(6,66,195,59),USE(?List),FORMAT('0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0' & |
-  '@[400L(2)|M~Name~C(0)@s100@]|~TASKORG~'),FROM(Queue:Browse),IMM
-                       BUTTON('&Insert'),AT(5,129,42,12),USE(?Insert)
-                       BUTTON('&Change'),AT(47,129,42,12),USE(?Change)
-                       BUTTON('&Delete'),AT(89,129,42,12),USE(?Delete)
-                       BUTTON('View TaskOrg'),AT(4,257),USE(?BUTTON2)
-                       BUTTON('View COP'),AT(68,257),USE(?BUTTON3)
-                       BUTTON('View MilDocs'),AT(120,257),USE(?BUTTON1)
-                       LIST,AT(206,66,207,59),USE(?List:2),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[100L(2)|M~C2IP Nam' & |
-  'e~C(0)@s100@40L(2)|M~C2IP Type~C(0)@s20@]|~C2IP Explorer~'),FROM(Queue:Browse:1),IMM
-                       BUTTON('Create COP'),AT(205,127),USE(?BUTTON4)
+                       LIST,AT(5,153,195,59),USE(?List),FORMAT('0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.' & |
+  '0@[400L(2)|M~Name~C(0)@s100@]|~TASKORG~'),FROM(Queue:Browse),IMM
+                       BUTTON('&Insert'),AT(2,217,42,12),USE(?Insert)
+                       BUTTON('&Change'),AT(45,217,42,12),USE(?Change)
+                       BUTTON('&Delete'),AT(86,217,42,12),USE(?Delete)
+                       BUTTON('View TaskOrg'),AT(4,257),USE(?BUTTON_ViewTaskOrg)
+                       BUTTON('View COP'),AT(68,257),USE(?BUTTON_ViewCOP)
+                       BUTTON('View MilDocs'),AT(120,257),USE(?BUTTON_MilDoc)
+                       LIST,AT(205,153,207,59),USE(?List:2),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[100L(2)|M~C2IP Na' & |
+  'me~C(0)@s100@40L(2)|M~C2IP Type~C(0)@s20@]|~C2IP Explorer~'),FROM(Queue:Browse:1),IMM
+                       BUTTON('Create COP'),AT(202,214),USE(?BUTTON_CreateCOP)
+                       PROMPT('Start Date:'),AT(121,33),USE(?Miss:StartDate:Prompt)
+                       ENTRY(@D10),AT(170,31,60,10),USE(Miss:StartDate),DECIMAL(12)
+                       PROMPT('Start Time:'),AT(302,33),USE(?Miss:StartTime:Prompt)
+                       ENTRY(@T4),AT(351,31,60,10),USE(Miss:StartTime)
+                       PROMPT('End Date:'),AT(119,47),USE(?Miss:EndDate:Prompt)
+                       ENTRY(@D10),AT(170,46,60,10),USE(Miss:EndDate)
+                       PROMPT('End Time:'),AT(301,47),USE(?Miss:EndTime:Prompt)
+                       ENTRY(@T4),AT(351,46,60,10),USE(Miss:EndTime)
+                       PROMPT('Mil Operation:'),AT(120,62),USE(?tpyMilOp:Name:Prompt)
+                       ENTRY(@s100),AT(170,61,242,10),USE(tpyMilOp:Name)
+                       TEXT,AT(5,78,515,70),USE(Miss:freeText),RTF(TEXT:Field)
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -2011,7 +2020,7 @@ ReturnValue          BYTE,AUTO
   SELF.Request = GlobalRequest                             ! Store the incoming request
   ReturnValue = PARENT.Init()
   IF ReturnValue THEN RETURN ReturnValue.
-  SELF.FirstField = ?OrgMiss:ID:Prompt
+  SELF.FirstField = ?OrgMiss:Organization:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
   SELF.AddItem(Toolbar)
@@ -2019,7 +2028,6 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalResponse)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(OrgMiss:Record,History::OrgMiss:Record)
-  SELF.AddHistoryField(?OrgMiss:ID,1)
   SELF.AddHistoryField(?OrgMiss:Organization,2)
   SELF.AddHistoryField(?OrgMiss:Mission,3)
   SELF.AddUpdateFile(Access:OrgMissions)
@@ -2045,18 +2053,22 @@ ReturnValue          BYTE,AUTO
   SELF.Open(QuickWindow)                                   ! Open window
   Do DefineListboxStyle
   IF SELF.Request = ViewRecord                             ! Configure controls for View Only mode
-    ?OrgMiss:ID{PROP:ReadOnly} = True
     ?OrgMiss:Organization{PROP:ReadOnly} = True
-    ?OrgMiss:Mission{PROP:ReadOnly} = True
-    DISABLE(?myOrg:Name)
     DISABLE(?Miss:Name)
+    DISABLE(?myOrg:Name)
+    ?OrgMiss:Mission{PROP:ReadOnly} = True
     DISABLE(?Insert)
     DISABLE(?Change)
     DISABLE(?Delete)
-    DISABLE(?BUTTON2)
-    DISABLE(?BUTTON3)
-    DISABLE(?BUTTON1)
-    DISABLE(?BUTTON4)
+    DISABLE(?BUTTON_ViewTaskOrg)
+    DISABLE(?BUTTON_ViewCOP)
+    DISABLE(?BUTTON_MilDoc)
+    DISABLE(?BUTTON_CreateCOP)
+    ?Miss:StartDate{PROP:ReadOnly} = True
+    ?Miss:StartTime{PROP:ReadOnly} = True
+    ?Miss:EndDate{PROP:ReadOnly} = True
+    ?Miss:EndTime{PROP:ReadOnly} = True
+    ?tpyMilOp:Name{PROP:ReadOnly} = True
   END
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
@@ -2100,6 +2112,7 @@ ReturnValue          BYTE,AUTO
   FDCB9.AddSortOrder(Miss:PKID)
   FDCB9.AddField(Miss:Name,FDCB9.Q.Miss:Name) !List box control field - type derived from field
   FDCB9.AddField(Miss:ID,FDCB9.Q.Miss:ID) !Primary key field - type derived from field
+  FDCB9.AddField(tpyMilOp:ID,FDCB9.Q.tpyMilOp:ID) !Related join file key field - type derived from field
   FDCB9.AddUpdateField(Miss:ID,OrgMiss:Mission)
   ThisWindow.AddItem(FDCB9.WindowComponent)
   FDCB9.DefaultFill = 0
@@ -2181,13 +2194,14 @@ Looped BYTE
       IF SELF.Request = ViewRecord AND NOT SELF.BatchProcessing THEN
          POST(EVENT:CloseWindow)
       END
-    OF ?BUTTON3
+    OF ?BUTTON_ViewCOP
       ThisWindow.Update()
       ! COPApp
       
       ! View current selected C2IP from C2IP Explorer
+      !MESSAGE('C2IP = ' & BRW_MissC2IPs.q.C2IP:ID)
       COPApp(BRW_MissC2IPs.q.C2IP:ID, OrgMiss:Organization, nMissTaskOrgRef, nTASKORGC2IPRef)
-    OF ?BUTTON4
+    OF ?BUTTON_CreateCOP
       ThisWindow.Update()
       ! COPApp
       

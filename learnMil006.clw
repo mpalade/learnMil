@@ -583,25 +583,44 @@ U_Missions PROCEDURE
 
 CurrentTab           STRING(80)                            ! 
 ActionMessage        CSTRING(40)                           ! 
+FDCB8::View:FileDropCombo VIEW(type_MilOps)
+                       PROJECT(tpyMilOp:Name)
+                       PROJECT(tpyMilOp:ID)
+                     END
+Queue:FileDropCombo  QUEUE                            !Queue declaration for browse/combo box using ?tpyMilOp:Name
+tpyMilOp:Name          LIKE(tpyMilOp:Name)            !List box control field - type derived from field
+tpyMilOp:ID            LIKE(tpyMilOp:ID)              !Primary key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
 History::Miss:Record LIKE(Miss:RECORD),THREAD
-QuickWindow          WINDOW('Form MilMissions'),AT(,,358,84),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
+QuickWindow          WINDOW('Form MilMissions'),AT(,,417,271),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
   RESIZE,CENTER,GRAY,IMM,MDI,HLP('U_Missions'),SYSTEM
-                       SHEET,AT(4,4,350,58),USE(?CurrentTab)
-                         TAB('&1) General'),USE(?Tab:1)
-                           PROMPT('ID:'),AT(8,20),USE(?Miss:ID:Prompt),TRN
-                           ENTRY(@n-10.0),AT(61,20,48,10),USE(Miss:ID),DECIMAL(12)
-                           PROMPT('Name:'),AT(8,34),USE(?Miss:Name:Prompt),TRN
-                           ENTRY(@s100),AT(61,34,289,10),USE(Miss:Name)
-                           PROMPT('Code:'),AT(8,48),USE(?Miss:Code:Prompt),TRN
-                           ENTRY(@s20),AT(61,48,84,10),USE(Miss:Code)
-                         END
-                       END
-                       BUTTON('&OK'),AT(199,66,49,14),USE(?OK),LEFT,ICON('WAOK.ICO'),DEFAULT,FLAT,MSG('Accept dat' & |
+                       PROMPT('ID:'),AT(8,20),USE(?Miss:ID:Prompt),TRN
+                       PROMPT('Name:'),AT(8,34),USE(?Miss:Name:Prompt),TRN
+                       ENTRY(@s100),AT(61,34,289,10),USE(Miss:Name)
+                       ENTRY(@n-10.0),AT(61,20,48,10),USE(Miss:ID),DECIMAL(12)
+                       PROMPT('Code:'),AT(8,48),USE(?Miss:Code:Prompt),TRN
+                       ENTRY(@s20),AT(61,48,84,10),USE(Miss:Code)
+                       BUTTON('&OK'),AT(259,255,49,14),USE(?OK),LEFT,ICON('WAOK.ICO'),DEFAULT,FLAT,MSG('Accept dat' & |
   'a and close the window'),TIP('Accept data and close the window')
-                       BUTTON('&Cancel'),AT(252,66,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel operation'), |
+                       BUTTON('&Cancel'),AT(312,255,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel operation'), |
   TIP('Cancel operation')
-                       BUTTON('&Help'),AT(305,66,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+                       BUTTON('&Help'),AT(365,255,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
   STD(STD:Help),TIP('See Help Window')
+                       PROMPT('Start Date:'),AT(11,63),USE(?Miss:StartDate:Prompt)
+                       ENTRY(@D10),AT(61,63,60,10),USE(Miss:StartDate),DECIMAL(12)
+                       PROMPT('Start Time:'),AT(137,64),USE(?Miss:StartTime:Prompt)
+                       ENTRY(@T4),AT(187,63,60,10),USE(Miss:StartTime)
+                       PROMPT('End Date:'),AT(12,78),USE(?Miss:EndDate:Prompt)
+                       ENTRY(@D10),AT(61,78,60,10),USE(Miss:EndDate)
+                       PROMPT('End Time:'),AT(137,79),USE(?Miss:EndTime:Prompt)
+                       ENTRY(@T4),AT(187,78,60,10),USE(Miss:EndTime)
+                       PROMPT('Military Operation type:'),AT(8,93,49,32),USE(?Miss:MilOpType:Prompt)
+                       ENTRY(@n-10.0),AT(61,92,60,10),USE(Miss:MilOpType),DECIMAL(12),HIDE
+                       COMBO(@s100),AT(61,92,289,10),USE(tpyMilOp:Name),DROP(5),FORMAT('400L(2)|M~Name~L(0)@s100@'), |
+  FROM(Queue:FileDropCombo),IMM
+                       TEXT,AT(62,118,288,86),USE(Miss:freeText,,?Miss:freeText:2),RTF(TEXT:Field)
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -616,6 +635,10 @@ Toolbar              ToolbarClass
 ToolbarForm          ToolbarUpdateClass                    ! Form Toolbar Manager
 Resizer              CLASS(WindowResizeClass)
 Init                   PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
+                     END
+
+FDCB8                CLASS(FileDropComboClass)             ! File drop combo manager
+Q                      &Queue:FileDropCombo           !Reference to browse queue type
                      END
 
 CurCtrlFeq          LONG
@@ -667,9 +690,15 @@ ReturnValue          BYTE,AUTO
   CLEAR(GlobalResponse)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(Miss:Record,History::Miss:Record)
-  SELF.AddHistoryField(?Miss:ID,1)
   SELF.AddHistoryField(?Miss:Name,2)
+  SELF.AddHistoryField(?Miss:ID,1)
   SELF.AddHistoryField(?Miss:Code,3)
+  SELF.AddHistoryField(?Miss:StartDate,4)
+  SELF.AddHistoryField(?Miss:StartTime,5)
+  SELF.AddHistoryField(?Miss:EndDate,6)
+  SELF.AddHistoryField(?Miss:EndTime,7)
+  SELF.AddHistoryField(?Miss:MilOpType,8)
+  SELF.AddHistoryField(?Miss:freeText:2,9)
   SELF.AddUpdateFile(Access:MilMissions)
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:MilMissions.Open                                  ! File MilMissions used by this procedure, so make sure it's RelationManager is open
@@ -690,9 +719,15 @@ ReturnValue          BYTE,AUTO
   SELF.Open(QuickWindow)                                   ! Open window
   Do DefineListboxStyle
   IF SELF.Request = ViewRecord                             ! Configure controls for View Only mode
-    ?Miss:ID{PROP:ReadOnly} = True
     ?Miss:Name{PROP:ReadOnly} = True
+    ?Miss:ID{PROP:ReadOnly} = True
     ?Miss:Code{PROP:ReadOnly} = True
+    ?Miss:StartDate{PROP:ReadOnly} = True
+    ?Miss:StartTime{PROP:ReadOnly} = True
+    ?Miss:EndDate{PROP:ReadOnly} = True
+    ?Miss:EndTime{PROP:ReadOnly} = True
+    ?Miss:MilOpType{PROP:ReadOnly} = True
+    DISABLE(?tpyMilOp:Name)
   END
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
@@ -700,6 +735,14 @@ ReturnValue          BYTE,AUTO
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
   ToolBarForm.HelpButton=?Help
   SELF.AddItem(ToolbarForm)
+  FDCB8.Init(tpyMilOp:Name,?tpyMilOp:Name,Queue:FileDropCombo.ViewPosition,FDCB8::View:FileDropCombo,Queue:FileDropCombo,Relate:type_MilOps,ThisWindow,GlobalErrors,0,1,0)
+  FDCB8.Q &= Queue:FileDropCombo
+  FDCB8.AddSortOrder()
+  FDCB8.AddField(tpyMilOp:Name,FDCB8.Q.tpyMilOp:Name) !List box control field - type derived from field
+  FDCB8.AddField(tpyMilOp:ID,FDCB8.Q.tpyMilOp:ID) !Primary key field - type derived from field
+  FDCB8.AddUpdateField(tpyMilOp:ID,Miss:MilOpType)
+  ThisWindow.AddItem(FDCB8.WindowComponent)
+  FDCB8.DefaultFill = 0
   SELF.SetAlerts()
   RETURN ReturnValue
 

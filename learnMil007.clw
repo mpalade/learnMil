@@ -524,6 +524,7 @@ sMoveToOvrlOptMenu   STRING(100)                           !
 nMoveToOvrlSelection SIGNED                                ! 
 vActPoints           LONG,DIM(20)                          ! 
 sCOPName             STRING(100)                           ! 
+sPrevCOPName         STRING(100)                           ! 
 nC2IERef             DECIMAL(7)                            ! 
 nC2IPRef             DECIMAL(7)                            ! 
 BRW1::View:Browse    VIEW(C2IPContent)
@@ -578,8 +579,8 @@ Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
 BRW10::View:Browse   VIEW(c2ieUnits)
-                       PROJECT(c2ieUni:Hostility)
                        PROJECT(c2ieUni:ID)
+                       PROJECT(c2ieUni:Hostility)
                        PROJECT(c2ieUni:C2IE)
                        PROJECT(c2ieUni:Unit)
                        JOIN(Uni:PKID,c2ieUni:Unit)
@@ -596,14 +597,19 @@ BRW10::View:Browse   VIEW(c2ieUnits)
                          PROJECT(tpyHstl:Code)
                          PROJECT(tpyHstl:ID)
                        END
+                       JOIN(_meta_c2ieUni:Kc2ieUni,c2ieUni:ID)
+                         PROJECT(_meta_c2ieUni:movedToOverlay)
+                       END
                      END
 Queue:Browse:2       QUEUE                            !Queue declaration for browse/combo box using ?List:2
+c2ieUni:ID             LIKE(c2ieUni:ID)               !List box control field - type derived from field
 tpyBSO:Code            LIKE(tpyBSO:Code)              !List box control field - type derived from field
 Uni:Code               LIKE(Uni:Code)                 !List box control field - type derived from field
 Uni:Name               LIKE(Uni:Name)                 !List box control field - type derived from field
+Uni:Name_Icon          LONG                           !Entry's icon ID
 c2ieUni:Hostility      LIKE(c2ieUni:Hostility)        !List box control field - type derived from field
 tpyHstl:Code           LIKE(tpyHstl:Code)             !List box control field - type derived from field
-c2ieUni:ID             LIKE(c2ieUni:ID)               !Primary key field - type derived from field
+_meta_c2ieUni:movedToOverlay LIKE(_meta_c2ieUni:movedToOverlay) !List box control field - type derived from field
 c2ieUni:C2IE           LIKE(c2ieUni:C2IE)             !Browse key field - type derived from field
 Uni:ID                 LIKE(Uni:ID)                   !Related join file key field - type derived from field
 tpyBSO:ID              LIKE(tpyBSO:ID)                !Related join file key field - type derived from field
@@ -639,9 +645,10 @@ QuickWindow          WINDOW('COP App'),AT(,,799,346),FONT('Microsoft Sans Serif'
   '@s20@60L(2)|M~1stOrdSubOrd~C(0)@s20@60L(2)|M~2ndOrdSubOrd~C(0)@s20@60L(2)|M~3rddOrdS' & |
   'ubOrd~C(0)@s20@]|~TASKORG~'),FROM(Queue:Browse),IMM,VCR
                        BUTTON('Move to Overlay'),AT(369,280),USE(?BUTTON_MoveToOverlay)
-                       LIST,AT(143,30,205,124),USE(?List:2),HVSCROLL,FORMAT('[40L(2)|M~BSO Type~C(0)@s20@40L(2' & |
-  ')|M~BSO Code~C(0)@s20@80L(2)|M~BSO Name~C(0)@s100@0L(2)|M~Hostility~D(12)@n-10.0@]|~' & |
-  'BSO~40L(2)|M~Hostility~C(0)@s20@'),FROM(Queue:Browse:2),IMM,VCR
+                       LIST,AT(143,30,205,124),USE(?List:2),HVSCROLL,DRAGID('moveToOvrl'),FORMAT('0L(2)|M~ID~D' & |
+  '(12)@n-10.0@[40L(2)|M~BSO Type~C(0)@s20@40L(2)|M~BSO Code~C(0)@s20@80L(2)|MI~BSO Nam' & |
+  'e~C(0)@s100@0L(2)|M~Hostility~D(12)@n-10.0@]|~BSO~40L(2)|M~Hostility~C(0)@s20@10L(2)' & |
+  '|M~Moved~C(0)@n3@'),FROM(Queue:Browse:2),IMM,VCR
                        BUTTON('&Insert'),AT(144,158,42,12),USE(?Insert)
                        BUTTON('&Change'),AT(185,158,42,12),USE(?Change)
                        BUTTON('&Delete'),AT(228,158,42,12),USE(?Delete)
@@ -659,6 +666,7 @@ QuickWindow          WINDOW('COP App'),AT(,,799,346),FONT('Microsoft Sans Serif'
                        IMAGE,AT(442,2,355,322),USE(?Draw)
                        PROMPT('Name:'),AT(9,9),USE(?sCOPName:Prompt)
                        ENTRY(@s100),AT(50,8,385,10),USE(sCOPName),FONT(,,,FONT:regular)
+                       REGION,AT(442,2,363,324),USE(?PANEL1),DROPID('moveToOvrl')
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -666,6 +674,7 @@ Init                   PROCEDURE(),BYTE,PROC,DERIVED
 Kill                   PROCEDURE(),BYTE,PROC,DERIVED
 Run                    PROCEDURE(USHORT Number,BYTE Request),BYTE,PROC,DERIVED
 TakeAccepted           PROCEDURE(),BYTE,PROC,DERIVED
+TakeFieldEvent         PROCEDURE(),BYTE,PROC,DERIVED
                      END
 
 Toolbar              ToolbarClass
@@ -685,6 +694,7 @@ BRW9::Sort0:Locator  StepLocatorClass                      ! Default Locator
 BRWC2IEBSOs          CLASS(BrowseClass)                    ! Browse using ?List:2
 Q                      &Queue:Browse:2                !Reference to browse queue
 Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+SetQueueRecord         PROCEDURE(),DERIVED
 TakeNewSelection       PROCEDURE(),DERIVED
                      END
 
@@ -696,11 +706,13 @@ Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,Rel
 
 BRW11::Sort0:Locator StepLocatorClass                      ! Default Locator
 BRW10::EIPManager    BrowseEIPManager                      ! Browse EIP Manager for Browse using ?List:2
+EditInPlace::c2ieUni:ID EditEntryClass                     ! Edit-in-place class for field c2ieUni:ID
 EditInPlace::tpyBSO:Code EditEntryClass                    ! Edit-in-place class for field tpyBSO:Code
 EditInPlace::Uni:Code EditEntryClass                       ! Edit-in-place class for field Uni:Code
 EditInPlace::Uni:Name EditEntryClass                       ! Edit-in-place class for field Uni:Name
 EditInPlace::c2ieUni:Hostility EditEntryClass              ! Edit-in-place class for field c2ieUni:Hostility
 EditInPlace::tpyHstl:Code EditEntryClass                   ! Edit-in-place class for field tpyHstl:Code
+EditInPlace::_meta_c2ieUni:movedToOverlay EditEntryClass   ! Edit-in-place class for field _meta_c2ieUni:movedToOverlay
 BRW11::EIPManager    BrowseEIPManager                      ! Browse EIP Manager for Browse using ?List:3
 EditInPlace::c2ieUniPos:xPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:xPos
 EditInPlace::c2ieUniPos:yPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:yPos
@@ -1001,6 +1013,7 @@ ReturnValue          BYTE,AUTO
   Relate:_Units.Open                                       ! File _Units used by this procedure, so make sure it's RelationManager is open
   Relate:_c2ieUnits.Open                                   ! File _c2ieUnits used by this procedure, so make sure it's RelationManager is open
   Relate:_c2ieUnitsPositions.Open                          ! File _c2ieUnitsPositions used by this procedure, so make sure it's RelationManager is open
+  Relate:_meta_c2ieUnits2.Open                             ! File _meta_c2ieUnits2 used by this procedure, so make sure it's RelationManager is open
   Relate:c2ieUnits.SetOpenRelated()
   Relate:c2ieUnits.Open                                    ! File c2ieUnits used by this procedure, so make sure it's RelationManager is open
   Relate:type_BSO.Open                                     ! File type_BSO used by this procedure, so make sure it's RelationManager is open
@@ -1010,8 +1023,6 @@ ReturnValue          BYTE,AUTO
   Access:type_Hostility.UseFile                            ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:C2IPs.UseFile                                     ! File referenced in 'Other Files' so need to inform it's FileManager
   SELF.FilesOpened = True
-  ! passed parameters
-  selC2IPRef  = pC2IPRef
   BRWC2IPContent.Init(?Browse:1,Queue:Browse:1.ViewPosition,BRW1::View:Browse,Queue:Browse:1,Relate:C2IPContent,SELF) ! Initialize the browse manager
   BRWC2IETaskorg.Init(?List,Queue:Browse.ViewPosition,BRW9::View:Browse,Queue:Browse,Relate:c2ieTaskOrg,SELF) ! Initialize the browse manager
   BRWC2IEBSOs.Init(?List:2,Queue:Browse:2.ViewPosition,BRW10::View:Browse,Queue:Browse:2,Relate:c2ieUnits,SELF) ! Initialize the browse manager
@@ -1049,12 +1060,14 @@ ReturnValue          BYTE,AUTO
   BRWC2IEBSOs.AddRange(c2ieUni:C2IE,selC2IERef)            ! Add single value range limit for sort order 1
   BRWC2IEBSOs.AddLocator(BRW10::Sort0:Locator)             ! Browse has a locator for sort order 1
   BRW10::Sort0:Locator.Init(,c2ieUni:C2IE,1,BRWC2IEBSOs)   ! Initialize the browse locator using  using key: c2ieUni:KC2IE , c2ieUni:C2IE
+  ?List:2{PROP:IconList,1} = '~.\resources\deployed.ico'
+  BRWC2IEBSOs.AddField(c2ieUni:ID,BRWC2IEBSOs.Q.c2ieUni:ID) ! Field c2ieUni:ID is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(tpyBSO:Code,BRWC2IEBSOs.Q.tpyBSO:Code) ! Field tpyBSO:Code is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(Uni:Code,BRWC2IEBSOs.Q.Uni:Code)    ! Field Uni:Code is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(Uni:Name,BRWC2IEBSOs.Q.Uni:Name)    ! Field Uni:Name is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(c2ieUni:Hostility,BRWC2IEBSOs.Q.c2ieUni:Hostility) ! Field c2ieUni:Hostility is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(tpyHstl:Code,BRWC2IEBSOs.Q.tpyHstl:Code) ! Field tpyHstl:Code is a hot field or requires assignment from browse
-  BRWC2IEBSOs.AddField(c2ieUni:ID,BRWC2IEBSOs.Q.c2ieUni:ID) ! Field c2ieUni:ID is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(_meta_c2ieUni:movedToOverlay,BRWC2IEBSOs.Q._meta_c2ieUni:movedToOverlay) ! Field _meta_c2ieUni:movedToOverlay is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(c2ieUni:C2IE,BRWC2IEBSOs.Q.c2ieUni:C2IE) ! Field c2ieUni:C2IE is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(Uni:ID,BRWC2IEBSOs.Q.Uni:ID)        ! Field Uni:ID is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(tpyBSO:ID,BRWC2IEBSOs.Q.tpyBSO:ID)  ! Field tpyBSO:ID is a hot field or requires assignment from browse
@@ -1082,7 +1095,13 @@ ReturnValue          BYTE,AUTO
   BRWBOSPos.AddToolbarTarget(Toolbar)                      ! Browse accepts toolbar control
   BRWBOSPos.ToolbarItem.HelpButton = ?Help
   SELF.SetAlerts()
-  ! Create COP C2IP
+  ! passed parameters
+  ! C2IP reference = COP reference
+  !MESSAGE('pC2IPRef = ' & pC2IPref)
+  selC2IPRef  = pC2IPRef
+  nC2IPRef    = pC2IPRef
+  
+  ! Create COP C2IP if this an empty COP C2IP
   
   IF pC2IPRef =0 THEN
       ! New COP C2IP
@@ -1090,6 +1109,8 @@ ReturnValue          BYTE,AUTO
       LOOP 10 TIMES
           sCOPName = CLIP(sCOPName) & CHR(RANDOM(97, 122))    
       END
+      DISPLAY(sCOPName)
+      QuickWindow{PROP:Text}='COP App (' & CLIP(sCOPName) & '.c2ip)'
   
       ! create new COP C2IP
       DO _newCOPC2IP
@@ -1115,7 +1136,8 @@ ReturnValue          BYTE,AUTO
           selC2IPName = C2IP:Name
           QuickWindow{PROP:Text}='COP App (' & CLIP(selC2IPName) & '.c2ip)'
           
-          sCOPName    = C2IP:Name
+          sCOPName        = C2IP:Name
+          sPrevCOPName    = C2IP:Name
           DISPLAY(sCOPName)
       END
   END
@@ -1149,6 +1171,7 @@ ReturnValue          BYTE,AUTO
     Relate:_Units.Close
     Relate:_c2ieUnits.Close
     Relate:_c2ieUnitsPositions.Close
+    Relate:_meta_c2ieUnits2.Close
     Relate:c2ieUnits.Close
     Relate:type_BSO.Close
   END
@@ -1206,6 +1229,23 @@ Looped BYTE
       _c2ieUni:Unit = selBSORef
       _c2ieUni:Hostility  = selBSOHostility
       IF Access:_c2ieUnits.TryInsert() = Level:Benign THEN
+          ! Make the Unit is moved to Overlay
+          _meta_c2ieUni2:c2ieUni  = BRWC2IEBSOs.Q.c2ieUni:ID
+          IF Access:_meta_c2ieUnits2.Fetch(_meta_c2ieUni2:Kc2ieUni) = Level:Benign THEN
+              _meta_c2ieUni2:movedToOverlay   = TRUE
+              IF Access:_meta_c2ieUnits2.TryUpdate() = Level:Benign THEN
+                  ! meta data saved
+                  !MESSAGE('meta data saved')
+              END
+          ELSE
+              Access:_meta_c2ieUnits2.PrimeAutoInc()
+              _meta_c2ieUni2:c2ieUni  = BRWC2IEBSOs.Q.c2ieUni:ID
+              _meta_c2ieUni2:movedToOverlay   = TRUE
+              IF Access:_meta_c2ieUnits2.TryInsert() = Level:Benign THEN
+                  !meta data inserted
+                  !MESSAGE('meta data inserted')
+              END       
+          END 
       ELSE
           !Access:_c2ieUnits.Throw(Msg:InsertFailed)       !handle the error
           Access:_c2ieUnits.CancelAutoInc ()
@@ -1214,6 +1254,18 @@ Looped BYTE
       
       
       
+    OF ?Insert:2
+      ThisWindow.Update()
+      ! Refresh drawing
+      DO _drawUnits
+    OF ?Change:2
+      ThisWindow.Update()
+      ! refresh drawing
+      DO _drawUnits
+    OF ?Delete:2
+      ThisWindow.Update()
+      ! Refresh drawing
+      DO _drawUnits
     OF ?BUTTON_ActProp
       ThisWindow.Update()
       ! View Action Properties
@@ -1231,16 +1283,116 @@ Looped BYTE
     OF ?Close
       ThisWindow.Update()
       ! Save COP C2IP Name
+      !MESSAGE('nC2IPRef = ' & nC2IPRef)
       _C2IP:ID    = nC2IPRef
       IF Access:_C2IPs.Fetch(_C2IP:PKID)  = Level:Benign THEN
           _C2IP:Name  = sCOPName
           IF Access:_C2IPs.TryUpdate() = Level:Benign THEN
               ! COP C2IP Name saved succesfully
+          ELSE
+              MESSAGE('Access:_C2IPs.TryUpdate() error')
           END
-          
+      ELSE
+          MESSAGE('Access:_C2IPs.Fetch(_C2IP:PKID) error')
       END
       
+      
+      OMIT('__C2IEName')
+      ! Save COP C2IE Name
+      MESSAGE('nC2EPRef = ' & nC2IERef)
+      _C2IE:ID    = nC2IERef
+      IF Access:_C2IEs.Fetch(_C2IE:PKID) = Level:Benign THEN
+          ! C2IE Name = C2IP Name
+          _C2IE:Name  = sCOPName
+          IF Access:_C2IEs.TryUpdate() = Level:Benign THEN
+              ! COP C2IE Name save succesfully
+          ELSE
+              MESSAGE('Access:_C2IEs.TryUpdate() error')
+          END
+      ELSE
+          MESSAGE('Access:_C2IEs.Fetch(_C2IE:PKID) error')
+      END
+      
+      __C2IEName
+      
+      
+    OF ?sCOPName
+      ! Refresh C2IP Name
+      
+      QuickWindow{PROP:Text}='COP App (' & CLIP(sCOPName) & '.c2ip)'
     END
+    RETURN ReturnValue
+  END
+  ReturnValue = Level:Fatal
+  RETURN ReturnValue
+
+
+ThisWindow.TakeFieldEvent PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+Looped BYTE
+  CODE
+  LOOP                                                     ! This method receives all field specific events
+    IF Looped
+      RETURN Level:Notify
+    ELSE
+      Looped = 1
+    END
+  ReturnValue = PARENT.TakeFieldEvent()
+  CASE FIELD()
+  OF ?PANEL1
+    CASE EVENT()
+    OF EVENT:Drop
+      ! Move to Overlay
+      !optionsMenu#     = POPUP('Option1|Option2',,,)
+      !nMoveToOvrlSelection    = POPUP(CLIP(sMoveToOvrlOptMenu),,,)
+      nMoveToOvrlSelection    = 1
+      
+      !MESSAGE('Overlay ' & vOvrlRef[nMoveToOvrlSelection])
+      
+      Access:_c2ieUnits.PrimeAutoInc()
+      _c2ieUni:C2IE  = vOvrlRef[nMoveToOvrlSelection]
+      _c2ieUni:Unit = selBSORef
+      _c2ieUni:Hostility  = selBSOHostility
+      IF Access:_c2ieUnits.TryInsert() = Level:Benign THEN
+          
+          ! Add default positions
+          Access:_UnitsPositions.PrimeAutoInc()
+          _c2ieUniPos:c2ieUnit = _c2ieUni:ID
+          _c2ieUniPos:xPos = DrwOverlay.MouseX()
+          _c2ieUniPos:yPos = DrwOverlay.MouseY()
+          IF Access:_c2ieUnitsPositions.TryInsert() = Level:Benign THEN
+              ! position defined
+          END
+          
+          
+          ! Make the Unit is moved to Overlay
+          _meta_c2ieUni2:c2ieUni  = BRWC2IEBSOs.Q.c2ieUni:ID
+          IF Access:_meta_c2ieUnits2.Fetch(_meta_c2ieUni2:Kc2ieUni) = Level:Benign THEN
+              _meta_c2ieUni2:movedToOverlay   = TRUE
+              IF Access:_meta_c2ieUnits2.TryUpdate() = Level:Benign THEN
+                  ! meta data saved
+                  !MESSAGE('meta data saved')
+              END
+          ELSE
+              Access:_meta_c2ieUnits2.PrimeAutoInc()
+              _meta_c2ieUni2:c2ieUni  = BRWC2IEBSOs.Q.c2ieUni:ID
+              _meta_c2ieUni2:movedToOverlay   = TRUE
+              IF Access:_meta_c2ieUnits2.TryInsert() = Level:Benign THEN
+                  !meta data inserted
+                  !MESSAGE('meta data inserted')
+              END       
+          END 
+      ELSE
+          !Access:_c2ieUnits.Throw(Msg:InsertFailed)       !handle the error
+          Access:_c2ieUnits.CancelAutoInc ()
+      
+      END
+      ! Refresh drawing
+      DO _drawUnits
+    END
+  END
     RETURN ReturnValue
   END
   ReturnValue = Level:Fatal
@@ -1273,17 +1425,31 @@ BRWC2IEBSOs.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationM
   CODE
   PARENT.Init(ListBox,Posit,V,Q,RM,WM)
   SELF.EIP &= BRW10::EIPManager                            ! Set the EIP manager
-  SELF.AddEditControl(EditInPlace::tpyBSO:Code,1)
-  SELF.AddEditControl(EditInPlace::Uni:Code,2)
-  SELF.AddEditControl(EditInPlace::Uni:Name,3)
-  SELF.AddEditControl(EditInPlace::c2ieUni:Hostility,4)
-  SELF.AddEditControl(EditInPlace::tpyHstl:Code,5)
+  SELF.AddEditControl(EditInPlace::c2ieUni:ID,1)
+  SELF.AddEditControl(EditInPlace::tpyBSO:Code,2)
+  SELF.AddEditControl(EditInPlace::Uni:Code,3)
+  SELF.AddEditControl(EditInPlace::Uni:Name,4)
+  SELF.AddEditControl(EditInPlace::c2ieUni:Hostility,6)
+  SELF.AddEditControl(EditInPlace::tpyHstl:Code,7)
+  SELF.AddEditControl(EditInPlace::_meta_c2ieUni:movedToOverlay,8)
   SELF.DeleteAction = EIPAction:Always
   SELF.ArrowAction = EIPAction:Default+EIPAction:Remain+EIPAction:RetainColumn
   IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
     SELF.InsertControl=?Insert
     SELF.ChangeControl=?Change
     SELF.DeleteControl=?Delete
+  END
+
+
+BRWC2IEBSOs.SetQueueRecord PROCEDURE
+
+  CODE
+  PARENT.SetQueueRecord
+  
+  IF (BRWC2IEBSOs.q._meta_c2ieUni:movedToOverlay=TRUE)
+    SELF.Q.Uni:Name_Icon = 1                               ! Set icon from icon list
+  ELSE
+    SELF.Q.Uni:Name_Icon = 0
   END
 
 
