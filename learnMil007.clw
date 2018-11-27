@@ -1646,8 +1646,8 @@ QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,523,346),FONT('Mic
                        LIST,AT(3,172,150,100),USE(?List:5),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[80L(2)|M~Code~C(0)' & |
   '@s20@100L(2)|M~Name~C(0)@s100@]|~Unit~'),FROM(Queue:Browse:4),IMM
                        LIST,AT(180,172,341,100),USE(?List:6),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[80L(2)|M~Code~C(' & |
-  '0)@s20@100L(2)|M~Name~C(0)@s100@]|~Unit~[100L(2)|M~Name~C(0)@s100@]|~TASKORG C2IP Source~'), |
-  FROM(Queue:Browse:5),IMM
+  '0)@s20@100L(2)|M~Name~C(0)@s100@]|~Unit~[100L(2)|M~Name~C(0)@s100@]|~TASKORG C2IP/C2' & |
+  'IE Source~'),FROM(Queue:Browse:5),IMM
                        BUTTON('Create TaskOrg'),AT(335,276),USE(?BUTTON1)
                        BUTTON('Move to TaskOrg'),AT(2,276),USE(?BUTTON2)
                        BUTTON('&Insert'),AT(179,295,42,12),USE(?Insert)
@@ -1802,7 +1802,7 @@ ReturnValue          BYTE,AUTO
   BRW_BSOTASKORG.AddRange(_c2ieBSOTSK:C2IE,selC2IETASKORGRef) ! Add single value range limit for sort order 1
   BRW_BSOTASKORG.AddLocator(BRW10::Sort0:Locator)          ! Browse has a locator for sort order 1
   BRW10::Sort0:Locator.Init(,_c2ieBSOTSK:C2IE,1,BRW_BSOTASKORG) ! Initialize the browse locator using  using key: _c2ieBSOTSK:KC2IE , _c2ieBSOTSK:C2IE
-  BRW_BSOTASKORG.SetFilter('(c2iUniTrf:C2IE_From=_c2ieBSOTSK:C2IE)') ! Apply filter expression to browse
+  BRW_BSOTASKORG.SetFilter('(c2iUniTrf:BSO_From = _c2ieBSOTSK:Unit)') ! Apply filter expression to browse
   BRW_BSOTASKORG.AddField(_c2ieBSOTSK:C2IE,BRW_BSOTASKORG.Q._c2ieBSOTSK:C2IE) ! Field _c2ieBSOTSK:C2IE is a hot field or requires assignment from browse
   BRW_BSOTASKORG.AddField(_Uni:Code,BRW_BSOTASKORG.Q._Uni:Code) ! Field _Uni:Code is a hot field or requires assignment from browse
   BRW_BSOTASKORG.AddField(_Uni:Name,BRW_BSOTASKORG.Q._Uni:Name) ! Field _Uni:Name is a hot field or requires assignment from browse
