@@ -157,9 +157,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?MissTSK:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
@@ -358,9 +358,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -527,6 +527,11 @@ sCOPName             STRING(100)                           !
 sPrevCOPName         STRING(100)                           ! 
 nC2IERef             DECIMAL(7)                            ! 
 nC2IPRef             DECIMAL(7)                            ! 
+COPBSOs              QUEUE,PRE(copBSO)                     ! 
+C2IEUnitRef          DECIMAL(7)                            ! 
+xPos                 DECIMAL(7)                            ! 
+yPos                 DECIMAL(7)                            ! 
+                     END                                   ! 
 BRW1::View:Browse    VIEW(C2IPContent)
                        PROJECT(C2IPCt:ID)
                        PROJECT(C2IPCt:C2IPPackage)
@@ -618,16 +623,16 @@ Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
 BRW11::View:Browse   VIEW(c2ieUnitsPositions)
+                       PROJECT(c2ieUniPos:c2ieUnit)
                        PROJECT(c2ieUniPos:xPos)
                        PROJECT(c2ieUniPos:yPos)
                        PROJECT(c2ieUniPos:ID)
-                       PROJECT(c2ieUniPos:c2ieUnit)
                      END
 Queue:Browse:3       QUEUE                            !Queue declaration for browse/combo box using ?List:3
+c2ieUniPos:c2ieUnit    LIKE(c2ieUniPos:c2ieUnit)      !List box control field - type derived from field
 c2ieUniPos:xPos        LIKE(c2ieUniPos:xPos)          !List box control field - type derived from field
 c2ieUniPos:yPos        LIKE(c2ieUniPos:yPos)          !List box control field - type derived from field
 c2ieUniPos:ID          LIKE(c2ieUniPos:ID)            !Primary key field - type derived from field
-c2ieUniPos:c2ieUnit    LIKE(c2ieUniPos:c2ieUnit)      !Browse key field - type derived from field
 Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
@@ -652,8 +657,8 @@ QuickWindow          WINDOW('COP App'),AT(,,799,346),FONT('Microsoft Sans Serif'
                        BUTTON('&Insert'),AT(144,158,42,12),USE(?Insert)
                        BUTTON('&Change'),AT(185,158,42,12),USE(?Change)
                        BUTTON('&Delete'),AT(228,158,42,12),USE(?Delete)
-                       LIST,AT(353,30,82,124),USE(?List:3),DECIMAL(12),FORMAT('40L(2)|M~xPos~C(0)@n-10.0@40L(2' & |
-  ')|M~yPos~C(0)@n-10.0@'),FROM(Queue:Browse:3),IMM
+                       LIST,AT(353,30,82,124),USE(?List:3),DECIMAL(12),FORMAT('0L(2)|M~ID~D(12)@n-10.0@40L(2)|' & |
+  'M~xPos~C(0)@n-10.0@40L(2)|M~yPos~C(0)@n-10.0@'),FROM(Queue:Browse:3),IMM
                        BUTTON('&Insert'),AT(353,160,42,12),USE(?Insert:2)
                        BUTTON('&Change'),AT(353,170,42,12),USE(?Change:2)
                        BUTTON('&Delete'),AT(394,170,42,12),USE(?Delete:2)
@@ -702,6 +707,7 @@ BRW10::Sort0:Locator StepLocatorClass                      ! Default Locator
 BRWBOSPos            CLASS(BrowseClass)                    ! Browse using ?List:3
 Q                      &Queue:Browse:3                !Reference to browse queue
 Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+ValidateRecord         PROCEDURE(),BYTE,DERIVED
                      END
 
 BRW11::Sort0:Locator StepLocatorClass                      ! Default Locator
@@ -714,6 +720,7 @@ EditInPlace::c2ieUni:Hostility EditEntryClass              ! Edit-in-place class
 EditInPlace::tpyHstl:Code EditEntryClass                   ! Edit-in-place class for field tpyHstl:Code
 EditInPlace::_meta_c2ieUni:movedToOverlay EditEntryClass   ! Edit-in-place class for field _meta_c2ieUni:movedToOverlay
 BRW11::EIPManager    BrowseEIPManager                      ! Browse EIP Manager for Browse using ?List:3
+EditInPlace::c2ieUniPos:c2ieUnit EditEntryClass            ! Edit-in-place class for field c2ieUniPos:c2ieUnit
 EditInPlace::c2ieUniPos:xPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:xPos
 EditInPlace::c2ieUniPos:yPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:yPos
 Resizer              CLASS(WindowResizeClass)
@@ -993,9 +1000,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1077,10 +1084,10 @@ ReturnValue          BYTE,AUTO
   BRWBOSPos.AddRange(c2ieUniPos:c2ieUnit,selC2IEBSORef)    ! Add single value range limit for sort order 1
   BRWBOSPos.AddLocator(BRW11::Sort0:Locator)               ! Browse has a locator for sort order 1
   BRW11::Sort0:Locator.Init(,c2ieUniPos:c2ieUnit,1,BRWBOSPos) ! Initialize the browse locator using  using key: c2ieUniPos:Kc2ieUnit , c2ieUniPos:c2ieUnit
+  BRWBOSPos.AddField(c2ieUniPos:c2ieUnit,BRWBOSPos.Q.c2ieUniPos:c2ieUnit) ! Field c2ieUniPos:c2ieUnit is a hot field or requires assignment from browse
   BRWBOSPos.AddField(c2ieUniPos:xPos,BRWBOSPos.Q.c2ieUniPos:xPos) ! Field c2ieUniPos:xPos is a hot field or requires assignment from browse
   BRWBOSPos.AddField(c2ieUniPos:yPos,BRWBOSPos.Q.c2ieUniPos:yPos) ! Field c2ieUniPos:yPos is a hot field or requires assignment from browse
   BRWBOSPos.AddField(c2ieUniPos:ID,BRWBOSPos.Q.c2ieUniPos:ID) ! Field c2ieUniPos:ID is a hot field or requires assignment from browse
-  BRWBOSPos.AddField(c2ieUniPos:c2ieUnit,BRWBOSPos.Q.c2ieUniPos:c2ieUnit) ! Field c2ieUniPos:c2ieUnit is a hot field or requires assignment from browse
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
   INIMgr.Fetch('COPApp',QuickWindow)                       ! Restore window settings from non-volatile store
@@ -1149,6 +1156,9 @@ ReturnValue          BYTE,AUTO
   ! Display Overlay Units
   
   DO _DrawUnits
+  ! BSO Queue
+  
+  MESSAGE('units = ' & RECORDS(COPBSOs))
   RETURN ReturnValue
 
 
@@ -1468,8 +1478,9 @@ BRWBOSPos.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationMan
   CODE
   PARENT.Init(ListBox,Posit,V,Q,RM,WM)
   SELF.EIP &= BRW11::EIPManager                            ! Set the EIP manager
-  SELF.AddEditControl(EditInPlace::c2ieUniPos:xPos,1)
-  SELF.AddEditControl(EditInPlace::c2ieUniPos:yPos,2)
+  SELF.AddEditControl(EditInPlace::c2ieUniPos:c2ieUnit,1)
+  SELF.AddEditControl(EditInPlace::c2ieUniPos:xPos,2)
+  SELF.AddEditControl(EditInPlace::c2ieUniPos:yPos,3)
   SELF.DeleteAction = EIPAction:Always
   SELF.ArrowAction = EIPAction:Default+EIPAction:Remain+EIPAction:RetainColumn
   IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
@@ -1477,6 +1488,25 @@ BRWBOSPos.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationMan
     SELF.ChangeControl=?Change:2
     SELF.DeleteControl=?Delete:2
   END
+
+
+BRWBOSPos.ValidateRecord PROCEDURE
+
+ReturnValue          BYTE,AUTO
+
+BRW11::RecordStatus  BYTE,AUTO
+  CODE
+  ReturnValue = PARENT.ValidateRecord()
+  ! Add BSO to queue
+  
+  copBSO:C2IEUnitRef  = BRWBOSPos.q.c2ieUniPos:c2ieUnit
+  copBSO:xPos         = BRWBOSPos.q.c2ieUniPos:xPos
+  copBSO:yPos         = BRWBOSPos.q.c2ieUniPos:yPos
+  
+  ADD(COPBSOs)
+  CLEAR(COPBSOs)
+  BRW11::RecordStatus=ReturnValue
+  RETURN ReturnValue
 
 
 Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
@@ -1696,9 +1726,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -1726,12 +1756,14 @@ ReturnValue          BYTE,AUTO
   BRW_C2IPORBAT.AddSortOrder(,_C2IP_Orbats:PKID)           ! Add the sort order for _C2IP_Orbats:PKID for sort order 1
   BRW_C2IPORBAT.AddLocator(BRW5::Sort0:Locator)            ! Browse has a locator for sort order 1
   BRW5::Sort0:Locator.Init(,_C2IP_Orbats:ID,1,BRW_C2IPORBAT) ! Initialize the browse locator using  using key: _C2IP_Orbats:PKID , _C2IP_Orbats:ID
+  BRW_C2IPORBAT.SetFilter('(_C2IP_Orbats:Type = 2)')       ! Apply filter expression to browse
   BRW_C2IPORBAT.AddField(_C2IP_Orbats:Name,BRW_C2IPORBAT.Q._C2IP_Orbats:Name) ! Field _C2IP_Orbats:Name is a hot field or requires assignment from browse
   BRW_C2IPORBAT.AddField(_C2IP_Orbats:ID,BRW_C2IPORBAT.Q._C2IP_Orbats:ID) ! Field _C2IP_Orbats:ID is a hot field or requires assignment from browse
   BRW6.Q &= Queue:Browse:1
   BRW6.AddSortOrder(,_C2IPTsk:PKID)                        ! Add the sort order for _C2IPTsk:PKID for sort order 1
   BRW6.AddLocator(BRW6::Sort0:Locator)                     ! Browse has a locator for sort order 1
   BRW6::Sort0:Locator.Init(,_C2IPTsk:ID,1,BRW6)            ! Initialize the browse locator using  using key: _C2IPTsk:PKID , _C2IPTsk:ID
+  BRW6.SetFilter('(_C2IPTsk:Type=2)')                      ! Apply filter expression to browse
   BRW6.AddField(_C2IPTsk:Name,BRW6.Q._C2IPTsk:Name)        ! Field _C2IPTsk:Name is a hot field or requires assignment from browse
   BRW6.AddField(_C2IPTsk:ID,BRW6.Q._C2IPTsk:ID)            ! Field _C2IPTsk:ID is a hot field or requires assignment from browse
   BRW_C2IEORBAT.Q &= Queue:Browse:2
@@ -1739,6 +1771,7 @@ ReturnValue          BYTE,AUTO
   BRW_C2IEORBAT.AddRange(C2IPCt:C2IPPackage,Relate:C2IPContent,Relate:_C2IP_ORBATs) ! Add file relationship range limit for sort order 1
   BRW_C2IEORBAT.AddLocator(BRW7::Sort0:Locator)            ! Browse has a locator for sort order 1
   BRW7::Sort0:Locator.Init(,C2IPCt:C2IPPackage,1,BRW_C2IEORBAT) ! Initialize the browse locator using  using key: C2IPCt:KC2IP , C2IPCt:C2IPPackage
+  BRW_C2IEORBAT.SetFilter('(_C2IEORB:Type=2)')             ! Apply filter expression to browse
   BRW_C2IEORBAT.AddField(_C2IEORB:ID,BRW_C2IEORBAT.Q._C2IEORB:ID) ! Field _C2IEORB:ID is a hot field or requires assignment from browse
   BRW_C2IEORBAT.AddField(_C2IEORB:Name,BRW_C2IEORBAT.Q._C2IEORB:Name) ! Field _C2IEORB:Name is a hot field or requires assignment from browse
   BRW_C2IEORBAT.AddField(C2IPCt:ID,BRW_C2IEORBAT.Q.C2IPCt:ID) ! Field C2IPCt:ID is a hot field or requires assignment from browse
@@ -1748,6 +1781,7 @@ ReturnValue          BYTE,AUTO
   BRW_C2IETASKORG.AddRange(_C2IPCt:C2IPPackage,Relate:_C2IPContent,Relate:_C2IP_TaskOrgs) ! Add file relationship range limit for sort order 1
   BRW_C2IETASKORG.AddLocator(BRW8::Sort0:Locator)          ! Browse has a locator for sort order 1
   BRW8::Sort0:Locator.Init(,_C2IPCt:C2IPPackage,1,BRW_C2IETASKORG) ! Initialize the browse locator using  using key: _C2IPCt:KC2IP , _C2IPCt:C2IPPackage
+  BRW_C2IETASKORG.SetFilter('(_C2IETSK:Type=2)')           ! Apply filter expression to browse
   BRW_C2IETASKORG.AddField(_C2IETSK:ID,BRW_C2IETASKORG.Q._C2IETSK:ID) ! Field _C2IETSK:ID is a hot field or requires assignment from browse
   BRW_C2IETASKORG.AddField(_C2IETSK:Name,BRW_C2IETASKORG.Q._C2IETSK:Name) ! Field _C2IETSK:Name is a hot field or requires assignment from browse
   BRW_C2IETASKORG.AddField(_C2IPCt:C2IEInstance,BRW_C2IETASKORG.Q._C2IPCt:C2IEInstance) ! Field _C2IPCt:C2IEInstance is a hot field or requires assignment from browse
@@ -1768,6 +1802,7 @@ ReturnValue          BYTE,AUTO
   BRW_BSOTASKORG.AddRange(_c2ieBSOTSK:C2IE,selC2IETASKORGRef) ! Add single value range limit for sort order 1
   BRW_BSOTASKORG.AddLocator(BRW10::Sort0:Locator)          ! Browse has a locator for sort order 1
   BRW10::Sort0:Locator.Init(,_c2ieBSOTSK:C2IE,1,BRW_BSOTASKORG) ! Initialize the browse locator using  using key: _c2ieBSOTSK:KC2IE , _c2ieBSOTSK:C2IE
+  BRW_BSOTASKORG.SetFilter('(c2iUniTrf:C2IE_From=_c2ieBSOTSK:C2IE)') ! Apply filter expression to browse
   BRW_BSOTASKORG.AddField(_c2ieBSOTSK:C2IE,BRW_BSOTASKORG.Q._c2ieBSOTSK:C2IE) ! Field _c2ieBSOTSK:C2IE is a hot field or requires assignment from browse
   BRW_BSOTASKORG.AddField(_Uni:Code,BRW_BSOTASKORG.Q._Uni:Code) ! Field _Uni:Code is a hot field or requires assignment from browse
   BRW_BSOTASKORG.AddField(_Uni:Name,BRW_BSOTASKORG.Q._Uni:Name) ! Field _Uni:Name is a hot field or requires assignment from browse
@@ -2171,9 +2206,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -2347,9 +2382,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieUni:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(_c2ieBSOTSK:Record,History::_c2ieBSOTSK:Record)
   SELF.AddHistoryField(?_c2ieBSOTSK:ID,1)
@@ -2539,9 +2574,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE

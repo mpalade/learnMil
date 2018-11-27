@@ -1,0 +1,19 @@
+[UNNAMED]
++SessionDate=26.11.2018
+crc32v2=607701429
++CurrentKey=Record Order
+ENV File Path=
+OEM=0
+Record Order=Record Order
+TPYC2IP:PKID=TPYC2IP:PKID
+TPYC2IP:KNAME=TPYC2IP:KNAME
+TPYC2IP:KCODE=TPYC2IP:KCODE
+Record Number=47R(2)~Rec No~C(0)@N_12@Y?Rec No:
+TPYC2IP:ID=60R(2)~Tpyc2ip:Id~C(0)@N-14@?Tpyc2ip:Id:
+TPYC2IP:NAME=79L(2)~Tpyc2ip:Name~C(0)?Tpyc2ip:Name:
+TPYC2IP:CODE=76L(2)~Tpyc2ip:Code~C(0)?Tpyc2ip:Code:
+Columns=4
+Column1=RECORD NUMBER
+Column2=TPYC2IP:ID
+Column3=TPYC2IP:NAME
+Column4=TPYC2IP:CODE
