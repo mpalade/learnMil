@@ -685,14 +685,23 @@ BRW9::View:Browse    VIEW(OrgMissions)
                          PROJECT(Miss:Name)
                          PROJECT(Miss:Code)
                          PROJECT(Miss:ID)
+                         PROJECT(Miss:MilOpType)
+                         JOIN(tpyMilOp:PKID,Miss:MilOpType)
+                           PROJECT(tpyMilOp:Name)
+                           PROJECT(tpyMilOp:Code)
+                           PROJECT(tpyMilOp:ID)
+                         END
                        END
                      END
 Queue:Browse:2       QUEUE                            !Queue declaration for browse/combo box using ?List:2
 Miss:Name              LIKE(Miss:Name)                !List box control field - type derived from field
 Miss:Code              LIKE(Miss:Code)                !List box control field - type derived from field
+tpyMilOp:Name          LIKE(tpyMilOp:Name)            !List box control field - type derived from field
+tpyMilOp:Code          LIKE(tpyMilOp:Code)            !List box control field - type derived from field
 OrgMiss:ID             LIKE(OrgMiss:ID)               !Primary key field - type derived from field
 OrgMiss:Organization   LIKE(OrgMiss:Organization)     !Browse key field - type derived from field
 Miss:ID                LIKE(Miss:ID)                  !Related join file key field - type derived from field
+tpyMilOp:ID            LIKE(tpyMilOp:ID)              !Related join file key field - type derived from field
 Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
@@ -766,7 +775,8 @@ QuickWindow          WINDOW('My Organization'),AT(,,524,347),FONT('Microsoft San
                        LIST,AT(3,154,261,60),USE(?List),FORMAT('[100L(2)|M~Name~C(0)@s100@40L(2)|M~Code~C(0)@s' & |
   '20@]|~Theaters of Operations~'),FROM(Queue:Browse),IMM
                        LIST,AT(269,154,252,60),USE(?List:2),FORMAT('[100L(2)|M~Name~C(0)@s100@40L(2)|M~Code~C(' & |
-  '0)@s20@]|~Missions~'),FROM(Queue:Browse:2),IMM
+  '0)@s20@]|~Missions~[100L(2)|M~Name~C(0)@s100@40L(2)|M~Code~C(0)@s20@]|~Operation Type~'), |
+  FROM(Queue:Browse:2),IMM
                        BUTTON('&Insert'),AT(1,218,42,12),USE(?Insert)
                        BUTTON('&Change'),AT(43,218,42,12),USE(?Change)
                        BUTTON('&Delete'),AT(85,218,42,12),USE(?Delete)
@@ -894,9 +904,12 @@ ReturnValue          BYTE,AUTO
   BRW9::Sort0:Locator.Init(,OrgMiss:Organization,1,BRW9)   ! Initialize the browse locator using  using key: OrgMiss:KOrganization , OrgMiss:Organization
   BRW9.AddField(Miss:Name,BRW9.Q.Miss:Name)                ! Field Miss:Name is a hot field or requires assignment from browse
   BRW9.AddField(Miss:Code,BRW9.Q.Miss:Code)                ! Field Miss:Code is a hot field or requires assignment from browse
+  BRW9.AddField(tpyMilOp:Name,BRW9.Q.tpyMilOp:Name)        ! Field tpyMilOp:Name is a hot field or requires assignment from browse
+  BRW9.AddField(tpyMilOp:Code,BRW9.Q.tpyMilOp:Code)        ! Field tpyMilOp:Code is a hot field or requires assignment from browse
   BRW9.AddField(OrgMiss:ID,BRW9.Q.OrgMiss:ID)              ! Field OrgMiss:ID is a hot field or requires assignment from browse
   BRW9.AddField(OrgMiss:Organization,BRW9.Q.OrgMiss:Organization) ! Field OrgMiss:Organization is a hot field or requires assignment from browse
   BRW9.AddField(Miss:ID,BRW9.Q.Miss:ID)                    ! Field Miss:ID is a hot field or requires assignment from browse
+  BRW9.AddField(tpyMilOp:ID,BRW9.Q.tpyMilOp:ID)            ! Field tpyMilOp:ID is a hot field or requires assignment from browse
   BRW12.Q &= Queue:Browse:3
   BRW12.AddSortOrder(,C2IPExp:KOrganization)               ! Add the sort order for C2IPExp:KOrganization for sort order 1
   BRW12.AddRange(C2IPExp:Organization,Relate:C2IPExplorer,Relate:myOrganization) ! Add file relationship range limit for sort order 1
@@ -1835,6 +1848,7 @@ CurrentTab           STRING(80)                            !
 ActionMessage        CSTRING(40)                           ! 
 nMissTaskOrgRef      DECIMAL(7)                            ! 
 nTASKORGC2IPRef      DECIMAL(7)                            ! 
+sMilMissFreeText     STRING(1000)                          ! 
 FDCB8::View:FileDropCombo VIEW(myOrganization)
                        PROJECT(myOrg:Name)
                        PROJECT(myOrg:ID)
@@ -1842,7 +1856,10 @@ FDCB8::View:FileDropCombo VIEW(myOrganization)
 FDCB9::View:FileDropCombo VIEW(MilMissions)
                        PROJECT(Miss:Name)
                        PROJECT(Miss:ID)
-                       JOIN(tpyMilOp:PKID,Miss:ID)
+                       PROJECT(Miss:MilOpType)
+                       JOIN(tpyMilOp:PKID,Miss:MilOpType)
+                         PROJECT(tpyMilOp:Name)
+                         PROJECT(tpyMilOp:Code)
                          PROJECT(tpyMilOp:ID)
                        END
                      END
@@ -1890,6 +1907,18 @@ tpyC2IP:ID             LIKE(tpyC2IP:ID)               !Related join file key fie
 Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
+BRW13::View:Browse   VIEW(MissionToDo)
+                       PROJECT(MissToDo:TaskName)
+                       PROJECT(MissToDo:ID)
+                       PROJECT(MissToDo:Mission)
+                     END
+Queue:Browse:2       QUEUE                            !Queue declaration for browse/combo box using ?List:3
+MissToDo:TaskName      LIKE(MissToDo:TaskName)        !List box control field - type derived from field
+MissToDo:ID            LIKE(MissToDo:ID)              !Primary key field - type derived from field
+MissToDo:Mission       LIKE(MissToDo:Mission)         !Browse key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
 Queue:FileDropCombo  QUEUE                            !Queue declaration for browse/combo box using ?myOrg:Name
 myOrg:Name             LIKE(myOrg:Name)               !List box control field - type derived from field
 myOrg:ID               LIKE(myOrg:ID)                 !Primary key field - type derived from field
@@ -1898,6 +1927,8 @@ ViewPosition           STRING(1024)                   !Entry's view position
                      END
 Queue:FileDropCombo:1 QUEUE                           !Queue declaration for browse/combo box using ?Miss:Name
 Miss:Name              LIKE(Miss:Name)                !List box control field - type derived from field
+tpyMilOp:Name          LIKE(tpyMilOp:Name)            !List box control field - type derived from field
+tpyMilOp:Code          LIKE(tpyMilOp:Code)            !List box control field - type derived from field
 Miss:ID                LIKE(Miss:ID)                  !Primary key field - type derived from field
 tpyMilOp:ID            LIKE(tpyMilOp:ID)              !Related join file key field - type derived from field
 Mark                   BYTE                           !Entry's marked status
@@ -1909,7 +1940,8 @@ QuickWindow          WINDOW('View Mission'),AT(,,523,345),FONT('Microsoft Sans S
                        PROMPT('Organization:'),AT(11,2),USE(?OrgMiss:Organization:Prompt),TRN
                        PROMPT('Mission:'),AT(11,17),USE(?OrgMiss:Mission:Prompt),TRN
                        ENTRY(@n-10.0),AT(67,2,48,10),USE(OrgMiss:Organization),DECIMAL(12),HIDE
-                       COMBO(@s100),AT(121,17,291,9),USE(Miss:Name),DROP(5),FORMAT('400L(2)|M~Name~L(0)@s100@'),FROM(Queue:FileDropCombo:1), |
+                       COMBO(@s100),AT(121,17,291,9),USE(Miss:Name),DROP(5),FORMAT('100L(2)|M~Name~C(0)@s100@[' & |
+  '100L(2)|M~Name~C(0)@s100@40L(2)|M~Code~C(0)@s20@]|~Mission Type~'),FROM(Queue:FileDropCombo:1), |
   IMM
                        COMBO(@s100),AT(121,2,291,10),USE(myOrg:Name),DROP(5),FORMAT('400L(2)|M~Name~L(0)@s100@'), |
   FROM(Queue:FileDropCombo),IMM
@@ -1920,7 +1952,7 @@ QuickWindow          WINDOW('View Mission'),AT(,,523,345),FONT('Microsoft Sans S
   TIP('Cancel operation')
                        BUTTON('&Help'),AT(472,329,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
   STD(STD:Help),TIP('See Help Window')
-                       LIST,AT(5,153,195,59),USE(?List),FORMAT('0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.' & |
+                       LIST,AT(5,125,173,87),USE(?List),FORMAT('0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.' & |
   '0@[400L(2)|M~Name~C(0)@s100@]|~TASKORG~'),FROM(Queue:Browse),IMM
                        BUTTON('&Insert'),AT(2,217,42,12),USE(?Insert)
                        BUTTON('&Change'),AT(45,217,42,12),USE(?Change)
@@ -1928,9 +1960,9 @@ QuickWindow          WINDOW('View Mission'),AT(,,523,345),FONT('Microsoft Sans S
                        BUTTON('View TaskOrg'),AT(4,257),USE(?BUTTON_ViewTaskOrg)
                        BUTTON('View COP'),AT(68,257),USE(?BUTTON_ViewCOP)
                        BUTTON('View MilDocs'),AT(120,257),USE(?BUTTON_MilDoc)
-                       LIST,AT(205,153,207,59),USE(?List:2),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[100L(2)|M~C2IP Na' & |
+                       LIST,AT(183,125,151,87),USE(?List:2),FORMAT('0L(2)|M~ID~D(12)@n-10.0@[100L(2)|M~C2IP Na' & |
   'me~C(0)@s100@40L(2)|M~C2IP Type~C(0)@s20@]|~C2IP Explorer~'),FROM(Queue:Browse:1),IMM
-                       BUTTON('Create COP'),AT(202,214),USE(?BUTTON_CreateCOP)
+                       BUTTON('Create COP'),AT(183,215),USE(?BUTTON_CreateCOP)
                        PROMPT('Start Date:'),AT(121,33),USE(?Miss:StartDate:Prompt)
                        ENTRY(@D10),AT(170,31,60,10),USE(Miss:StartDate),DECIMAL(12)
                        PROMPT('Start Time:'),AT(302,33),USE(?Miss:StartTime:Prompt)
@@ -1941,7 +1973,9 @@ QuickWindow          WINDOW('View Mission'),AT(,,523,345),FONT('Microsoft Sans S
                        ENTRY(@T4),AT(351,46,60,10),USE(Miss:EndTime)
                        PROMPT('Mil Operation:'),AT(120,62),USE(?tpyMilOp:Name:Prompt)
                        ENTRY(@s100),AT(170,61,242,10),USE(tpyMilOp:Name)
-                       TEXT,AT(5,78,515,70),USE(Miss:freeText),RTF(TEXT:Field)
+                       TEXT,AT(5,78,515,42),USE(sMilMissFreeText),RTF(TEXT:Field)
+                       LIST,AT(339,125,181,87),USE(?List:3),FORMAT('1020L(2)|M~Task Name~L(0)@s255@'),FROM(Queue:Browse:2), |
+  IMM
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -1979,6 +2013,11 @@ Q                      &Queue:Browse:1                !Reference to browse queue
                      END
 
 BRW12::Sort0:Locator StepLocatorClass                      ! Default Locator
+BRW13                CLASS(BrowseClass)                    ! Browse using ?List:3
+Q                      &Queue:Browse:2                !Reference to browse queue
+                     END
+
+BRW13::Sort0:Locator StepLocatorClass                      ! Default Locator
 CurCtrlFeq          LONG
 FieldColorQueue     QUEUE
 Feq                   LONG
@@ -2050,6 +2089,7 @@ ReturnValue          BYTE,AUTO
   END
   BRW_MissTaskOrg.Init(?List,Queue:Browse.ViewPosition,BRW10::View:Browse,Queue:Browse,Relate:MissionTASKORG,SELF) ! Initialize the browse manager
   BRW_MissC2IPs.Init(?List:2,Queue:Browse:1.ViewPosition,BRW12::View:Browse,Queue:Browse:1,Relate:C2IPExplorer,SELF) ! Initialize the browse manager
+  BRW13.Init(?List:3,Queue:Browse:2.ViewPosition,BRW13::View:Browse,Queue:Browse:2,Relate:MissionToDo,SELF) ! Initialize the browse manager
   SELF.Open(QuickWindow)                                   ! Open window
   Do DefineListboxStyle
   IF SELF.Request = ViewRecord                             ! Configure controls for View Only mode
@@ -2094,6 +2134,14 @@ ReturnValue          BYTE,AUTO
   BRW_MissC2IPs.AddField(C2IPExp:Organization,BRW_MissC2IPs.Q.C2IPExp:Organization) ! Field C2IPExp:Organization is a hot field or requires assignment from browse
   BRW_MissC2IPs.AddField(C2IP:ID,BRW_MissC2IPs.Q.C2IP:ID)  ! Field C2IP:ID is a hot field or requires assignment from browse
   BRW_MissC2IPs.AddField(tpyC2IP:ID,BRW_MissC2IPs.Q.tpyC2IP:ID) ! Field tpyC2IP:ID is a hot field or requires assignment from browse
+  BRW13.Q &= Queue:Browse:2
+  BRW13.AddSortOrder(,MissToDo:KMission)                   ! Add the sort order for MissToDo:KMission for sort order 1
+  BRW13.AddRange(MissToDo:Mission,OrgMiss:Mission)         ! Add single value range limit for sort order 1
+  BRW13.AddLocator(BRW13::Sort0:Locator)                   ! Browse has a locator for sort order 1
+  BRW13::Sort0:Locator.Init(,MissToDo:Mission,1,BRW13)     ! Initialize the browse locator using  using key: MissToDo:KMission , MissToDo:Mission
+  BRW13.AddField(MissToDo:TaskName,BRW13.Q.MissToDo:TaskName) ! Field MissToDo:TaskName is a hot field or requires assignment from browse
+  BRW13.AddField(MissToDo:ID,BRW13.Q.MissToDo:ID)          ! Field MissToDo:ID is a hot field or requires assignment from browse
+  BRW13.AddField(MissToDo:Mission,BRW13.Q.MissToDo:Mission) ! Field MissToDo:Mission is a hot field or requires assignment from browse
   INIMgr.Fetch('View_OrgMissions',QuickWindow)             ! Restore window settings from non-volatile store
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
   ToolBarForm.HelpButton=?Help
@@ -2111,6 +2159,8 @@ ReturnValue          BYTE,AUTO
   FDCB9.Q &= Queue:FileDropCombo:1
   FDCB9.AddSortOrder(Miss:PKID)
   FDCB9.AddField(Miss:Name,FDCB9.Q.Miss:Name) !List box control field - type derived from field
+  FDCB9.AddField(tpyMilOp:Name,FDCB9.Q.tpyMilOp:Name) !List box control field - type derived from field
+  FDCB9.AddField(tpyMilOp:Code,FDCB9.Q.tpyMilOp:Code) !List box control field - type derived from field
   FDCB9.AddField(Miss:ID,FDCB9.Q.Miss:ID) !Primary key field - type derived from field
   FDCB9.AddField(tpyMilOp:ID,FDCB9.Q.tpyMilOp:ID) !Related join file key field - type derived from field
   FDCB9.AddUpdateField(Miss:ID,OrgMiss:Mission)
@@ -2121,7 +2171,12 @@ ReturnValue          BYTE,AUTO
   BRW_MissTaskOrg.ToolbarItem.HelpButton = ?Help
   BRW_MissC2IPs.AddToolbarTarget(Toolbar)                  ! Browse accepts toolbar control
   BRW_MissC2IPs.ToolbarItem.HelpButton = ?Help
+  BRW13.AddToolbarTarget(Toolbar)                          ! Browse accepts toolbar control
+  BRW13.ToolbarItem.HelpButton = ?Help
   SELF.SetAlerts()
+  ! Mission Free Text
+  
+  sMilMissFreeText    = Miss:freeText
   RETURN ReturnValue
 
 

@@ -1,0 +1,19 @@
+[UNNAMED]
++SessionDate=27.11.2018
+crc32v2=1258343151
++CurrentKey=Record Order
+ENV File Path=
+OEM=0
+Record Order=Record Order
+TYP:PKID=TYP:PKID
+TYP:KNAME=TYP:KNAME
+TYP:KCODE=TYP:KCODE
+Record Number=47R(2)~Rec No~C(0)@N_12@Y?Rec No:
+TYP:ID=40R(2)~Typ:Id~C(0)@N-14@?Typ:Id:
+TYP:NAME=59L(2)~Typ:Name~C(0)?Typ:Name:
+TYP:CODE=56L(2)~Typ:Code~C(0)?Typ:Code:
+Columns=4
+Column1=RECORD NUMBER
+Column2=TYP:ID
+Column3=TYP:NAME
+Column4=TYP:CODE

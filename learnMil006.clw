@@ -13,6 +13,7 @@
                      MAP
                        INCLUDE('LEARNMIL006.INC'),ONCE        !Local module procedure declarations
                        INCLUDE('LEARNMIL007.INC'),ONCE        !Req'd for module callout resolution
+                       INCLUDE('LEARNMIL009.INC'),ONCE        !Req'd for module callout resolution
                      END
 
 
@@ -218,19 +219,28 @@ BRW1::View:Browse    VIEW(MilMissions)
                        PROJECT(Miss:ID)
                        PROJECT(Miss:Name)
                        PROJECT(Miss:Code)
+                       PROJECT(Miss:MilOpType)
+                       JOIN(tpyMilOp:PKID,Miss:MilOpType)
+                         PROJECT(tpyMilOp:Name)
+                         PROJECT(tpyMilOp:Code)
+                         PROJECT(tpyMilOp:ID)
+                       END
                      END
 Queue:Browse:1       QUEUE                            !Queue declaration for browse/combo box using ?Browse:1
 Miss:ID                LIKE(Miss:ID)                  !List box control field - type derived from field
 Miss:Name              LIKE(Miss:Name)                !List box control field - type derived from field
 Miss:Code              LIKE(Miss:Code)                !List box control field - type derived from field
+tpyMilOp:Name          LIKE(tpyMilOp:Name)            !List box control field - type derived from field
+tpyMilOp:Code          LIKE(tpyMilOp:Code)            !List box control field - type derived from field
+tpyMilOp:ID            LIKE(tpyMilOp:ID)              !Related join file key field - type derived from field
 Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
 QuickWindow          WINDOW('Browse the MilMissions file'),AT(,,277,198),FONT('Microsoft Sans Serif',8,,FONT:regular, |
   CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,MDI,HLP('B_Missions'),SYSTEM
                        LIST,AT(8,30,261,124),USE(?Browse:1),HVSCROLL,FORMAT('48R(2)|M~ID~C(0)@n-10.0@80L(2)|M~' & |
-  'Name~L(2)@s100@80L(2)|M~Code~L(2)@s20@'),FROM(Queue:Browse:1),IMM,MSG('Browsing the ' & |
-  'MilMissions file')
+  'Name~@s100@80L(2)|M~Code~@s20@[100L(2)|M~Name~C(0)@s100@40L(2)|M~Code~C(0)@s20@]|~Mi' & |
+  'ssion Type~'),FROM(Queue:Browse:1),IMM,MSG('Browsing the MilMissions file')
                        BUTTON('&Select'),AT(8,158,49,14),USE(?Select:2),LEFT,ICON('WASELECT.ICO'),FLAT,MSG('Select the Record'), |
   TIP('Select the Record')
                        BUTTON('&View'),AT(61,158,49,14),USE(?View:3),LEFT,ICON('WAVIEW.ICO'),FLAT,MSG('View Record'), |
@@ -317,6 +327,9 @@ ReturnValue          BYTE,AUTO
   BRW1.AddField(Miss:ID,BRW1.Q.Miss:ID)                    ! Field Miss:ID is a hot field or requires assignment from browse
   BRW1.AddField(Miss:Name,BRW1.Q.Miss:Name)                ! Field Miss:Name is a hot field or requires assignment from browse
   BRW1.AddField(Miss:Code,BRW1.Q.Miss:Code)                ! Field Miss:Code is a hot field or requires assignment from browse
+  BRW1.AddField(tpyMilOp:Name,BRW1.Q.tpyMilOp:Name)        ! Field tpyMilOp:Name is a hot field or requires assignment from browse
+  BRW1.AddField(tpyMilOp:Code,BRW1.Q.tpyMilOp:Code)        ! Field tpyMilOp:Code is a hot field or requires assignment from browse
+  BRW1.AddField(tpyMilOp:ID,BRW1.Q.tpyMilOp:ID)            ! Field tpyMilOp:ID is a hot field or requires assignment from browse
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
   INIMgr.Fetch('B_Missions',QuickWindow)                   ! Restore window settings from non-volatile store
@@ -587,6 +600,18 @@ FDCB8::View:FileDropCombo VIEW(type_MilOps)
                        PROJECT(tpyMilOp:Name)
                        PROJECT(tpyMilOp:ID)
                      END
+BRW9::View:Browse    VIEW(MissionToDo)
+                       PROJECT(MissToDo:TaskName)
+                       PROJECT(MissToDo:ID)
+                       PROJECT(MissToDo:Mission)
+                     END
+Queue:Browse         QUEUE                            !Queue declaration for browse/combo box using ?List
+MissToDo:TaskName      LIKE(MissToDo:TaskName)        !List box control field - type derived from field
+MissToDo:ID            LIKE(MissToDo:ID)              !Primary key field - type derived from field
+MissToDo:Mission       LIKE(MissToDo:Mission)         !Browse key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
 Queue:FileDropCombo  QUEUE                            !Queue declaration for browse/combo box using ?tpyMilOp:Name
 tpyMilOp:Name          LIKE(tpyMilOp:Name)            !List box control field - type derived from field
 tpyMilOp:ID            LIKE(tpyMilOp:ID)              !Primary key field - type derived from field
@@ -620,7 +645,12 @@ QuickWindow          WINDOW('Form MilMissions'),AT(,,417,271),FONT('Microsoft Sa
                        ENTRY(@n-10.0),AT(61,92,60,10),USE(Miss:MilOpType),DECIMAL(12),HIDE
                        COMBO(@s100),AT(61,92,289,10),USE(tpyMilOp:Name),DROP(5),FORMAT('400L(2)|M~Name~L(0)@s100@'), |
   FROM(Queue:FileDropCombo),IMM
-                       TEXT,AT(62,118,288,86),USE(Miss:freeText,,?Miss:freeText:2),RTF(TEXT:Field)
+                       TEXT,AT(61,107,352,57),USE(Miss:freeText,,?Miss:freeText:2),RTF(TEXT:Field),HVSCROLL
+                       LIST,AT(61,169,352,52),USE(?List),FORMAT('1020L(2)|M~Task Name~C(0)@s255@'),FROM(Queue:Browse), |
+  IMM
+                       BUTTON('&Insert'),AT(288,225,42,12),USE(?Insert)
+                       BUTTON('&Change'),AT(330,225,42,12),USE(?Change)
+                       BUTTON('&Delete'),AT(372,225,42,12),USE(?Delete)
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -628,6 +658,7 @@ Ask                    PROCEDURE(),DERIVED
 Init                   PROCEDURE(),BYTE,PROC,DERIVED
 Kill                   PROCEDURE(),BYTE,PROC,DERIVED
 Run                    PROCEDURE(),BYTE,PROC,DERIVED
+Run                    PROCEDURE(USHORT Number,BYTE Request),BYTE,PROC,DERIVED
 TakeAccepted           PROCEDURE(),BYTE,PROC,DERIVED
                      END
 
@@ -641,6 +672,12 @@ FDCB8                CLASS(FileDropComboClass)             ! File drop combo man
 Q                      &Queue:FileDropCombo           !Reference to browse queue type
                      END
 
+BRW9                 CLASS(BrowseClass)                    ! Browse using ?List
+Q                      &Queue:Browse                  !Reference to browse queue
+Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+                     END
+
+BRW9::Sort0:Locator  StepLocatorClass                      ! Default Locator
 CurCtrlFeq          LONG
 FieldColorQueue     QUEUE
 Feq                   LONG
@@ -716,6 +753,7 @@ ReturnValue          BYTE,AUTO
     SELF.OkControl = ?OK
     IF SELF.PrimeUpdate() THEN RETURN Level:Notify.
   END
+  BRW9.Init(?List,Queue:Browse.ViewPosition,BRW9::View:Browse,Queue:Browse,Relate:MissionToDo,SELF) ! Initialize the browse manager
   SELF.Open(QuickWindow)                                   ! Open window
   Do DefineListboxStyle
   IF SELF.Request = ViewRecord                             ! Configure controls for View Only mode
@@ -728,21 +766,35 @@ ReturnValue          BYTE,AUTO
     ?Miss:EndTime{PROP:ReadOnly} = True
     ?Miss:MilOpType{PROP:ReadOnly} = True
     DISABLE(?tpyMilOp:Name)
+    DISABLE(?Insert)
+    DISABLE(?Change)
+    DISABLE(?Delete)
   END
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
+  BRW9.Q &= Queue:Browse
+  BRW9.AddSortOrder(,MissToDo:KMission)                    ! Add the sort order for MissToDo:KMission for sort order 1
+  BRW9.AddRange(MissToDo:Mission,Relate:MissionToDo,Relate:MilMissions) ! Add file relationship range limit for sort order 1
+  BRW9.AddLocator(BRW9::Sort0:Locator)                     ! Browse has a locator for sort order 1
+  BRW9::Sort0:Locator.Init(,MissToDo:Mission,1,BRW9)       ! Initialize the browse locator using  using key: MissToDo:KMission , MissToDo:Mission
+  BRW9.AddField(MissToDo:TaskName,BRW9.Q.MissToDo:TaskName) ! Field MissToDo:TaskName is a hot field or requires assignment from browse
+  BRW9.AddField(MissToDo:ID,BRW9.Q.MissToDo:ID)            ! Field MissToDo:ID is a hot field or requires assignment from browse
+  BRW9.AddField(MissToDo:Mission,BRW9.Q.MissToDo:Mission)  ! Field MissToDo:Mission is a hot field or requires assignment from browse
   INIMgr.Fetch('U_Missions',QuickWindow)                   ! Restore window settings from non-volatile store
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
   ToolBarForm.HelpButton=?Help
   SELF.AddItem(ToolbarForm)
   FDCB8.Init(tpyMilOp:Name,?tpyMilOp:Name,Queue:FileDropCombo.ViewPosition,FDCB8::View:FileDropCombo,Queue:FileDropCombo,Relate:type_MilOps,ThisWindow,GlobalErrors,0,1,0)
   FDCB8.Q &= Queue:FileDropCombo
-  FDCB8.AddSortOrder()
+  FDCB8.AddSortOrder(tpyMilOp:PKID)
   FDCB8.AddField(tpyMilOp:Name,FDCB8.Q.tpyMilOp:Name) !List box control field - type derived from field
   FDCB8.AddField(tpyMilOp:ID,FDCB8.Q.tpyMilOp:ID) !Primary key field - type derived from field
   FDCB8.AddUpdateField(tpyMilOp:ID,Miss:MilOpType)
   ThisWindow.AddItem(FDCB8.WindowComponent)
   FDCB8.DefaultFill = 0
+  BRW9.AskProcedure = 1                                    ! Will call: U_MissToDo
+  BRW9.AddToolbarTarget(Toolbar)                           ! Browse accepts toolbar control
+  BRW9.ToolbarItem.HelpButton = ?Help
   SELF.SetAlerts()
   RETURN ReturnValue
 
@@ -772,6 +824,22 @@ ReturnValue          BYTE,AUTO
   ReturnValue = PARENT.Run()
   IF SELF.Request = ViewRecord                             ! In View Only mode always signal RequestCancelled
     ReturnValue = RequestCancelled
+  END
+  RETURN ReturnValue
+
+
+ThisWindow.Run PROCEDURE(USHORT Number,BYTE Request)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Run(Number,Request)
+  IF SELF.Request = ViewRecord
+    ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
+  ELSE
+    GlobalRequest = Request
+    U_MissToDo
+    ReturnValue = GlobalResponse
   END
   RETURN ReturnValue
 
@@ -808,6 +876,17 @@ Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize
   CODE
   PARENT.Init(AppStrategy,SetWindowMinSize,SetWindowMaxSize)
   SELF.SetParentDefaults()                                 ! Calculate default control parent-child relationships based upon their positions on the window
+
+
+BRW9.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+
+  CODE
+  PARENT.Init(ListBox,Posit,V,Q,RM,WM)
+  IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
+    SELF.InsertControl=?Insert
+    SELF.ChangeControl=?Change
+    SELF.DeleteControl=?Delete
+  END
 
 !!! <summary>
 !!! Generated from procedure template - Window
