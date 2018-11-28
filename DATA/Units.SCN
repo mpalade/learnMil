@@ -1,6 +1,6 @@
 [UNNAMED]
-+SessionDate=07.11.2018
-crc32v2=2494563007
++SessionDate=28.11.2018
+crc32v2=794321392
 +CurrentKey=Record Order
 ENV File Path=
 OEM=0
@@ -10,12 +10,13 @@ UNI:KNAME=UNI:KNAME
 UNI:KCODE=UNI:KCODE
 Record Number=47R(2)~Rec No~C(0)@N_12@Y?Rec No:
 UNI:ID=38R(2)~Uni:Id~C(0)@N-14@?Uni:Id:
-UNI:NAME=57L(2)~Uni:Name~C(0)?Uni:Name:
-UNI:CODE=54L(2)~Uni:Code~C(0)?Uni:Code:
+UNI:NAME=104L(2)~Uni:Name~C(0)?Uni:Name:
+UNI:CODE=147L(2)~Uni:Code~C(0)?Uni:Code:
 Columns=5
 Column1=RECORD NUMBER
 Column2=UNI:ID
 Column3=UNI:NAME
 Column4=UNI:CODE
-UNI:BSOTYPE=67R(2)~Uni:Bsotype~C(0)@N-14@?Uni:Bsotype:
+UNI:BSOTYPE=281R(2)~Uni:Bsotype~C(0)@N-14@?Uni:Bsotype:
 Column5=UNI:BSOTYPE
+UNI:KBSOTYPE=UNI:KBSOTYPE
