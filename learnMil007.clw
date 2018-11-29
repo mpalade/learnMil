@@ -157,9 +157,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?MissTSK:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
@@ -358,9 +358,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -532,6 +532,8 @@ C2IEUnitRef          DECIMAL(7)                            !
 xPos                 DECIMAL(7)                            ! 
 yPos                 DECIMAL(7)                            ! 
                      END                                   ! 
+bBSOFoundOnCanvas    BYTE                                  ! 
+nBSOFoundPos         ULONG                                 ! 
 BRW1::View:Browse    VIEW(C2IPContent)
                        PROJECT(C2IPCt:ID)
                        PROJECT(C2IPCt:C2IPPackage)
@@ -605,6 +607,10 @@ BRW10::View:Browse   VIEW(c2ieUnits)
                        JOIN(_meta_c2ieUni:Kc2ieUni,c2ieUni:ID)
                          PROJECT(_meta_c2ieUni:movedToOverlay)
                        END
+                       JOIN(c2ieUniPos:Kc2ieUnit,c2ieUni:ID)
+                         PROJECT(c2ieUniPos:xPos)
+                         PROJECT(c2ieUniPos:yPos)
+                       END
                      END
 Queue:Browse:2       QUEUE                            !Queue declaration for browse/combo box using ?List:2
 c2ieUni:ID             LIKE(c2ieUni:ID)               !List box control field - type derived from field
@@ -615,6 +621,8 @@ Uni:Name_Icon          LONG                           !Entry's icon ID
 c2ieUni:Hostility      LIKE(c2ieUni:Hostility)        !List box control field - type derived from field
 tpyHstl:Code           LIKE(tpyHstl:Code)             !List box control field - type derived from field
 _meta_c2ieUni:movedToOverlay LIKE(_meta_c2ieUni:movedToOverlay) !List box control field - type derived from field
+c2ieUniPos:xPos        LIKE(c2ieUniPos:xPos)          !List box control field - type derived from field
+c2ieUniPos:yPos        LIKE(c2ieUniPos:yPos)          !List box control field - type derived from field
 c2ieUni:C2IE           LIKE(c2ieUni:C2IE)             !Browse key field - type derived from field
 Uni:ID                 LIKE(Uni:ID)                   !Related join file key field - type derived from field
 tpyBSO:ID              LIKE(tpyBSO:ID)                !Related join file key field - type derived from field
@@ -652,8 +660,9 @@ QuickWindow          WINDOW('COP App'),AT(,,799,346),FONT('Microsoft Sans Serif'
                        BUTTON('Move to Overlay'),AT(369,280),USE(?BUTTON_MoveToOverlay)
                        LIST,AT(143,30,205,124),USE(?List:2),HVSCROLL,DRAGID('moveToOvrl'),FORMAT('0L(2)|M~ID~D' & |
   '(12)@n-10.0@[40L(2)|M~BSO Type~C(0)@s20@40L(2)|M~BSO Code~C(0)@s20@80L(2)|MI~BSO Nam' & |
-  'e~C(0)@s100@0L(2)|M~Hostility~D(12)@n-10.0@]|~BSO~40L(2)|M~Hostility~C(0)@s20@10L(2)' & |
-  '|M~Moved~C(0)@n3@'),FROM(Queue:Browse:2),IMM,VCR
+  'e~C(0)@s100@0L(2)|M~Hostility~D(12)@n-10.0@]|~BSO~40L(2)|M~Hostility~C(0)@s20@0L(2)|' & |
+  'M~Moved~C(0)@n3@0L(2)|M~x Pos~D(12)@n-10.0@0L(2)|M~y Pos~D(12)@n-10.0@'),FROM(Queue:Browse:2), |
+  IMM,VCR
                        BUTTON('&Insert'),AT(144,158,42,12),USE(?Insert)
                        BUTTON('&Change'),AT(185,158,42,12),USE(?Change)
                        BUTTON('&Delete'),AT(228,158,42,12),USE(?Delete)
@@ -671,7 +680,8 @@ QuickWindow          WINDOW('COP App'),AT(,,799,346),FONT('Microsoft Sans Serif'
                        IMAGE,AT(442,2,355,322),USE(?Draw)
                        PROMPT('Name:'),AT(9,9),USE(?sCOPName:Prompt)
                        ENTRY(@s100),AT(50,8,385,10),USE(sCOPName),FONT(,,,FONT:regular)
-                       REGION,AT(442,2,363,324),USE(?PANEL1),DROPID('moveToOvrl')
+                       REGION,AT(442,2,363,324),USE(?PANEL1),DROPID('moveToOvrl'),IMM
+                       BUTTON('compute COPBSOs'),AT(9,298),USE(?BUTTON2)
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -707,7 +717,6 @@ BRW10::Sort0:Locator StepLocatorClass                      ! Default Locator
 BRWBOSPos            CLASS(BrowseClass)                    ! Browse using ?List:3
 Q                      &Queue:Browse:3                !Reference to browse queue
 Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
-ValidateRecord         PROCEDURE(),BYTE,DERIVED
                      END
 
 BRW11::Sort0:Locator StepLocatorClass                      ! Default Locator
@@ -719,6 +728,8 @@ EditInPlace::Uni:Name EditEntryClass                       ! Edit-in-place class
 EditInPlace::c2ieUni:Hostility EditEntryClass              ! Edit-in-place class for field c2ieUni:Hostility
 EditInPlace::tpyHstl:Code EditEntryClass                   ! Edit-in-place class for field tpyHstl:Code
 EditInPlace::_meta_c2ieUni:movedToOverlay EditEntryClass   ! Edit-in-place class for field _meta_c2ieUni:movedToOverlay
+EditInPlace::c2ieUniPos:xPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:xPos
+EditInPlace::c2ieUniPos:yPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:yPos
 BRW11::EIPManager    BrowseEIPManager                      ! Browse EIP Manager for Browse using ?List:3
 EditInPlace::c2ieUniPos:c2ieUnit EditEntryClass            ! Edit-in-place class for field c2ieUniPos:c2ieUnit
 EditInPlace::c2ieUniPos:xPos EditEntryClass                ! Edit-in-place class for field c2ieUniPos:xPos
@@ -1000,9 +1011,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1075,6 +1086,8 @@ ReturnValue          BYTE,AUTO
   BRWC2IEBSOs.AddField(c2ieUni:Hostility,BRWC2IEBSOs.Q.c2ieUni:Hostility) ! Field c2ieUni:Hostility is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(tpyHstl:Code,BRWC2IEBSOs.Q.tpyHstl:Code) ! Field tpyHstl:Code is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(_meta_c2ieUni:movedToOverlay,BRWC2IEBSOs.Q._meta_c2ieUni:movedToOverlay) ! Field _meta_c2ieUni:movedToOverlay is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(c2ieUniPos:xPos,BRWC2IEBSOs.Q.c2ieUniPos:xPos) ! Field c2ieUniPos:xPos is a hot field or requires assignment from browse
+  BRWC2IEBSOs.AddField(c2ieUniPos:yPos,BRWC2IEBSOs.Q.c2ieUniPos:yPos) ! Field c2ieUniPos:yPos is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(c2ieUni:C2IE,BRWC2IEBSOs.Q.c2ieUni:C2IE) ! Field c2ieUni:C2IE is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(Uni:ID,BRWC2IEBSOs.Q.Uni:ID)        ! Field Uni:ID is a hot field or requires assignment from browse
   BRWC2IEBSOs.AddField(tpyBSO:ID,BRWC2IEBSOs.Q.tpyBSO:ID)  ! Field tpyBSO:ID is a hot field or requires assignment from browse
@@ -1156,9 +1169,6 @@ ReturnValue          BYTE,AUTO
   ! Display Overlay Units
   
   DO _DrawUnits
-  ! BSO Queue
-  
-  MESSAGE('units = ' & RECORDS(COPBSOs))
   RETURN ReturnValue
 
 
@@ -1330,6 +1340,53 @@ Looped BYTE
       ! Refresh C2IP Name
       
       QuickWindow{PROP:Text}='COP App (' & CLIP(sCOPName) & '.c2ip)'
+    OF ?PANEL1
+      ! identify BSO object
+      
+      mouseX# = DrwOverlay.MouseX()
+      mouseY# = DrwOverlay.MouseY()
+      
+      !MESSAGE('xPos = ' & mouseX# & ', yPos = ' & mouseY#)
+      
+      bBSOFoundOnCanvas   = FALSE
+      i# = 1
+      LOOP
+          GET(COPBSOs, i#)
+          IF ERRORCODE() THEN
+              BREAK
+          END   
+          !MESSAGE('ref = ' & copBSO:C2IEUnitRef & ' xpos= ' & copBSO:xPos & ' ypos= ' & copBSO:yPos)
+          IF (copBSO:xPos < mouseX#) AND (mouseX# < copBSO:xPos + 50) THEN
+              IF (copBSO:yPos < mouseY#) AND (mouseY# < copBSO:yPos + 30) THEN
+                  ! Object found
+                  !MESSAGE('found object')            
+                  bBSOFoundOnCanvas = TRUE
+                  nBSOFoundPos    = i#
+                  BREAK            
+              END
+              
+          END
+          i# = i# + 1
+          
+      END
+    OF ?BUTTON2
+      ThisWindow.Update()
+      ! Add BSO to queue
+      
+      LOOP i# = 1 TO RECORDS(BRWC2IEBSOs.q)
+          GET(BRWC2IEBSOs.q, i#)
+          
+          !MESSAGE('ref = ' & BRWC2IEBSOs.q.c2ieUni:ID & ' xpos = ' & BRWC2IEBSOs.q.c2ieUniPos:xPos & ' ypos = ' & BRWC2IEBSOs.q.c2ieUniPos:yPos)
+          
+          copBSO:C2IEUnitRef  = BRWC2IEBSOs.q.c2ieUni:ID
+          copBSO:xPos         = BRWC2IEBSOs.q.c2ieUniPos:xPos
+          copBSO:yPos         = BRWC2IEBSOs.q.c2ieUniPos:yPos
+          
+          ADD(COPBSOs)
+          CLEAR(COPBSOs)
+      END
+      
+      !MESSAGE('units = ' & RECORDS(COPBSOs))
     END
     RETURN ReturnValue
   END
@@ -1353,6 +1410,34 @@ Looped BYTE
   CASE FIELD()
   OF ?PANEL1
     CASE EVENT()
+    OF EVENT:MouseUp
+      ! BSO new positions
+      
+      IF bBSOFoundOnCanvas = TRUE THEN
+          _c2ieUniPos:c2ieUnit    = copBSO:C2IEUnitRef
+          IF Access:_c2ieUnitsPositions.TryFetch(_c2ieUniPos:Kc2ieUnit) = Level:Benign THEN
+              mouseX# = DrwOverlay.MouseX()
+              mouseY# = DrwOverlay.MouseY()
+              _c2ieUniPos:xPos    = mouseX#
+              _c2ieUniPos:yPos    = mouseY#
+              IF Access:_c2ieUnitsPositions.TryUpdate() = Level:Benign THEN
+                  ! Position updated
+                  !MESSAGE('pos updated')
+                  
+                  copBSO:xPos = mouseX#
+                  copBSO:yPos = mouseY#
+                  PUT(COPBSOs)
+                  IF ERRORCODE() THEN
+                      MESSAGE('queue error')
+                  END
+                  
+                  
+                  DO _drawUnits
+              END
+              
+          END
+          
+      END
     OF EVENT:Drop
       ! Move to Overlay
       !optionsMenu#     = POPUP('Option1|Option2',,,)
@@ -1442,6 +1527,8 @@ BRWC2IEBSOs.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationM
   SELF.AddEditControl(EditInPlace::c2ieUni:Hostility,6)
   SELF.AddEditControl(EditInPlace::tpyHstl:Code,7)
   SELF.AddEditControl(EditInPlace::_meta_c2ieUni:movedToOverlay,8)
+  SELF.AddEditControl(EditInPlace::c2ieUniPos:xPos,9)
+  SELF.AddEditControl(EditInPlace::c2ieUniPos:yPos,10)
   SELF.DeleteAction = EIPAction:Always
   SELF.ArrowAction = EIPAction:Default+EIPAction:Remain+EIPAction:RetainColumn
   IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
@@ -1490,25 +1577,6 @@ BRWBOSPos.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationMan
   END
 
 
-BRWBOSPos.ValidateRecord PROCEDURE
-
-ReturnValue          BYTE,AUTO
-
-BRW11::RecordStatus  BYTE,AUTO
-  CODE
-  ReturnValue = PARENT.ValidateRecord()
-  ! Add BSO to queue
-  
-  copBSO:C2IEUnitRef  = BRWBOSPos.q.c2ieUniPos:c2ieUnit
-  copBSO:xPos         = BRWBOSPos.q.c2ieUniPos:xPos
-  copBSO:yPos         = BRWBOSPos.q.c2ieUniPos:yPos
-  
-  ADD(COPBSOs)
-  CLEAR(COPBSOs)
-  BRW11::RecordStatus=ReturnValue
-  RETURN ReturnValue
-
-
 Resizer.Init PROCEDURE(BYTE AppStrategy=AppStrategy:Resize,BYTE SetWindowMinSize=False,BYTE SetWindowMaxSize=False)
 
 
@@ -1524,6 +1592,7 @@ View_ORBAT_TASKORGTransfers PROCEDURE
 
 selC2IEORBATRef      DECIMAL(7)                            ! 
 selC2IETASKORGRef    DECIMAL(7)                            ! 
+selBSOForC2DisplayRef DECIMAL(7)                           ! 
 sNewTaskOrgName      STRING(100)                           ! 
 sC2RelCode           STRING(20)                            ! 
 BSOFromNodeOrder     DECIMAL(2)                            ! 
@@ -1824,6 +1893,7 @@ Q                      &Queue:Browse:4                !Reference to browse queue
 BRW9::Sort0:Locator  StepLocatorClass                      ! Default Locator
 BRW_BSOTASKORG       CLASS(BrowseClass)                    ! Browse using ?List:6
 Q                      &Queue:Browse:5                !Reference to browse queue
+TakeNewSelection       PROCEDURE(),DERIVED
                      END
 
 BRW10::Sort0:Locator StepLocatorClass                      ! Default Locator
@@ -1870,9 +1940,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -2005,7 +2075,7 @@ ReturnValue          BYTE,AUTO
   BRW_BSOTASKORG2.AddField(_c2ieOC_TSK:C2IE,BRW_BSOTASKORG2.Q._c2ieOC_TSK:C2IE) ! Field _c2ieOC_TSK:C2IE is a hot field or requires assignment from browse
   BRW_C2Rel.Q &= Queue:Browse:8
   BRW_C2Rel.AddSortOrder(,c2ieUniC2Rel:Kc2ieUnit)          ! Add the sort order for c2ieUniC2Rel:Kc2ieUnit for sort order 1
-  BRW_C2Rel.AddRange(c2ieUniC2Rel:c2ieUnit,selC2IETASKORGRef) ! Add single value range limit for sort order 1
+  BRW_C2Rel.AddRange(c2ieUniC2Rel:c2ieUnit,selBSOForC2DisplayRef) ! Add single value range limit for sort order 1
   BRW_C2Rel.AddLocator(BRW14::Sort0:Locator)               ! Browse has a locator for sort order 1
   BRW14::Sort0:Locator.Init(,c2ieUniC2Rel:c2ieUnit,1,BRW_C2Rel) ! Initialize the browse locator using  using key: c2ieUniC2Rel:Kc2ieUnit , c2ieUniC2Rel:c2ieUnit
   BRW_C2Rel.AddField(c2ieUniC2Rel:ID,BRW_C2Rel.Q.c2ieUniC2Rel:ID) ! Field c2ieUniC2Rel:ID is a hot field or requires assignment from browse
@@ -2099,6 +2169,8 @@ Looped BYTE
       ThisWindow.Update()
       ! Call create New TaskOrg Object procedure
       _createNewTaskOrgObject(CLIP(sNewTaskOrgName))
+      
+      BRW_C2IETASKORG.ResetFromFile()
     OF ?BUTTON2
       ThisWindow.Update()
       ! add BSO Transfer
@@ -2237,6 +2309,7 @@ Looped BYTE
       !    BRW_C2IETASKORG.q._C2IETSK:ID)
           
           
+          !MESSAGE('BSOParentRef = ' & BSOParentRef)
       _addBSOTransferToTaskOrgObject2(BRW_C2IPORBAT.q._C2IP_Orbats:ID, | 
           BRW_C2IEORBAT.q._C2IEORB:ID, | 
           BSOFromRef, |
@@ -2245,7 +2318,8 @@ Looped BYTE
           BSOParentRef)    
           
           
-          BRW_BSOTASKORG.ResetFromFile()
+      BRW_BSOTASKORG.ResetFromFile()
+      BRW_C2Rel.ResetFromFile()
     END
   END
     RETURN ReturnValue
@@ -2278,6 +2352,14 @@ BRW_C2IETASKORG.TakeNewSelection PROCEDURE
   ! current selection selC2IETASKORGRef
   
   selC2IETASKORGRef = BRW_C2IETASKORG.q._C2IETSK:ID
+
+
+BRW_BSOTASKORG.TakeNewSelection PROCEDURE
+
+  CODE
+  PARENT.TakeNewSelection
+  ! current selection BSO for C2 Relationships Display
+  selBSOForC2DisplayRef   = BRW_BSOTASKORG.q._c2ieBSOTSK:ID
 
 !!! <summary>
 !!! Generated from procedure template - Source
@@ -2374,7 +2456,7 @@ IF LEN(CLIP(pTaskOrgName))>0 THEN
             _C2IPCt:C2IPPackage = nC2IPRef
             _C2IPCt:C2IEInstance    = nC2IERef
             IF Access:_C2IPContent.TryInsert() = Level:Benign THEN
-                MESSAGE('TaskOrg created')
+                !MESSAGE('TaskOrg created')
                 
                 OMIT('__noCompile'_)
                 ! Add the new C2IP to the current C2IP Explorer
@@ -2542,9 +2624,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -2718,9 +2800,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieUni:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(_c2ieBSOTSK:Record,History::_c2ieBSOTSK:Record)
   SELF.AddHistoryField(?_c2ieBSOTSK:ID,1)
@@ -2910,9 +2992,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -3021,9 +3103,8 @@ _addBSOTransferToTaskOrgObject2 PROCEDURE  (ULONG pC2IPRef,ULONG pC2IEFromRef,UL
             
             ! Update BSO C2 Relationships
             IF Access:c2ieUnitsC2Relationships.PrimeRecord() = Level:Benign THEN
-                c2ieUniC2Rel:c2ieUnit   = _c2ieUni:ID
-                IF Access:c2ieUnitsC2Relationships.TryInsert() = Level:Benign THEN
-                    ! BSO C2 Relationship added succesfully
+                    !MESSAGE('the new _c2ieUni:ID = ' & _c2ieUni:ID)
+                    c2ieUniC2Rel:c2ieUnit   = _c2ieUni:ID
                     CASE CLIP(pC2RelCode)
                     OF 'FC'
                         ! Full Command
@@ -3047,11 +3128,14 @@ _addBSOTransferToTaskOrgObject2 PROCEDURE  (ULONG pC2IPRef,ULONG pC2IEFromRef,UL
                         ! default FC
                         ! Full Command
                         c2ieUniC2Rel:FC = pBSOParentRef
-                        
-                    END
+                    END    
+                
+                IF Access:c2ieUnitsC2Relationships.TryInsert() = Level:Benign THEN
+                    ! C2 Relationship added    
                 ELSE
                     Access:c2ieUnitsC2Relationships.CancelAutoInc()                    
                 END
+                
             END
             
             
@@ -3072,8 +3156,7 @@ _addBSOTransferToTaskOrgObject2 PROCEDURE  (ULONG pC2IPRef,ULONG pC2IEFromRef,UL
                     MESSAGE('Access:c2ieUnitTransfer TryInsert error')
                 END
             ELSE
-                MESSAGE('Access:c2ieUnitTransfer error prime insert')
-                
+                MESSAGE('Access:c2ieUnitTransfer error prime insert')                
             END
         ELSE
             MESSAGE('Access:_c2ieUnits TryInsert error')
