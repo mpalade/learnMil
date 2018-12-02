@@ -1822,34 +1822,38 @@ QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,673,417),FONT('Mic
   STD(STD:Help),TIP('See Help Window')
                        LIST,AT(3,12,150,70),USE(?List),HVSCROLL,FORMAT('100L(2)|M~ORBAT Name~C(0)@s100@'),FROM(Queue:Browse), |
   IMM
-                       LIST,AT(199,12,150,70),USE(?List:2),HVSCROLL,FORMAT('100L(2)|M~TaskOrg Name~C(0)@s100@'),FROM(Queue:Browse:1), |
+                       LIST,AT(254,12,150,70),USE(?List:2),HVSCROLL,FORMAT('100L(2)|M~TaskOrg Name~C(0)@s100@'),FROM(Queue:Browse:1), |
   IMM
-                       LIST,AT(3,87,150,34),USE(?List:3),HVSCROLL,FORMAT('0L(2)|M~ID~D(12)@n-10.0@100L(2)|M~TA' & |
-  'SKORG C2IE Name~C(0)@s100@'),FROM(Queue:Browse:2),IMM
-                       LIST,AT(199,87,150,34),USE(?List:4),HVSCROLL,FORMAT('0L(2)|M~ID~D(12)@n-10.0@100L(2)|M~' & |
+                       LIST,AT(43,49,150,34),USE(?List:3),HVSCROLL,FORMAT('0L(2)|M~ID~D(12)@n-10.0@100L(2)|M~T' & |
+  'ASKORG C2IE Name~C(0)@s100@'),FROM(Queue:Browse:2),IMM
+                       LIST,AT(299,49,150,34),USE(?List:4),HVSCROLL,FORMAT('0L(2)|M~ID~D(12)@n-10.0@100L(2)|M~' & |
   'TASKORG C2IE Name~C(0)@s100@'),FROM(Queue:Browse:3),IMM
-                       LIST,AT(3,244,149,100),USE(?List:5),HVSCROLL,FORMAT('0L(2)|M~ID~D(12)@n-10.0@[40L(2)|M~' & |
+                       LIST,AT(5,294,149,100),USE(?List:5),HVSCROLL,FORMAT('0L(2)|M~ID~D(12)@n-10.0@[40L(2)|M~' & |
   'Code~C(0)@s20@100L(2)|M~Name~C(0)@s100@]|~Unit~'),FROM(Queue:Browse:4),IMM
-                       LIST,AT(199,244,246,100),USE(?List:6),HVSCROLL,FORMAT('0L(2)|M~ID~D(12)@n-10.0@[40L(2)|' & |
+                       LIST,AT(201,294,246,100),USE(?List:6),HVSCROLL,FORMAT('0L(2)|M~ID~D(12)@n-10.0@[40L(2)|' & |
   'M~Code~C(0)@s20@100L(2)|M~Name~C(0)@s100@]|~Unit~[100L(2)|M~Name~C(0)@s100@]|~TASKOR' & |
   'G C2IP/C2IE Source~'),FROM(Queue:Browse:5),IMM
-                       BUTTON('Create TaskOrg'),AT(379,348),USE(?BUTTON1)
+                       BUTTON('Create TaskOrg'),AT(381,399),USE(?BUTTON1)
                        BUTTON('Move to TaskOrg'),AT(2,401),USE(?BUTTON2)
-                       PROMPT('TaskOrg Name:'),AT(223,353),USE(?sNewTaskOrgName:Prompt)
-                       ENTRY(@s100),AT(279,353,96,10),USE(sNewTaskOrgName)
-                       LIST,AT(3,126,150,79),USE(?List:7),HVSCROLL,DRAGID('transferBSO'),FORMAT('0L(2)|M~ID~D(' & |
-  '12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@4' & |
-  '0L(2)|M~My Echelon~C(0)@s20@40L(2)|M~1st Level~C(0)@s20@40L(2)|M~2nd Level~C(0)@s20@' & |
-  '40L(2)|M~3rd Level~C(0)@s20@'),FROM(Queue:Browse:6),IMM
-                       LIST,AT(199,126,246,79),USE(?List:8),HVSCROLL,DROPID('transferBSO'),FORMAT('0L(2)|M~ID~' & |
-  'D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0' & |
-  '@40L(2)|M~My Echelon~L(0)@s20@40L(2)|M~1st Level~L(0)@s20@40L(2)|M~2nd Level~L(0)@s2' & |
-  '0@40L(2)|M~3rd Level~L(0)@s20@'),FROM(Queue:Browse:7),IMM
-                       LIST,AT(450,244,218,95),USE(?List:9),DECIMAL(12),FORMAT('0L(2)|M~ID~D(12)@n-10.0@40L(2)' & |
+                       PROMPT('TaskOrg Name:'),AT(225,404),USE(?sNewTaskOrgName:Prompt)
+                       ENTRY(@s100),AT(281,404,96,10),USE(sNewTaskOrgName)
+                       LIST,AT(3,87,150,79),USE(?List:7),HVSCROLL,DRAGID('transferBSO'),FORMAT('0L(2)|M~ID~D(1' & |
+  '2)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@40' & |
+  'L(2)|M~My Echelon~C(0)@s20@40L(2)|M~1st Level~C(0)@s20@40L(2)|M~2nd Level~C(0)@s20@4' & |
+  '0L(2)|M~3rd Level~C(0)@s20@'),FROM(Queue:Browse:6),IMM
+                       LIST,AT(254,87,246,79),USE(?List:8),HVSCROLL,DROPID('transferBSO'),FORMAT('0L(2)|M~ID~D' & |
+  '(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@' & |
+  '40L(2)|M~My Echelon~L(0)@s20@40L(2)|M~1st Level~L(0)@s20@40L(2)|M~2nd Level~L(0)@s20' & |
+  '@40L(2)|M~3rd Level~L(0)@s20@'),FROM(Queue:Browse:7),IMM
+                       LIST,AT(453,294,218,95),USE(?List:9),DECIMAL(12),FORMAT('0L(2)|M~ID~D(12)@n-10.0@40L(2)' & |
   '|M~FC~C(0)@s20@40L(2)|M~OpCom~C(0)@s20@40L(2)|M~OpCon~C(0)@s20@40L(2)|M~TaCom~C(0)@s' & |
   '20@40L(2)|M~TaCon~C(0)@s20@40L(2)|M~Adm~C(0)@s20@'),FROM(Queue:Browse:8),IMM
-                       COMBO(@s20),AT(3,210,150,10),USE(tpyC2Rel:Code),DROP(5),FORMAT('80L(2)|M~Code~L(0)@s20@'), |
+                       COMBO(@s20),AT(157,87,92,10),USE(tpyC2Rel:Code),DROP(5),FORMAT('80L(2)|M~Code~L(0)@s20@'), |
   FROM(Queue:FileDropCombo),IMM
+                       IMAGE,AT(2,170,248,119),USE(?Draw)
+                       IMAGE,AT(253,170,247,119),USE(?Draw:2)
+                       IMAGE,AT(504,170,167,119),USE(?Draw:3),HVSCROLL
+                       REGION,AT(504,170,168,127),USE(?PANEL1),IMM
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -1916,6 +1920,21 @@ FDCB11               CLASS(FileDropComboClass)             ! File drop combo man
 Q                      &Queue:FileDropCombo           !Reference to browse queue type
                      END
 
+! ----- DrwFrom --------------------------------------------------------------------------
+DrwFrom              Class(Draw)
+    ! derived method declarations
+                     End  ! DrwFrom
+! ----- end DrwFrom -----------------------------------------------------------------------
+! ----- DrwTo --------------------------------------------------------------------------
+DrwTo                Class(Draw)
+    ! derived method declarations
+                     End  ! DrwTo
+! ----- end DrwTo -----------------------------------------------------------------------
+! ----- DrwOCFrom --------------------------------------------------------------------------
+DrwOCFrom            Class(DrawPaint)
+    ! derived method declarations
+                     End  ! DrwOCFrom
+! ----- end DrwOCFrom -----------------------------------------------------------------------
 
   CODE
   GlobalResponse = ThisWindow.Run()                        ! Opens the window and starts an Accept Loop
@@ -1927,6 +1946,293 @@ DefineListboxStyle ROUTINE
 !| It`s called after the window open
 !|
 !---------------------------------------------------------------------------
+_drawOrgChartFrom       ROUTINE
+DATA
+CODE
+    
+    DrwFrom.Blank(COLOR:White)
+    DrwFrom.Display()
+
+    i# = 0
+    SET(c2ieTaskOrg)
+    LOOP
+        IF Access:c2ieTaskOrg.Next() = Level:Benign THEN
+            IF c2ieTO:C2IE = selC2IEORBATRef THEN
+                i# = i# + 1
+                
+                IF c2ieTO:Parent <> 0 THEN    
+                    DrwFrom.Box(1, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwFrom.Line(1 + 25, i#*30, 1, 10)
+                    
+                    UniP:ID = c2ieTO:Parent
+                    IF Access:P.TryFetch(UniP:PKID) = Level:Benign THEN
+                        DrwFrom.Show(1 + 5, (i#-1)*30+11, UniP:Code)
+                    END
+                    
+                END
+                IF c2ieTO:Child1 <> 0 THEN
+                    DrwFrom.Box(50, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwFrom.Line(50 + 25, i#*30, 1, 10)
+                    
+                    UniC1:ID = c2ieTO:Child1
+                    IF Access:C1.TryFetch(UniC1:PKID) = Level:Benign THEN
+                        DrwFrom.Show(50 + 5, (i#-1)*30+11, UniC1:Code)
+                    END
+                    
+                END
+                IF c2ieTO:Child2 <> 0 THEN
+                    DrwFrom.Box(100, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwFrom.Line(100 + 25, i#*30, 1, 10)
+                    
+                    UniC2:ID = c2ieTO:Child2
+                    IF Access:C2.TryFetch(UniC2:PKID) = Level:Benign THEN
+                        DrwFrom.Show(100 + 5, (i#-1)*30+11, UniC2:Code)
+                    END
+                   
+                END
+                IF c2ieTO:Child3 <> 0 THEN
+                    DrwFrom.Box(150, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwFrom.Line(100 + 25, i#*30, 1, 10)
+                    
+                    UniC2:ID = c2ieTO:Child3
+                    IF Access:C2.TryFetch(UniC2:PKID) = Level:Benign THEN
+                        DrwFrom.Show(150 + 5, (i#-1)*30+11, UniC2:Code)
+                    END
+                   
+                END
+            END
+            
+            
+        ELSE
+            BREAK
+        END
+    END
+
+    DrwFrom.Display()
+    
+    
+    EXIT
+    
+_drawOrgChartTo       ROUTINE
+DATA
+CODE
+    
+    DrwTo.Blank(COLOR:White)
+    DrwTo.Display()
+
+    i# = 0
+    SET(c2ieTaskOrg)
+    LOOP
+        IF Access:c2ieTaskOrg.Next() = Level:Benign THEN
+            IF c2ieTO:C2IE = selC2IETASKORGRef THEN
+                i# = i# + 1
+                
+                IF c2ieTO:Parent <> 0 THEN    
+                    DrwTo.Box(1, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwTo.Line(1 + 25, i#*30, 1, 10)
+                    
+                    UniP:ID = c2ieTO:Parent
+                    IF Access:P.TryFetch(UniP:PKID) = Level:Benign THEN
+                        DrwTo.Show(1 + 5, (i#-1)*30+11, UniP:Code)
+                    END
+                    
+                END
+                IF c2ieTO:Child1 <> 0 THEN
+                    DrwTo.Box(50, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwTo.Line(50 + 25, i#*30, 1, 10)
+                    
+                    UniC1:ID = c2ieTO:Child1
+                    IF Access:C1.TryFetch(UniC1:PKID) = Level:Benign THEN
+                        DrwTo.Show(50 + 5, (i#-1)*30+11, UniC1:Code)
+                    END
+                    
+                END
+                IF c2ieTO:Child2 <> 0 THEN
+                    DrwTo.Box(100, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwTo.Line(100 + 25, i#*30, 1, 10)
+                    
+                    UniC2:ID = c2ieTO:Child2
+                    IF Access:C2.TryFetch(UniC2:PKID) = Level:Benign THEN
+                        DrwTo.Show(100 + 5, (i#-1)*30+11, UniC2:Code)
+                    END
+                   
+                END
+                IF c2ieTO:Child3 <> 0 THEN
+                    DrwTo.Box(150, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwTo.Line(100 + 25, i#*30, 1, 10)
+                    
+                    UniC2:ID = c2ieTO:Child3
+                    IF Access:C2.TryFetch(UniC2:PKID) = Level:Benign THEN
+                        DrwTo.Show(150 + 5, (i#-1)*30+11, UniC2:Code)
+                    END
+                   
+                END
+            END
+            
+            
+        ELSE
+            BREAK
+        END
+    END
+
+    DrwTo.Display()
+    
+    
+    EXIT
+    
+_drawOCFrom       ROUTINE
+DATA
+CODE
+    
+    Clear(DrwOCFrom.ItemQueue)
+    
+    DrwOCFrom.Blank(COLOR:White)
+    DrwOCFrom.SetCanvasSize(DrwOCFrom.width *1.2, DrwOCFrom.Height * 1.2)  ! a bit larger to demonstrate scrolling
+    DrwOCFrom.SetGrid(true)
+    
+    !DrwOCFrom.Blank(COLOR:White)
+    !DrwOCFrom.Display()
+
+    i# = 0
+    SET(c2ieTaskOrg)
+    LOOP
+        IF Access:c2ieTaskOrg.Next() = Level:Benign THEN
+            IF c2ieTO:C2IE = selC2IEORBATRef THEN
+                i# = i# + 1
+                
+                IF c2ieTO:Parent <> 0 THEN    
+                    DrwOCFrom.ItemQueue.type = create:box
+                    DrwOCFrom.ItemQueue.xpos = 1
+                    DrwOCFrom.ItemQueue.ypos = (i#-1)*30 + 1
+                    DrwOCFrom.ItemQueue.width = 50
+                    DrwOCFrom.ItemQueue.height = 30
+                    DrwOCFrom.ItemQueue.BoxBorderColor = COLOR:Black
+                    DrwOCFrom.ItemQueue.BoxFillColor = COLOR:Aqua
+                    DrwOCFrom.AddItem()
+                    
+                    !DrwOCFrom.Box(1, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwOCFrom.Line(1 + 25, i#*30, 1, 10)
+                    
+                    UniP:ID = c2ieTO:Parent
+                    IF Access:P.TryFetch(UniP:PKID) = Level:Benign THEN
+                        DrwOCFrom.ItemQueue.type = create:string
+                        DrwOCFrom.ItemQueue.TextValue = UniP:Code
+                        DrwOCFrom.ItemQueue.FontName = 'Tahoma'
+                        DrwOCFrom.ItemQueue.xpos = 1 + 5
+                        DrwOCFrom.ItemQueue.FontColor = color:black
+                        DrwOCFrom.ItemQueue.FontSize = 10
+                        !DrwOCFrom.ItemQueue.ypos = 10 + Drawer.ItemQueue.FontSize * 2
+                        DrwOCFrom.ItemQueue.ypos = (i#-1)*30+11
+                        DrwOCFrom.ItemQueue.FontStyle = FONT:Regular
+                        DrwOCFrom.AddItem()
+                        !DrwOCFrom.Show(1 + 5, (i#-1)*30+11, UniP:Code)
+                    END
+                    
+                END
+                IF c2ieTO:Child1 <> 0 THEN
+                    DrwOCFrom.ItemQueue.type = create:box
+                    DrwOCFrom.ItemQueue.xpos = 50
+                    DrwOCFrom.ItemQueue.ypos = (i#-1)*30 + 1
+                    DrwOCFrom.ItemQueue.width = 50
+                    DrwOCFrom.ItemQueue.height = 30
+                    DrwOCFrom.ItemQueue.BoxBorderColor = COLOR:Black
+                    DrwOCFrom.ItemQueue.BoxFillColor = COLOR:Aqua
+                    DrwOCFrom.AddItem()
+                    
+                    !DrwOCFrom.Box(50, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwOCFrom.Line(50 + 25, i#*30, 1, 10)
+                    
+                    UniC1:ID = c2ieTO:Child1
+                    IF Access:C1.TryFetch(UniC1:PKID) = Level:Benign THEN
+                        DrwOCFrom.ItemQueue.type = create:string
+                        DrwOCFrom.ItemQueue.TextValue = UniC1:Code
+                        DrwOCFrom.ItemQueue.FontName = 'Tahoma'
+                        DrwOCFrom.ItemQueue.xpos = 50 + 5
+                        DrwOCFrom.ItemQueue.FontColor = color:black
+                        DrwOCFrom.ItemQueue.FontSize = 10
+                        !DrwOCFrom.ItemQueue.ypos = 10 + Drawer.ItemQueue.FontSize * 2
+                        DrwOCFrom.ItemQueue.ypos = (i#-1)*30+11
+                        DrwOCFrom.ItemQueue.FontStyle = FONT:Regular
+                        DrwOCFrom.AddItem()
+                        
+                        !DrwOCFrom.Show(50 + 5, (i#-1)*30+11, UniC1:Code)
+                    END
+                    
+                END
+                IF c2ieTO:Child2 <> 0 THEN
+                    DrwOCFrom.ItemQueue.type = create:box
+                    DrwOCFrom.ItemQueue.xpos = 100
+                    DrwOCFrom.ItemQueue.ypos = (i#-1)*30 + 1
+                    DrwOCFrom.ItemQueue.width = 50
+                    DrwOCFrom.ItemQueue.height = 30
+                    DrwOCFrom.ItemQueue.BoxBorderColor = COLOR:Black
+                    DrwOCFrom.ItemQueue.BoxFillColor = COLOR:Aqua
+                    DrwOCFrom.AddItem()
+                    
+                    !DrwOCFrom.Box(100, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwOCFrom.Line(100 + 25, i#*30, 1, 10)
+                    
+                    UniC2:ID = c2ieTO:Child2
+                    IF Access:C2.TryFetch(UniC2:PKID) = Level:Benign THEN
+                        DrwOCFrom.ItemQueue.type = create:string
+                        DrwOCFrom.ItemQueue.TextValue = UniC2:Code
+                        DrwOCFrom.ItemQueue.FontName = 'Tahoma'
+                        DrwOCFrom.ItemQueue.xpos = 100 + 5
+                        DrwOCFrom.ItemQueue.FontColor = color:black
+                        DrwOCFrom.ItemQueue.FontSize = 10
+                        !DrwOCFrom.ItemQueue.ypos = 10 + Drawer.ItemQueue.FontSize * 2
+                        DrwOCFrom.ItemQueue.ypos = (i#-1)*30+11
+                        DrwOCFrom.ItemQueue.FontStyle = FONT:Regular
+                        DrwOCFrom.AddItem()
+                        
+                        !DrwOCFrom.Show(100 + 5, (i#-1)*30+11, UniC2:Code)
+                    END
+                   
+                END
+                IF c2ieTO:Child3 <> 0 THEN
+                    DrwOCFrom.ItemQueue.type = create:box
+                    DrwOCFrom.ItemQueue.xpos = 100 +25
+                    DrwOCFrom.ItemQueue.ypos = (i#-1)*30 + 1
+                    DrwOCFrom.ItemQueue.width = 50
+                    DrwOCFrom.ItemQueue.height = 30
+                    DrwOCFrom.ItemQueue.BoxBorderColor = COLOR:Black
+                    DrwOCFrom.ItemQueue.BoxFillColor = COLOR:Aqua
+                    DrwOCFrom.AddItem()
+                    
+                    !DrwOCFrom.Box(150, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
+                    !DrwOCFrom.Line(100 + 25, i#*30, 1, 10)
+                    
+                    UniC2:ID = c2ieTO:Child3
+                    IF Access:C2.TryFetch(UniC2:PKID) = Level:Benign THEN
+                        DrwOCFrom.ItemQueue.type = create:string
+                        DrwOCFrom.ItemQueue.TextValue = UniC3:Code
+                        DrwOCFrom.ItemQueue.FontName = 'Tahoma'
+                        DrwOCFrom.ItemQueue.xpos = 150 + 5
+                        DrwOCFrom.ItemQueue.FontColor = color:black
+                        DrwOCFrom.ItemQueue.FontSize = 10
+                        !DrwOCFrom.ItemQueue.ypos = 10 + Drawer.ItemQueue.FontSize * 2
+                        DrwOCFrom.ItemQueue.ypos = (i#-1)*30+11
+                        DrwOCFrom.ItemQueue.FontStyle = FONT:Regular
+                        DrwOCFrom.AddItem()
+                        
+                        !DrwOCFrom.Show(150 + 5, (i#-1)*30+11, UniC3:Code)
+                    END
+                   
+                END
+            END
+            
+            
+        ELSE
+            BREAK
+        END
+    END
+
+    !DrwOCFrom.Display()
+    DrwOCFrom.DrawItems()
+    
+    
+    EXIT
+    
 
 ThisWindow.Init PROCEDURE
 
@@ -1982,6 +2288,12 @@ ReturnValue          BYTE,AUTO
   BRW_BSOTASKORG2.Init(?List:8,Queue:Browse:7.ViewPosition,BRW13::View:Browse,Queue:Browse:7,Relate:_c2ieOrgChart_TASKORGs,SELF) ! Initialize the browse manager
   BRW_C2Rel.Init(?List:9,Queue:Browse:8.ViewPosition,BRW14::View:Browse,Queue:Browse:8,Relate:c2ieUnitsC2Relationships,SELF) ! Initialize the browse manager
   SELF.Open(QuickWindow)                                   ! Open window
+    QuickWindow{PROP:Buffer} = 1 ! Remove flicker when animating.
+    DrwFrom.Init(?Draw)
+    QuickWindow{PROP:Buffer} = 1 ! Remove flicker when animating.
+    DrwTo.Init(?Draw:2)
+    QuickWindow{PROP:Buffer} = 1 ! Remove flicker when animating.
+    DrwOCFrom.Init(?Draw:3)
   Do DefineListboxStyle
   Resizer.Init(AppStrategy:Surface,Resize:SetMinSize)      ! Controls like list boxes will resize, whilst controls like buttons will move
   SELF.AddItem(Resizer)                                    ! Add resizer to window manager
@@ -2122,6 +2434,9 @@ ThisWindow.Kill PROCEDURE
 ReturnValue          BYTE,AUTO
 
   CODE
+          DrwFrom.Kill()
+          DrwTo.Kill()
+          DrwOCFrom.Kill()
   ReturnValue = PARENT.Kill()
   IF ReturnValue THEN RETURN ReturnValue.
   IF SELF.FilesOpened
@@ -2321,6 +2636,11 @@ Looped BYTE
       BRW_BSOTASKORG.ResetFromFile()
       BRW_C2Rel.ResetFromFile()
     END
+  OF ?PANEL1
+    ! pass event
+    
+    message('jkjjk')
+    DrwOCFrom.TakeEvent()
   END
     RETURN ReturnValue
   END
@@ -2343,6 +2663,10 @@ BRW_C2IEORBAT.TakeNewSelection PROCEDURE
   ! current selection selC2IEORBATRef
   
   selC2IEORBATRef = BRW_C2IEORBAT.q._C2IEORB:ID
+  
+  DO _drawOrgChartFrom
+  
+  DO _drawOCFrom
 
 
 BRW_C2IETASKORG.TakeNewSelection PROCEDURE
@@ -2352,6 +2676,8 @@ BRW_C2IETASKORG.TakeNewSelection PROCEDURE
   ! current selection selC2IETASKORGRef
   
   selC2IETASKORGRef = BRW_C2IETASKORG.q._C2IETSK:ID
+  
+  DO _drawOrgChartTo
 
 
 BRW_BSOTASKORG.TakeNewSelection PROCEDURE
