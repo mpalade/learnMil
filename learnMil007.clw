@@ -157,9 +157,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?MissTSK:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
@@ -358,9 +358,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -1011,9 +1011,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1816,6 +1816,7 @@ QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,673,417),FONT('Mic
   CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,HLP('ORBAT_TASKORGTransfers'),SYSTEM
                        BUTTON('&OK'),AT(517,401,49,14),USE(?Ok),LEFT,ICON('WAOK.ICO'),FLAT,MSG('Accept operation'), |
   TIP('Accept Operation')
+                       REGION,AT(499,163,173,127),USE(?PANEL1),IMM
                        BUTTON('&Cancel'),AT(569,401,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel Operation'), |
   TIP('Cancel Operation')
                        BUTTON('&Help'),AT(622,401,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
@@ -1853,7 +1854,6 @@ QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,673,417),FONT('Mic
                        IMAGE,AT(2,170,248,119),USE(?Draw)
                        IMAGE,AT(253,170,247,119),USE(?Draw:2)
                        IMAGE,AT(504,170,167,119),USE(?Draw:3),HVSCROLL
-                       REGION,AT(504,170,168,127),USE(?PANEL1),IMM
                      END
 
 ThisWindow           CLASS(WindowManager)
@@ -2086,6 +2086,13 @@ CODE
     
     Clear(DrwOCFrom.ItemQueue)
     
+    j# = DrwOCFrom._items
+    MESSAGE('j# = ' & j#)
+    LOOP i# = 1 TO DrwOCFrom._items
+        DrwOCFrom.DeleteItem(1)
+    END
+    MESSAGE('i# = ' & i#)
+    
     DrwOCFrom.Blank(COLOR:White)
     DrwOCFrom.SetCanvasSize(DrwOCFrom.width *1.2, DrwOCFrom.Height * 1.2)  ! a bit larger to demonstrate scrolling
     DrwOCFrom.SetGrid(true)
@@ -2246,9 +2253,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -2524,6 +2531,10 @@ Looped BYTE
     END
   ReturnValue = PARENT.TakeFieldEvent()
   CASE FIELD()
+  OF ?PANEL1
+    ! Pass events
+    
+        DrwOCFrom.TakeEvent()
   OF ?List:8
     CASE EVENT()
     OF EVENT:Drop
@@ -2636,11 +2647,6 @@ Looped BYTE
       BRW_BSOTASKORG.ResetFromFile()
       BRW_C2Rel.ResetFromFile()
     END
-  OF ?PANEL1
-    ! pass event
-    
-    message('jkjjk')
-    DrwOCFrom.TakeEvent()
   END
     RETURN ReturnValue
   END
@@ -2950,9 +2956,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -3126,9 +3132,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieUni:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(_c2ieBSOTSK:Record,History::_c2ieBSOTSK:Record)
   SELF.AddHistoryField(?_c2ieBSOTSK:ID,1)
@@ -3318,9 +3324,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
+  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
-  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
