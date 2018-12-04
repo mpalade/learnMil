@@ -17,6 +17,7 @@
                        INCLUDE('LEARNMIL003.INC'),ONCE        !Req'd for module callout resolution
                        INCLUDE('LEARNMIL004.INC'),ONCE        !Req'd for module callout resolution
                        INCLUDE('LEARNMIL008.INC'),ONCE        !Req'd for module callout resolution
+                       INCLUDE('LEARNMIL010.INC'),ONCE        !Req'd for module callout resolution
                      END
 
 
@@ -157,9 +158,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?MissTSK:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(MissTSK:Record,History::MissTSK:Record)
   SELF.AddHistoryField(?MissTSK:ID,1)
@@ -358,9 +359,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -1011,9 +1012,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -1034,11 +1035,11 @@ ReturnValue          BYTE,AUTO
   Relate:_meta_c2ieUnits2.Open                             ! File _meta_c2ieUnits2 used by this procedure, so make sure it's RelationManager is open
   Relate:c2ieUnits.SetOpenRelated()
   Relate:c2ieUnits.Open                                    ! File c2ieUnits used by this procedure, so make sure it's RelationManager is open
-  Relate:type_BSO.Open                                     ! File type_BSO used by this procedure, so make sure it's RelationManager is open
   Access:type_C2IP.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:_C2IPs.UseFile                                    ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_C2IE.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_Hostility.UseFile                            ! File referenced in 'Other Files' so need to inform it's FileManager
+  Access:type_BSO.UseFile                                  ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:C2IPs.UseFile                                     ! File referenced in 'Other Files' so need to inform it's FileManager
   SELF.FilesOpened = True
   BRWC2IPContent.Init(?Browse:1,Queue:Browse:1.ViewPosition,BRW1::View:Browse,Queue:Browse:1,Relate:C2IPContent,SELF) ! Initialize the browse manager
@@ -1193,7 +1194,6 @@ ReturnValue          BYTE,AUTO
     Relate:_c2ieUnitsPositions.Close
     Relate:_meta_c2ieUnits2.Close
     Relate:c2ieUnits.Close
-    Relate:type_BSO.Close
   END
   IF SELF.Opened
     INIMgr.Update('COPApp',QuickWindow)                    ! Save window data to non-volatile store
@@ -1804,6 +1804,30 @@ c2ieUniC2Rel:c2ieUnit  LIKE(c2ieUniC2Rel:c2ieUnit)    !Browse key field - type d
 Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
+BRW18::View:Browse   VIEW(c2ieUnitsCommandPosts)
+                       PROJECT(c2ieUniCP:ID)
+                       PROJECT(c2ieUniCP:c2ieUnit)
+                       PROJECT(c2ieUniCP:UnitAsCP)
+                       PROJECT(c2ieUniCP:CPType)
+                       JOIN(Uni:PKID,c2ieUniCP:UnitAsCP)
+                         PROJECT(Uni:Code)
+                         PROJECT(Uni:ID)
+                       END
+                       JOIN(tpyCP:PKID,c2ieUniCP:CPType)
+                         PROJECT(tpyCP:Code)
+                         PROJECT(tpyCP:ID)
+                       END
+                     END
+Queue:Browse:9       QUEUE                            !Queue declaration for browse/combo box using ?List:10
+Uni:Code               LIKE(Uni:Code)                 !List box control field - type derived from field
+tpyCP:Code             LIKE(tpyCP:Code)               !List box control field - type derived from field
+c2ieUniCP:ID           LIKE(c2ieUniCP:ID)             !Primary key field - type derived from field
+c2ieUniCP:c2ieUnit     LIKE(c2ieUniCP:c2ieUnit)       !Browse key field - type derived from field
+Uni:ID                 LIKE(Uni:ID)                   !Related join file key field - type derived from field
+tpyCP:ID               LIKE(tpyCP:ID)                 !Related join file key field - type derived from field
+Mark                   BYTE                           !Entry's marked status
+ViewPosition           STRING(1024)                   !Entry's view position
+                     END
 FDCB11::View:FileDropCombo VIEW(type_C2Rel)
                        PROJECT(tpyC2Rel:Code)
                      END
@@ -1816,7 +1840,7 @@ QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,673,417),FONT('Mic
   CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,HLP('ORBAT_TASKORGTransfers'),SYSTEM
                        BUTTON('&OK'),AT(517,401,49,14),USE(?Ok),LEFT,ICON('WAOK.ICO'),FLAT,MSG('Accept operation'), |
   TIP('Accept Operation')
-                       REGION,AT(499,163,173,127),USE(?PANEL1),IMM
+                       REGION,AT(499,163,164,127),USE(?PANEL1),HIDE,IMM
                        BUTTON('&Cancel'),AT(569,401,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel Operation'), |
   TIP('Cancel Operation')
                        BUTTON('&Help'),AT(622,401,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
@@ -1846,19 +1870,27 @@ QuickWindow          WINDOW('ORBAT - TASKORG Transfers'),AT(,,673,417),FONT('Mic
   '(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@0L(2)|M~ID~D(12)@n-10.0@' & |
   '40L(2)|M~My Echelon~L(0)@s20@40L(2)|M~1st Level~L(0)@s20@40L(2)|M~2nd Level~L(0)@s20' & |
   '@40L(2)|M~3rd Level~L(0)@s20@'),FROM(Queue:Browse:7),IMM
-                       LIST,AT(453,294,218,95),USE(?List:9),DECIMAL(12),FORMAT('0L(2)|M~ID~D(12)@n-10.0@40L(2)' & |
+                       LIST,AT(453,294,218,34),USE(?List:9),DECIMAL(12),FORMAT('0L(2)|M~ID~D(12)@n-10.0@40L(2)' & |
   '|M~FC~C(0)@s20@40L(2)|M~OpCom~C(0)@s20@40L(2)|M~OpCon~C(0)@s20@40L(2)|M~TaCom~C(0)@s' & |
   '20@40L(2)|M~TaCon~C(0)@s20@40L(2)|M~Adm~C(0)@s20@'),FROM(Queue:Browse:8),IMM
                        COMBO(@s20),AT(157,87,92,10),USE(tpyC2Rel:Code),DROP(5),FORMAT('80L(2)|M~Code~L(0)@s20@'), |
   FROM(Queue:FileDropCombo),IMM
                        IMAGE,AT(2,170,248,119),USE(?Draw)
                        IMAGE,AT(253,170,247,119),USE(?Draw:2)
-                       IMAGE,AT(504,170,167,119),USE(?Draw:3),HVSCROLL
+                       IMAGE,AT(504,170,167,119),USE(?Draw:3),HVSCROLL,HIDE
+                       BUTTON('is HQ'),AT(505,98,87),USE(?BUTTON3)
+                       BUTTON('Define Command Post'),AT(504,116),USE(?BUTTON4)
+                       LIST,AT(453,333,217,47),USE(?List:10),FORMAT('80L(2)|M~Unit Code~C(0)@s20@80L(2)|M~Comm' & |
+  'and Post Type~C(0)@s20@'),FROM(Queue:Browse:9),IMM
+                       BUTTON('&Insert'),AT(470,384,42,12),USE(?Insert:2)
+                       BUTTON('&Change'),AT(512,384,42,12),USE(?Change:2)
+                       BUTTON('&Delete'),AT(554,384,42,12),USE(?Delete:2)
                      END
 
 ThisWindow           CLASS(WindowManager)
 Init                   PROCEDURE(),BYTE,PROC,DERIVED
 Kill                   PROCEDURE(),BYTE,PROC,DERIVED
+Run                    PROCEDURE(USHORT Number,BYTE Request),BYTE,PROC,DERIVED
 TakeAccepted           PROCEDURE(),BYTE,PROC,DERIVED
 TakeFieldEvent         PROCEDURE(),BYTE,PROC,DERIVED
                      END
@@ -1916,6 +1948,12 @@ Q                      &Queue:Browse:8                !Reference to browse queue
                      END
 
 BRW14::Sort0:Locator StepLocatorClass                      ! Default Locator
+BRW18                CLASS(BrowseClass)                    ! Browse using ?List:10
+Q                      &Queue:Browse:9                !Reference to browse queue
+Init                   PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+                     END
+
+BRW18::Sort0:Locator StepLocatorClass                      ! Default Locator
 FDCB11               CLASS(FileDropComboClass)             ! File drop combo manager
 Q                      &Queue:FileDropCombo           !Reference to browse queue type
                      END
@@ -2088,10 +2126,11 @@ CODE
     
     j# = DrwOCFrom._items
     MESSAGE('j# = ' & j#)
-    LOOP i# = 1 TO DrwOCFrom._items
-        DrwOCFrom.DeleteItem(1)
-    END
-    MESSAGE('i# = ' & i#)
+    !LOOP i# = 1 TO DrwOCFrom._items
+    !    DrwOCFrom.DeleteItem(i#)        
+    !END
+    !MESSAGE('i# = ' & i#)
+    !DrwOCFrom.DrawItems()
     
     DrwOCFrom.Blank(COLOR:White)
     DrwOCFrom.SetCanvasSize(DrwOCFrom.width *1.2, DrwOCFrom.Height * 1.2)  ! a bit larger to demonstrate scrolling
@@ -2107,6 +2146,12 @@ CODE
             IF c2ieTO:C2IE = selC2IEORBATRef THEN
                 i# = i# + 1
                 
+                insert# = TRUE
+                IF 2*i# <= DrwOCFrom._items THEN 
+                    DrwOCFrom.WithItem(i#)
+                    insert# = FALSE
+                END
+                                
                 IF c2ieTO:Parent <> 0 THEN    
                     DrwOCFrom.ItemQueue.type = create:box
                     DrwOCFrom.ItemQueue.xpos = 1
@@ -2115,10 +2160,10 @@ CODE
                     DrwOCFrom.ItemQueue.height = 30
                     DrwOCFrom.ItemQueue.BoxBorderColor = COLOR:Black
                     DrwOCFrom.ItemQueue.BoxFillColor = COLOR:Aqua
-                    DrwOCFrom.AddItem()
                     
-                    !DrwOCFrom.Box(1, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
-                    !DrwOCFrom.Line(1 + 25, i#*30, 1, 10)
+                    IF insert# = TRUE THEN
+                        DrwOCFrom.AddItem()
+                    END                    
                     
                     UniP:ID = c2ieTO:Parent
                     IF Access:P.TryFetch(UniP:PKID) = Level:Benign THEN
@@ -2128,11 +2173,12 @@ CODE
                         DrwOCFrom.ItemQueue.xpos = 1 + 5
                         DrwOCFrom.ItemQueue.FontColor = color:black
                         DrwOCFrom.ItemQueue.FontSize = 10
-                        !DrwOCFrom.ItemQueue.ypos = 10 + Drawer.ItemQueue.FontSize * 2
                         DrwOCFrom.ItemQueue.ypos = (i#-1)*30+11
                         DrwOCFrom.ItemQueue.FontStyle = FONT:Regular
-                        DrwOCFrom.AddItem()
-                        !DrwOCFrom.Show(1 + 5, (i#-1)*30+11, UniP:Code)
+                        
+                        IF insert# = TRUE THEN
+                            DrwOCFrom.AddItem()
+                        END                                                
                     END
                     
                 END
@@ -2144,10 +2190,10 @@ CODE
                     DrwOCFrom.ItemQueue.height = 30
                     DrwOCFrom.ItemQueue.BoxBorderColor = COLOR:Black
                     DrwOCFrom.ItemQueue.BoxFillColor = COLOR:Aqua
-                    DrwOCFrom.AddItem()
                     
-                    !DrwOCFrom.Box(50, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
-                    !DrwOCFrom.Line(50 + 25, i#*30, 1, 10)
+                    IF insert# = TRUE THEN
+                        DrwOCFrom.AddItem()
+                    END
                     
                     UniC1:ID = c2ieTO:Child1
                     IF Access:C1.TryFetch(UniC1:PKID) = Level:Benign THEN
@@ -2157,12 +2203,12 @@ CODE
                         DrwOCFrom.ItemQueue.xpos = 50 + 5
                         DrwOCFrom.ItemQueue.FontColor = color:black
                         DrwOCFrom.ItemQueue.FontSize = 10
-                        !DrwOCFrom.ItemQueue.ypos = 10 + Drawer.ItemQueue.FontSize * 2
                         DrwOCFrom.ItemQueue.ypos = (i#-1)*30+11
                         DrwOCFrom.ItemQueue.FontStyle = FONT:Regular
-                        DrwOCFrom.AddItem()
                         
-                        !DrwOCFrom.Show(50 + 5, (i#-1)*30+11, UniC1:Code)
+                        IF insert# = TRUE THEN
+                            DrwOCFrom.AddItem()
+                        END                                                
                     END
                     
                 END
@@ -2174,10 +2220,10 @@ CODE
                     DrwOCFrom.ItemQueue.height = 30
                     DrwOCFrom.ItemQueue.BoxBorderColor = COLOR:Black
                     DrwOCFrom.ItemQueue.BoxFillColor = COLOR:Aqua
-                    DrwOCFrom.AddItem()
                     
-                    !DrwOCFrom.Box(100, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
-                    !DrwOCFrom.Line(100 + 25, i#*30, 1, 10)
+                    IF insert# = TRUE THEN
+                        DrwOCFrom.AddItem()
+                    END                    
                     
                     UniC2:ID = c2ieTO:Child2
                     IF Access:C2.TryFetch(UniC2:PKID) = Level:Benign THEN
@@ -2187,12 +2233,12 @@ CODE
                         DrwOCFrom.ItemQueue.xpos = 100 + 5
                         DrwOCFrom.ItemQueue.FontColor = color:black
                         DrwOCFrom.ItemQueue.FontSize = 10
-                        !DrwOCFrom.ItemQueue.ypos = 10 + Drawer.ItemQueue.FontSize * 2
                         DrwOCFrom.ItemQueue.ypos = (i#-1)*30+11
                         DrwOCFrom.ItemQueue.FontStyle = FONT:Regular
-                        DrwOCFrom.AddItem()
                         
-                        !DrwOCFrom.Show(100 + 5, (i#-1)*30+11, UniC2:Code)
+                        IF insert# = TRUE THEN
+                            DrwOCFrom.AddItem()
+                        END                                                
                     END
                    
                 END
@@ -2204,10 +2250,10 @@ CODE
                     DrwOCFrom.ItemQueue.height = 30
                     DrwOCFrom.ItemQueue.BoxBorderColor = COLOR:Black
                     DrwOCFrom.ItemQueue.BoxFillColor = COLOR:Aqua
-                    DrwOCFrom.AddItem()
                     
-                    !DrwOCFrom.Box(150, (i#-1)*30 + 1, 50, 30, COLOR:Aqua)
-                    !DrwOCFrom.Line(100 + 25, i#*30, 1, 10)
+                    IF insert# = TRUE THEN
+                        DrwOCFrom.AddItem()
+                    END                                       
                     
                     UniC2:ID = c2ieTO:Child3
                     IF Access:C2.TryFetch(UniC2:PKID) = Level:Benign THEN
@@ -2217,12 +2263,13 @@ CODE
                         DrwOCFrom.ItemQueue.xpos = 150 + 5
                         DrwOCFrom.ItemQueue.FontColor = color:black
                         DrwOCFrom.ItemQueue.FontSize = 10
-                        !DrwOCFrom.ItemQueue.ypos = 10 + Drawer.ItemQueue.FontSize * 2
                         DrwOCFrom.ItemQueue.ypos = (i#-1)*30+11
                         DrwOCFrom.ItemQueue.FontStyle = FONT:Regular
-                        DrwOCFrom.AddItem()
                         
-                        !DrwOCFrom.Show(150 + 5, (i#-1)*30+11, UniC3:Code)
+                        IF insert# = TRUE THEN
+                            DrwOCFrom.AddItem()
+                        END                                            
+                        
                     END
                    
                 END
@@ -2234,7 +2281,6 @@ CODE
         END
     END
 
-    !DrwOCFrom.Display()
     DrwOCFrom.DrawItems()
     
     
@@ -2253,9 +2299,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Ok
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Ok,RequestCancelled)                    ! Add the close control to the window manger
   ELSE
@@ -2294,6 +2340,7 @@ ReturnValue          BYTE,AUTO
   BRW_BSOORBAT2.Init(?List:7,Queue:Browse:6.ViewPosition,BRW12::View:Browse,Queue:Browse:6,Relate:_c2ieOrgChart_ORBATs,SELF) ! Initialize the browse manager
   BRW_BSOTASKORG2.Init(?List:8,Queue:Browse:7.ViewPosition,BRW13::View:Browse,Queue:Browse:7,Relate:_c2ieOrgChart_TASKORGs,SELF) ! Initialize the browse manager
   BRW_C2Rel.Init(?List:9,Queue:Browse:8.ViewPosition,BRW14::View:Browse,Queue:Browse:8,Relate:c2ieUnitsC2Relationships,SELF) ! Initialize the browse manager
+  BRW18.Init(?List:10,Queue:Browse:9.ViewPosition,BRW18::View:Browse,Queue:Browse:9,Relate:c2ieUnitsCommandPosts,SELF) ! Initialize the browse manager
   SELF.Open(QuickWindow)                                   ! Open window
     QuickWindow{PROP:Buffer} = 1 ! Remove flicker when animating.
     DrwFrom.Init(?Draw)
@@ -2405,8 +2452,20 @@ ReturnValue          BYTE,AUTO
   BRW_C2Rel.AddField(UniTaCon:Code,BRW_C2Rel.Q.UniTaCon:Code) ! Field UniTaCon:Code is a hot field or requires assignment from browse
   BRW_C2Rel.AddField(UniAdm:Code,BRW_C2Rel.Q.UniAdm:Code)  ! Field UniAdm:Code is a hot field or requires assignment from browse
   BRW_C2Rel.AddField(c2ieUniC2Rel:c2ieUnit,BRW_C2Rel.Q.c2ieUniC2Rel:c2ieUnit) ! Field c2ieUniC2Rel:c2ieUnit is a hot field or requires assignment from browse
+  BRW18.Q &= Queue:Browse:9
+  BRW18.AddSortOrder(,c2ieUniCP:Kc2ieUnit)                 ! Add the sort order for c2ieUniCP:Kc2ieUnit for sort order 1
+  BRW18.AddRange(c2ieUniCP:c2ieUnit,selBSOForC2DisplayRef) ! Add single value range limit for sort order 1
+  BRW18.AddLocator(BRW18::Sort0:Locator)                   ! Browse has a locator for sort order 1
+  BRW18::Sort0:Locator.Init(,c2ieUniCP:c2ieUnit,1,BRW18)   ! Initialize the browse locator using  using key: c2ieUniCP:Kc2ieUnit , c2ieUniCP:c2ieUnit
+  BRW18.AddField(Uni:Code,BRW18.Q.Uni:Code)                ! Field Uni:Code is a hot field or requires assignment from browse
+  BRW18.AddField(tpyCP:Code,BRW18.Q.tpyCP:Code)            ! Field tpyCP:Code is a hot field or requires assignment from browse
+  BRW18.AddField(c2ieUniCP:ID,BRW18.Q.c2ieUniCP:ID)        ! Field c2ieUniCP:ID is a hot field or requires assignment from browse
+  BRW18.AddField(c2ieUniCP:c2ieUnit,BRW18.Q.c2ieUniCP:c2ieUnit) ! Field c2ieUniCP:c2ieUnit is a hot field or requires assignment from browse
+  BRW18.AddField(Uni:ID,BRW18.Q.Uni:ID)                    ! Field Uni:ID is a hot field or requires assignment from browse
+  BRW18.AddField(tpyCP:ID,BRW18.Q.tpyCP:ID)                ! Field tpyCP:ID is a hot field or requires assignment from browse
   INIMgr.Fetch('View_ORBAT_TASKORGTransfers',QuickWindow)  ! Restore window settings from non-volatile store
   Resizer.Resize                                           ! Reset required after window size altered by INI manager
+  BRW18.AskProcedure = 1                                   ! Will call: U_c2ieUniCPs
   FDCB11.Init(tpyC2Rel:Code,?tpyC2Rel:Code,Queue:FileDropCombo.ViewPosition,FDCB11::View:FileDropCombo,Queue:FileDropCombo,Relate:type_C2Rel,ThisWindow,GlobalErrors,0,1,0)
   FDCB11.Q &= Queue:FileDropCombo
   FDCB11.AddSortOrder(tpyC2Rel:PKID)
@@ -2432,6 +2491,8 @@ ReturnValue          BYTE,AUTO
   BRW_BSOTASKORG2.ToolbarItem.HelpButton = ?Help
   BRW_C2Rel.AddToolbarTarget(Toolbar)                      ! Browse accepts toolbar control
   BRW_C2Rel.ToolbarItem.HelpButton = ?Help
+  BRW18.AddToolbarTarget(Toolbar)                          ! Browse accepts toolbar control
+  BRW18.ToolbarItem.HelpButton = ?Help
   SELF.SetAlerts()
   RETURN ReturnValue
 
@@ -2470,6 +2531,22 @@ ReturnValue          BYTE,AUTO
     INIMgr.Update('View_ORBAT_TASKORGTransfers',QuickWindow) ! Save window data to non-volatile store
   END
   GlobalErrors.SetProcedureName
+  RETURN ReturnValue
+
+
+ThisWindow.Run PROCEDURE(USHORT Number,BYTE Request)
+
+ReturnValue          BYTE,AUTO
+
+  CODE
+  ReturnValue = PARENT.Run(Number,Request)
+  IF SELF.Request = ViewRecord
+    ReturnValue = RequestCancelled                         ! Always return RequestCancelled if the form was opened in ViewRecord mode
+  ELSE
+    GlobalRequest = Request
+    U_c2ieUniCPs
+    ReturnValue = GlobalResponse
+  END
   RETURN ReturnValue
 
 
@@ -2672,7 +2749,8 @@ BRW_C2IEORBAT.TakeNewSelection PROCEDURE
   
   DO _drawOrgChartFrom
   
-  DO _drawOCFrom
+  !DrawPaint does not work properly at the moment
+  !DO _drawOCFrom
 
 
 BRW_C2IETASKORG.TakeNewSelection PROCEDURE
@@ -2692,6 +2770,17 @@ BRW_BSOTASKORG.TakeNewSelection PROCEDURE
   PARENT.TakeNewSelection
   ! current selection BSO for C2 Relationships Display
   selBSOForC2DisplayRef   = BRW_BSOTASKORG.q._c2ieBSOTSK:ID
+
+
+BRW18.Init PROCEDURE(SIGNED ListBox,*STRING Posit,VIEW V,QUEUE Q,RelationManager RM,WindowManager WM)
+
+  CODE
+  PARENT.Init(ListBox,Posit,V,Q,RM,WM)
+  IF WM.Request <> ViewRecord                              ! If called for anything other than ViewMode, make the insert, change & delete controls available
+    SELF.InsertControl=?Insert:2
+    SELF.ChangeControl=?Change:2
+    SELF.DeleteControl=?Delete:2
+  END
 
 !!! <summary>
 !!! Generated from procedure template - Source
@@ -2956,9 +3045,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
@@ -3132,9 +3221,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?c2ieUni:ID:Prompt
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   SELF.HistoryKey = CtrlH
   SELF.AddHistoryFile(_c2ieBSOTSK:Record,History::_c2ieBSOTSK:Record)
   SELF.AddHistoryField(?_c2ieBSOTSK:ID,1)
@@ -3324,9 +3413,9 @@ ReturnValue          BYTE,AUTO
   SELF.FirstField = ?Browse:1
   SELF.VCRRequest &= VCRRequest
   SELF.Errors &= GlobalErrors                              ! Set this windows ErrorManager to the global ErrorManager
-  SELF.AddItem(Toolbar)
   CLEAR(GlobalRequest)                                     ! Clear GlobalRequest after storing locally
   CLEAR(GlobalResponse)
+  SELF.AddItem(Toolbar)
   IF SELF.Request = SelectRecord
      SELF.AddItem(?Close,RequestCancelled)                 ! Add the close control to the window manger
   ELSE
