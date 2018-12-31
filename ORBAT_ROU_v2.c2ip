@@ -1,0 +1,84 @@
+{
+	"TaskOrg" : {
+		"C2IPName" : "ORBAT_ROU",
+		"Units" : [
+			{
+				"UNITNAME" : "Land Forces Command",
+				"XPOS" : 1,
+				"YPOS" : 1,
+				"TREEPOS" : 1,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "2nd Infantry Division \"Getica\"",
+				"XPOS" : 51,
+				"YPOS" : 31,
+				"TREEPOS" : 2,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "282nd Mech Brig \"Unirea Principatelor\"",
+				"XPOS" : 101,
+				"YPOS" : 61,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "9th Mech Brig \"Marasesti\"",
+				"XPOS" : 101,
+				"YPOS" : 91,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "2nd Vanatori de munte Bde. \"Sarmizegetusa\"",
+				"XPOS" : 101,
+				"YPOS" : 121,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "2nd Infantry Bde. \"Rovine\"",
+				"XPOS" : 101,
+				"YPOS" : 151,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "96th Engineer Battalion",
+				"XPOS" : 101,
+				"YPOS" : 181,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "47th Signal Battalion",
+				"XPOS" : 101,
+				"YPOS" : 211,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "528th Recon Battalion",
+				"XPOS" : 101,
+				"YPOS" : 241,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "2nd Infantry Division HQ",
+				"XPOS" : 101,
+				"YPOS" : 271,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0
+			},
+			{
+				"UNITNAME" : "4th Infantry Division \"Gemina|",
+				"XPOS" : 51,
+				"YPOS" : 301,
+				"TREEPOS" : 2,
+				"MARKFORDEL" : 0
+			}
+		]
+	}
+}
