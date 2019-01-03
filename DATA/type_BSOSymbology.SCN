@@ -1,0 +1,22 @@
+[UNNAMED]
++SessionDate=01.01.2019
+crc32v2=229891649
++CurrentKey=Record Order
+ENV File Path=
+OEM=0
+Record Order=Record Order
+TPYBSOSYMB:PKID=TPYBSOSYMB:PKID
+TPYBSOSYMB:KALLENTITIES=TPYBSOSYMB:KALLENTITIES
+Record Number=47R(2)~Rec No~C(0)@N_12@Y?Rec No:
+TPYBSOSYMB:ID=81R(2)~Tpybsosymb:Id~C(0)@N-14@?Tpybsosymb:Id:
+TPYBSOSYMB:ENTITY=98L(2)~Tpybsosymb:Entity~C(0)?Tpybsosymb:Entity:
+TPYBSOSYMB:ENTITYTYPE=118L(2)~Tpybsosymb:Entitytype~C(0)?Tpybsosymb:Entitytype:
+TPYBSOSYMB:ENTITYSUBTYPE=135L(2)~Tpybsosymb:Entitysubtype~C(0)?Tpybsosymb:Entitysubtype:
+TPYBSOSYMB:DIGITS=98L(2)~Tpybsosymb:Digits~C(0)?Tpybsosymb:Digits:
+Columns=6
+Column1=RECORD NUMBER
+Column2=TPYBSOSYMB:ID
+Column3=TPYBSOSYMB:ENTITY
+Column4=TPYBSOSYMB:ENTITYTYPE
+Column5=TPYBSOSYMB:ENTITYSUBTYPE
+Column6=TPYBSOSYMB:DIGITS
