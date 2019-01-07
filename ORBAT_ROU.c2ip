@@ -7,133 +7,145 @@
 				"UNITTYPE" : 1001,
 				"UNITTYPECODE" : "121100",
 				"ECHELON" : 1114,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 1,
 				"YPOS" : 1,
 				"TREEPOS" : 1,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "2nd Infantry Division \"Getica\"",
 				"UNITTYPE" : 1000,
 				"UNITTYPECODE" : "121100",
 				"ECHELON" : 1109,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 51,
 				"YPOS" : 31,
 				"TREEPOS" : 2,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "282nd Mech Brig \"Unirea Principatelor\"",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121102",
 				"ECHELON" : 1108,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 101,
 				"YPOS" : 61,
 				"TREEPOS" : 3,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "9th Mech Brig \"Marasesti\"",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121102",
 				"ECHELON" : 1108,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 101,
 				"YPOS" : 91,
 				"TREEPOS" : 3,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "2nd Vanatori de munte Bde. \"Sarmizegetusa\"",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121101",
 				"ECHELON" : 1108,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 101,
 				"YPOS" : 121,
 				"TREEPOS" : 3,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "2nd Infantry Bde. \"Rovine\"",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121100",
 				"ECHELON" : 1108,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 101,
 				"YPOS" : 151,
 				"TREEPOS" : 3,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "96th Engineer Battalion",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121100",
 				"ECHELON" : 1106,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 101,
 				"YPOS" : 181,
 				"TREEPOS" : 3,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "47th Signal Battalion",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121100",
 				"ECHELON" : 1106,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 101,
 				"YPOS" : 211,
 				"TREEPOS" : 3,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "528th Recon Battalion",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121100",
 				"ECHELON" : 1106,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 101,
 				"YPOS" : 241,
 				"TREEPOS" : 3,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "2nd Infantry Division HQ",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121100",
 				"ECHELON" : 1109,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 1,
 				"XPOS" : 101,
 				"YPOS" : 271,
 				"TREEPOS" : 3,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			},
 			{
 				"UNITNAME" : "4th Infantry Division \"Gemina|",
 				"UNITTYPE" : 0,
 				"UNITTYPECODE" : "121100",
 				"ECHELON" : 1109,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 51,
 				"YPOS" : 301,
 				"TREEPOS" : 2,
-				"MARKFORDEL" : 0
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
 			}
-		]
+		],
+		"refC2IPs" : null
 	}
 }
