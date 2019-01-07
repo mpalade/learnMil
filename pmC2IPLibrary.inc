@@ -139,6 +139,33 @@ DrawNode                PROCEDURE(LONG nUnitType=0), LONG, PRIVATE
 
 !DrawNode variants
 DrawNode_Default        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+
+    ! inner sinus
+Draw_innerSine          PROCEDURE(), PRIVATE
+Draw_innerEllipse       PROCEDURE(), PRIVATE
+Draw_medianLine         PROCEDURE(), PRIVATE
+Draw_secondDiag         PROCEDURE(), PRIVATE
+Draw_innerPapillon      PROCEDURE(), PRIVATE
+Draw_innerClepsydra     PROCEDURE(), PRIVATE
+Draw_innerRoundPapillon PROCEDURE(), PRIVATE
+
+DrawNode_Amphibious     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Antiarmor     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Antiarmor_Armored     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Antiarmor_Motorized    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+
+DrawNode_Armor          PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Armor_Recon    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Armor_Amphibious       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+
+DrawNode_ArmyAviation       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_ArmyAviation_Recon PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_AviationComposite   PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_AviationFixedWing  PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Combat             PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_CombinedArms       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+
 DrawNode_Infantry       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 DrawNode_Infantry_Amphibious    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 DrawNode_Infantry_Armored       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
