@@ -1,0 +1,65 @@
+{
+	"TaskOrg" : {
+		"C2IPName" : "soasbxbmvz",
+		"Units" : [
+			{
+				"UNITNAME" : "bdvwgdfpyu",
+				"UNITTYPE" : 1000,
+				"UNITTYPECODE" : "121100",
+				"ECHELON" : 1106,
+				"HOSTILITY" : 1505,
+				"ISHQ" : 0,
+				"XPOS" : 1,
+				"YPOS" : 1,
+				"TREEPOS" : 1,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "monyqkzggl",
+				"UNITTYPE" : 1000,
+				"UNITTYPECODE" : "121105",
+				"ECHELON" : 1106,
+				"HOSTILITY" : 0,
+				"ISHQ" : 0,
+				"XPOS" : 51,
+				"YPOS" : 31,
+				"TREEPOS" : 2,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "gytisroppw",
+				"UNITTYPE" : 1000,
+				"UNITTYPECODE" : "",
+				"ECHELON" : 1100,
+				"HOSTILITY" : 0,
+				"ISHQ" : 0,
+				"XPOS" : 101,
+				"YPOS" : 61,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "tkjcdiqpty",
+				"UNITTYPE" : 1000,
+				"UNITTYPECODE" : "121101",
+				"ECHELON" : 1106,
+				"HOSTILITY" : 0,
+				"ISHQ" : 0,
+				"XPOS" : 101,
+				"YPOS" : 91,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			}
+		],
+		"refC2IPs" : [
+			{
+				"C2IPPATH" : "D:\\WORK\\inception\\pers\\CW10\\learnMil\\gigel.c2ip",
+				"C2IPNAME" : "cjuwsozqql"
+			}
+		]
+	}
+}

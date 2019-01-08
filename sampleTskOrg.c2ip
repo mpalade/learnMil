@@ -1,6 +1,6 @@
 {
 	"TaskOrg" : {
-		"C2IPName" : "hqtravqnss",
+		"C2IPName" : "fgrcxmwnqr",
 		"Units" : [
 			{
 				"UNITNAME" : "282nd Mech Brig \"Unirea Principatelor\"",
@@ -16,9 +16,9 @@
 				"MARKFORDISBL" : 0
 			},
 			{
-				"UNITNAME" : "2nd Infantry Bde. \"Rovine\"",
+				"UNITNAME" : "2nd Vanatori de munte Bde. \"Sarmizegetusa\"",
 				"UNITTYPE" : 0,
-				"UNITTYPECODE" : "121100",
+				"UNITTYPECODE" : "121101",
 				"ECHELON" : 1108,
 				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
@@ -29,35 +29,22 @@
 				"MARKFORDISBL" : 0
 			},
 			{
-				"UNITNAME" : "4th Infantry Division \"Gemina|",
+				"UNITNAME" : "9th Mech Brig \"Marasesti\"",
 				"UNITTYPE" : 0,
-				"UNITTYPECODE" : "121100",
-				"ECHELON" : 1109,
+				"UNITTYPECODE" : "121102",
+				"ECHELON" : 1108,
 				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
-				"XPOS" : 101,
+				"XPOS" : 51,
 				"YPOS" : 61,
-				"TREEPOS" : 3,
-				"MARKFORDEL" : 0,
-				"MARKFORDISBL" : 0
-			},
-			{
-				"UNITNAME" : "528th Recon Battalion",
-				"UNITTYPE" : 0,
-				"UNITTYPECODE" : "121100",
-				"ECHELON" : 1106,
-				"HOSTILITY" : 1503,
-				"ISHQ" : 0,
-				"XPOS" : 101,
-				"YPOS" : 91,
-				"TREEPOS" : 3,
+				"TREEPOS" : 2,
 				"MARKFORDEL" : 0,
 				"MARKFORDISBL" : 0
 			}
 		],
 		"refC2IPs" : [
 			{
-				"C2IPPATH" : "C:\\WORK\\DEV\\learnMil\\github\\learnMil\\ORBAT_ROU.c2ip",
+				"C2IPPATH" : "D:\\WORK\\inception\\pers\\CW10\\learnMil\\ORBAT_ROU.c2ip",
 				"C2IPNAME" : "ORBAT_ROU"
 			}
 		]

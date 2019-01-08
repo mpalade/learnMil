@@ -146,8 +146,10 @@ Draw_innerEllipse       PROCEDURE(), PRIVATE
 Draw_medianLine         PROCEDURE(), PRIVATE
 Draw_secondDiag         PROCEDURE(), PRIVATE
 Draw_innerPapillon      PROCEDURE(), PRIVATE
-Draw_innerClepsydra     PROCEDURE(), PRIVATE
+Draw_innerSmallClepsydra        PROCEDURE(), PRIVATE
+Draw_innerSmallRoundPapillon    PROCEDURE(), PRIVATE
 Draw_innerRoundPapillon PROCEDURE(), PRIVATE
+Draw_innerTriangle      PROCEDURE(), PRIVATE
 
 DrawNode_Amphibious     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 DrawNode_Antiarmor     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
@@ -174,6 +176,12 @@ DrawNode_Infantry_Motorized     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 DrawNode_Infantry_FightingVehicle       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 
 DrawNode_Observer       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+
+DrawNode_Reconnaissance         PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Reconnaissance_Recon       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Reconnaissance_Marine      PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Reconnaissance_Motorized   PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+
 
 
 DrawNode_Echelon        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE

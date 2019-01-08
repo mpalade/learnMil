@@ -43,7 +43,7 @@ CODE
     
     SELF.drwImg     &= pDraw
 
-OrgChartC2IP.Redraw PROCEDURE
+OrgChartC2IP.Redraw PROCEDURE()
 nCurrentUnitType    LONG
 CODE
     ! do something
@@ -164,6 +164,22 @@ CODE
             OF '121200'
                 ! Observer
                 IF SELF.DrawNode_Observer(FALSE) = TRUE THEN
+                END
+            OF '121300'
+                ! Reconnaissance/Cavalry/Scout
+                IF SELF.DrawNode_Reconnaissance(FALSE) = TRUE THEN
+                END
+            OF '121301'
+                ! Reconnaissance/Cavalry/Scout -> Reconnaissance and Surveillance
+                IF SELF.DrawNode_Reconnaissance_Recon(FALSE) = TRUE THEN
+                END
+            OF '121302'
+                ! Reconnaissance/Cavalry/Scout -> Marine
+                IF SELF.DrawNode_Reconnaissance_Marine(FALSE) = TRUE THEN
+                END
+            OF '121303'
+                ! Reconnaissance/Cavalry/Scout -> Motorized
+                IF SELF.DrawNode_Reconnaissance_Motorized(FALSE) = TRUE THEN
                 END
             ELSE
                 IF SELF.DrawNode_Default(FALSE) = TRUE THEN
@@ -357,7 +373,7 @@ CODE
     END
     
     
-    RETURN TRUE
+    RETURN TRUE      
     
 OrgChartC2IP.Draw_innerSine PROCEDURE()
     CODE
@@ -372,23 +388,23 @@ OrgChartC2IP.Draw_innerSine PROCEDURE()
 OrgChartC2IP.Draw_innerEllipse       PROCEDURE()
     CODE        
         ! inner ellipse
-    SELF.drwImg.Line(SELF.ul.xPos + 15, SELF.ul.yPos + 10, 20, 0)
-    SELF.drwImg.Arc(SELF.ul.xPos + 15 + 20 - 5, SELF.ul.yPos + 10, 10, 10, 2700, 900)
-    SELF.drwImg.Line(SELF.ul.xPos + 15, SELF.ul.yPos + 20, 20, 0)
+        SELF.drwImg.Line(SELF.ul.xPos + 15, SELF.ul.yPos + 10, 20, 0)
+        SELF.drwImg.Arc(SELF.ul.xPos + 15 + 20 - 5, SELF.ul.yPos + 10, 10, 10, 2700, 900)
+        SELF.drwImg.Line(SELF.ul.xPos + 15, SELF.ul.yPos + 20, 20, 0)
         SELF.drwImg.Arc(SELF.ul.xPos + 5 + 5, SELF.ul.yPos + 10, 10, 10, 900, 2700)
         
-OrgChartC2IP.Draw_medianLine        PROCEDURE
+OrgChartC2IP.Draw_medianLine        PROCEDURE()
     CODE
         ! median line
-    SELF.drwImg.Line(SELF.ul.xPos + 25, SELF.ul.yPos, 0, 30)
+        SELF.drwImg.Line(SELF.ul.xPos + 25, SELF.ul.yPos, 0, 30)
 
-OrgChartC2IP.Draw_secondDiag        PROCEDURE
+OrgChartC2IP.Draw_secondDiag        PROCEDURE()
     CODE        
         ! second diagonal
         SELF.drwImg.Line(SELF.ul.xPos, SELF.ul.yPos + 30, 50, -30)
         
         
-OrgChartC2IP.Draw_innerPapillon     PROCEDURE
+OrgChartC2IP.Draw_innerPapillon     PROCEDURE()
 pVertices    LONG, DIM(6)
     CODE
         ! inner papillon
@@ -407,26 +423,26 @@ pVertices    LONG, DIM(6)
         pVertices[6] = SELF.ul.yPos + 15 + 5
         SELF.drwImg.Polygon(pVertices, COLOR:Black)
         
-OrgChartC2IP.Draw_innerClepsydra    PROCEDURE
+OrgChartC2IP.Draw_innerSmallClepsydra    PROCEDURE()
 pVertices    LONG, DIM(6)
     CODE
         ! inner clepsydra
-    pVertices[1] = SELF.ul.xPos + 25 - 5
-    pVertices[2] = SELF.ul.yPos + 15 - 5
-    pVertices[3] = SELF.ul.xPos + 25 + 5
-    pVertices[4] = SELF.ul.yPos + 15 - 5
-    pVertices[5] = SELF.ul.xPos + 25
-    pVertices[6] = SELF.ul.yPos + 15
-    SELF.drwImg.Polygon(pVertices, COLOR:Black)
-    pVertices[1] = SELF.ul.xPos + 25
-    pVertices[2] = SELF.ul.yPos + 15
-    pVertices[3] = SELF.ul.xPos + 25 + 5
-    pVertices[4] = SELF.ul.yPos + 15 + 5
-    pVertices[5] = SELF.ul.xPos + 25 - 5
-    pVertices[6] = SELF.ul.yPos + 15 + 5
-    SELF.drwImg.Polygon(pVertices, COLOR:Black)        
+        pVertices[1] = SELF.ul.xPos + 25 - 5
+        pVertices[2] = SELF.ul.yPos + 15 - 5
+        pVertices[3] = SELF.ul.xPos + 25 + 5
+        pVertices[4] = SELF.ul.yPos + 15 - 5
+        pVertices[5] = SELF.ul.xPos + 25
+        pVertices[6] = SELF.ul.yPos + 15
+        SELF.drwImg.Polygon(pVertices, COLOR:Black)
+        pVertices[1] = SELF.ul.xPos + 25
+        pVertices[2] = SELF.ul.yPos + 15
+        pVertices[3] = SELF.ul.xPos + 25 + 5
+        pVertices[4] = SELF.ul.yPos + 15 + 5
+        pVertices[5] = SELF.ul.xPos + 25 - 5
+        pVertices[6] = SELF.ul.yPos + 15 + 5
+        SELF.drwImg.Polygon(pVertices, COLOR:Black)        
         
-OrgChartC2IP.Draw_innerRoundPapillon        PROCEDURE
+OrgChartC2IP.Draw_innerSmallRoundPapillon        PROCEDURE()
 pVertices    LONG, DIM(6)
     CODE
         ! inner small papillon
@@ -446,10 +462,39 @@ pVertices    LONG, DIM(6)
         SELF.drwImg.Polygon(pVertices, COLOR:Black)
         
         ! inner arc chords
-    !SELF.drwImg.Chord(SELF.ul.xPos + 25 - 2, SELF.ul.yPos + 15 - 1, - 2, 3, 900, 2700, COLOR:Black)
-    !SELF.drwImg.Chord(SELF.ul.xPos + 25 + 2, SELF.ul.yPos + 15 - 1, 2, 3, 2700, 3599, COLOR:Black)
-                          
+        !SELF.drwImg.Chord(SELF.ul.xPos + 25 - 2, SELF.ul.yPos + 15 - 1, - 2, 3, 900, 2700, COLOR:Black)
+        !SELF.drwImg.Chord(SELF.ul.xPos + 25 + 2, SELF.ul.yPos + 15 - 1, 2, 3, 2700, 3599, COLOR:Black)
+        SELF.drwImg.Arc(SELF.ul.xPos + 25 - 4 - 2, SELF.ul.yPos + 15 - 1, 2, 3, 900, 2700)
+        SELF.drwImg.Arc(SELF.ul.xPos + 25 + 4 + 2, SELF.ul.yPos + 15 - 1, 2, 3, 2700, 3599)
+        SELF.drwImg.Arc(SELF.ul.xPos + 25 + 4 + 2, SELF.ul.yPos + 15 - 1, 2, 3, 0, 900)
+        
     
+OrgChartC2IP.Draw_innerRoundPapillon      PROCEDURE()
+pVertices           LONG, DIM(6)
+    CODE
+        ! inner papillon
+        SELF.Draw_innerPapillon()
+        ! inner chords
+        SELF.drwImg.Arc(SELF.ul.xPos + 25 - 5 - 5, SELF.ul.yPos + 15 - 5, 10, 10, 900, 2700)
+        !SELF.drwImg.Chord(SELF.ul.xPos + 25 - 5 - 5, SELF.ul.yPos + 15 - 5, 10, 10, 900, 2700, COLOR:Black)
+        SELF.drwImg.Arc(SELF.ul.xPos + 25, SELF.ul.yPos + 15 - 5, 10, 10, 2700, 3599)
+        !SELF.drwImg.Chord(SELF.ul.xPos + 25, SELF.ul.yPos + 15 - 5, 10, 10, 2700, 3599, COLOR:Black)
+        SELF.drwImg.Arc(SELF.ul.xPos + 25, SELF.ul.yPos + 15 - 5, 10, 10, 0, 900)
+        !SELF.drwImg.Chord(SELF.ul.xPos + 25, SELF.ul.yPos + 15 - 5, 10, 10, 0, 900, COLOR:Black)
+        
+OrgChartC2IP.Draw_innerTriangle PROCEDURE
+pVertices           LONG, DIM(6)
+    CODE
+        ! inner triangle
+        pVertices[1] = SELF.ul.xPos + 25 - 5
+        pVertices[2] = SELF.ul.yPos + 15 + 2
+        pVertices[3] = SELF.ul.xPos + 25
+        pVertices[4] = SELF.ul.yPos + 15 - 3
+        pVertices[5] = SELF.ul.xPos + 25 + 5
+        pVertices[6] = SELF.ul.yPos + 15 + 2
+        SELF.drwImg.Polygon(pVertices, COLOR:Black, COLOR:Black)
+               
+                                                     
 OrgChartC2IP.DrawNode_Amphibious PROCEDURE(BOOL bAutoDisplay)
     CODE
         erroCode#   = SELF.DrawNode_Default(bAutoDisplay)    
@@ -562,9 +607,9 @@ OrgChartC2IP.DrawNode_AviationComposite     PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Default()
         ! clepsydra
-        SELF.Draw_innerClepsydra()
+        SELF.Draw_innerSmallClepsydra()
         ! round papillon
-        SELF.Draw_innerRoundPapillon()
+        SELF.Draw_innerSmallRoundPapillon()
         
         IF bAutoDisplay THEN
             SELF.drwImg.Display()
@@ -573,6 +618,9 @@ OrgChartC2IP.DrawNode_AviationComposite     PROCEDURE(BOOL bAutoDisplay)
         
 OrgChartC2IP.DrawNode_AviationFixedWing     PROCEDURE(BOOL bAutoDisplay)
     CODE
+        errCode#    = SELF.DrawNode_Default()
+        ! inner round papillon
+        SELF.Draw_innerRoundPapillon()
         
         IF bAutoDisplay THEN
             SELF.drwImg.Display()
@@ -581,6 +629,9 @@ OrgChartC2IP.DrawNode_AviationFixedWing     PROCEDURE(BOOL bAutoDisplay)
         
 OrgChartC2IP.DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay)
     CODE
+        errCode#    = SELF.DrawNode_AviationFixedWing(bAutoDisplay)        
+        ! inner second diagonal
+        SELF.Draw_secondDiag()
         
         IF bAutoDisplay THEN
             SELF.drwImg.Display()
@@ -590,6 +641,9 @@ OrgChartC2IP.DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay)
         
 OrgChartC2IP.DrawNode_Combat         PROCEDURE(BOOL bAutoDisplay)
     CODE
+        errCode#    = SELF.DrawNode_Default()
+        ! CBT
+        SELF.drwImg.Show(SELF.ul.xPos + 25 - 10, SELF.ul.yPos + 15 + 5, 'CBT')       
         
         IF bAutoDisplay THEN
             SELF.drwImg.Display()
@@ -598,6 +652,16 @@ OrgChartC2IP.DrawNode_Combat         PROCEDURE(BOOL bAutoDisplay)
         
 OrgChartC2IP.DrawNode_CombinedArms   PROCEDURE(BOOL bAutoDisplay)
     CODE
+        errCode#    = SELF.DrawNode_Default(bAutoDisplay)
+        
+        ! inner ellipse
+        SELF.Draw_innerEllipse()
+        ! inner empty clepsydra
+        SELF.drwImg.Line(SELF.ul.xPos + 25 - 10, SELF.ul.yPos + 15 - 5, 20, 10)        
+        SELF.drwImg.Line(SELF.ul.xPos + 25 - 10, SELF.ul.yPos + 15 + 5, 20, -10)
+
+        
+        
         
         IF bAutoDisplay THEN
             SELF.drwImg.Display()
@@ -745,6 +809,50 @@ CODE
     END
     
     RETURN TRUE
+    
+OrgChartC2IP.DrawNode_Reconnaissance        PROCEDURE(BOOL bAutoDisplay)
+    CODE
+        errCode#    = SELF.DrawNode_Default()        
+        ! inner second diagonal
+        SELF.Draw_secondDiag()
+        
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
+        RETURN TRUE
+        
+OrgChartC2IP.DrawNode_Reconnaissance_Recon  PROCEDURE(BOOL bAutoDisplay)
+    CODE
+        errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
+        ! inner triangle
+        SELF.Draw_innerTriangle()
+        
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
+        RETURN TRUE
+        
+OrgChartC2IP.DrawNode_Reconnaissance_Marine PROCEDURE(BOOL bAutoDisplay)
+    CODE
+        errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
+        ! inner ellipse
+        SELF.Draw_innerSine()
+        
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
+        RETURN TRUE
+        
+OrgChartC2IP.DrawNode_Reconnaissance_Motorized      PROCEDURE(BOOL bAutoDisplay)
+    CODE
+        errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
+        ! inner middle line
+        SELF.Draw_medianLine()
+        
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
+        RETURN TRUE
     
 OrgChartC2IP.DrawNode_Echelon       PROCEDURE(BOOL bAutoDisplay)
 CODE
