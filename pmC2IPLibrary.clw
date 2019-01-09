@@ -17,12 +17,25 @@ localV                  LONG
 aClass.bProcedure    PROCEDURE(LONG nPrm)
     CODE
         SELF.aValue = nPrm
+        
+BSO.Construct       PROCEDURE()
+    CODE
+        
+BSO.Destruct        PROCEDURE()
+    CODE
+        
+BSOCollection.Construct     PROCEDURE()
+    CODE
+        SELF.ul     &= NEW(UnitsList)
+        
+BSOCollection.Destruct      PROCEDURE()
+    CODE            
+        DISPOSE(SELF.ul)        
+        
      
-                  
-OrgChartC2IP.Construct     PROCEDURE
-CODE
-    ! do something
-    
+C2IP.Construct      PROCEDURE()
+    CODE
+        ! initialize default objects    
     SELF.ul     &= NEW(UnitsList)
     SELF.tmpul  &= NEW(UnitsList)
     
@@ -36,12 +49,22 @@ CODE
     SELF.refC2IPs   &= NEW(C2IPsList)
     
     SELF.labelEditMode  = FALSE
-
-OrgChartC2IP.InitDraw     PROCEDURE(Draw pDraw)
+        
+C2IP.Destruct       PROCEDURE()
+    CODE    
+        ! destroy default objects    
+        DISPOSE(SELF.refC2IPs)        
+        DISPOSE(SELF.tmpul)
+        DISPOSE(SELF.ul)
+        
+C2IP.InitDraw     PROCEDURE(Draw pDraw)
 CODE
-    ! do something
-    
-    SELF.drwImg     &= pDraw
+    ! Init Drawing Object    
+    SELF.drwImg     &= pDraw        
+                  
+OrgChartC2IP.Construct     PROCEDURE()
+    CODE
+        PARENT.Construct()    
 
 OrgChartC2IP.Redraw PROCEDURE()
 nCurrentUnitType    LONG
@@ -181,6 +204,102 @@ CODE
                 ! Reconnaissance/Cavalry/Scout -> Motorized
                 IF SELF.DrawNode_Reconnaissance_Motorized(FALSE) = TRUE THEN
                 END
+            OF '121400'
+                ! Sea Air Land (SEAL)
+            OF '121500'
+                ! Snipper
+            OF '121600'
+                ! Surveillance
+            OF '121700'
+                ! Special Forces
+            OF '121800'
+                ! Special Operations Forces (SOF)
+            OF '121801'
+                ! Special Operations Forces (SOF) -> 	Fixed Wing MISO
+            OF '121802'
+                ! Special Operations Forces (SOF) -> 	Ground
+            OF '121803'
+                ! Special Operations Forces (SOF) -> 	Special Boat
+            OF '121804'
+                ! Special Operations Forces (SOF) -> 	Special SSNR
+            OF '121805'
+                ! Special Operations Forces (SOF) -> 	Underwater Demolition Team
+            OF '121900'
+                ! Unmanned Aerial Systems
+            OF '130000'
+                ! Fires
+            OF '130100'
+                ! Air Defense
+            OF '130101'
+                ! Air Defense -> Main Gun System
+            OF '130102'
+                ! Air Defense -> Missile
+            OF '130200'
+                ! Air/Land Naval Gunfire Liaison
+            OF '130300'
+                ! Field Artillery
+            OF '130301'
+                ! Field Artillery -> Self-propelled
+            OF '130302'
+                ! Field Artillery -> Target Acquisition
+            OF '130400'
+                ! Field Artillery Observer
+            OF '130500'
+                ! Joint Fire Support
+            OF '130600'
+                ! Meteorological
+            OF '130700'
+                ! Missile
+            OF '130800'
+                ! Mortar
+            OF '130801'
+                ! Mortar -> Armored/Mechanized/Tracked
+            OF '130802'
+                ! Mortar ->	Self-Propelled Wheeled
+            OF '130803'
+                ! Mortar -> Towed
+            OF '130900'
+                ! Survey
+            OF '140000'
+                ! Protection
+            OF '140100'
+                ! Chemical Biological Radiological Nuclear Defense
+            OF '140101'
+                ! Chemical Biological Radiological Nuclear Defense -> Mechanized
+            OF '140102'
+                ! Chemical Biological Radiological Nuclear Defense -> Motorized
+            OF '140103'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance
+            OF '140104'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Armored
+            OF '140105'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Equipped
+            OF '140200'
+                ! Combat Support (Maneuver Enhancement)
+            OF '140300'
+                ! Criminal Investigation Division
+            OF '140400'
+                ! Diving
+            OF '140500'
+                ! Dog
+            OF '140600'
+                ! Drilling
+            OF '140700'
+                ! Engineer
+                IF SELF.DrawNode_Engineer(FALSE) = TRUE THEN
+                END
+            OF '140701'
+                ! Engineer -> Mechanized
+                IF SELF.DrawNode_Engineer_Mechanized(FALSE) = TRUE THEN
+                END
+            OF '140702'
+                ! Engineer -> Motorized
+                IF SELF.DrawNode_Engineer_Motorized(FALSE) = TRUE THEN
+                END
+            OF '140703'
+                ! Engineer -> Reconnaissance
+                IF SELF.DrawNode_Engineer_Recon(FALSE) = TRUE THEN
+                END
             ELSE
                 IF SELF.DrawNode_Default(FALSE) = TRUE THEN
                 END
@@ -218,6 +337,7 @@ CODE
                 SELF.drwImg.Line(SELF.ul.xPos + 25 + 2, SELF.ul.yPos - 6, 0, 4)
             OF echTpy:Brigade
                 ! Brigade
+                
                 SELF.drwImg.Line(SELF.ul.xPos + 25 - 2, SELF.ul.yPos - 6, 4, 4)
                 SELF.drwImg.Line(SELF.ul.xPos + 25 - 2, SELF.ul.yPos - 3, 4, -4)
             OF echTpy:Division
@@ -402,6 +522,14 @@ OrgChartC2IP.Draw_secondDiag        PROCEDURE()
     CODE        
         ! second diagonal
         SELF.drwImg.Line(SELF.ul.xPos, SELF.ul.yPos + 30, 50, -30)
+        
+OrgChartC2IP.Draw_innerFork     PROCEDURE()
+    CODE
+        ! inner fork
+    SELF.drwImg.Line(SELF.ul.xPos + 25 - 5, SELF.ul.yPos + 15 - 5, 10, 0)
+    SELF.drwImg.Line(SELF.ul.xPos + 25 - 5, SELF.ul.yPos + 15 - 5, 0, 10)
+    SELF.drwImg.Line(SELF.ul.xPos + 25, SELF.ul.yPos + 15 - 5, 0, 10)
+    SELF.drwImg.Line(SELF.ul.xPos + 25 + 5, SELF.ul.yPos + 15 - 5, 0, 10)
         
         
 OrgChartC2IP.Draw_innerPapillon     PROCEDURE()
@@ -848,6 +976,51 @@ OrgChartC2IP.DrawNode_Reconnaissance_Motorized      PROCEDURE(BOOL bAutoDisplay)
         errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
         ! inner middle line
         SELF.Draw_medianLine()
+        
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
+        RETURN TRUE
+        
+        
+OrgChartC2IP.DrawNode_Engineer      PROCEDURE(BOOL bAutoDisplay)
+    CODE
+        errCode#    = SELF.DrawNode_Default()        
+        ! inner fork
+        SELF.Draw_innerFork()
+        
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
+        RETURN TRUE
+        
+OrgChartC2IP.DrawNode_Engineer_Mechanized   PROCEDURE(BOOL bAutoDisplay)
+    CODE
+        errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
+        ! inner ellipse
+        SELF.Draw_innerEllipse()
+        
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
+        RETURN TRUE
+        
+OrgChartC2IP.DrawNode_Engineer_Motorized    PROCEDURE(BOOL bAutoDisplay)
+    CODE
+        errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
+        ! inner median line
+        SELF.Draw_medianLine()
+        
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
+        RETURN TRUE
+        
+OrgChartC2IP.DrawNode_Engineer_Recon        PROCEDURE(BOOL bAutoDisplay)
+    CODE
+        errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
+        ! inner second diagonal
+        SELF.Draw_secondDiag()
         
         IF bAutoDisplay THEN
             SELF.drwImg.Display()
@@ -1484,13 +1657,8 @@ CODE
     
     
 OrgChartC2IP.Destruct     PROCEDURE
-CODE
-    ! do something
-    
-    DISPOSE(SELF.refC2IPs)
-    
-    DISPOSE(SELF.tmpul)
-    DISPOSE(SELF.ul)
+CODE        
+    PARENT.Destruct()
     
 OrgChartC2IP.GetUnitName     PROCEDURE
 CODE
@@ -1960,3 +2128,13 @@ CODE
         
 
 
+OverlayC2IP.Construct       PROCEDURE()
+    CODE
+        PARENT.Construct()
+        
+OverlayC2IP.Destruct        PROCEDURE()
+    CODE
+        PARENT.Destruct()
+        
+        
+        

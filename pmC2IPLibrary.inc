@@ -45,6 +45,8 @@ COLOR:Hostile       EQUATE(COLOR:Red)
 
 ! Disable for selection color
 COLOR:NodeDisabled  EQUATE(COLOR:Gray)
+
+
 ! Units Queue Structure
 UnitsList           QUEUE, TYPE
 UnitName                STRING(100)
@@ -59,7 +61,6 @@ TreePos                 LONG
 markForDel              BOOL
 markForDisbl            BOOL
                     END
-
 
 ! Unit Basic Record Structure
 UnitBasicRecord     GROUP, TYPE
@@ -92,8 +93,24 @@ collection  &JSONClass
 
 ?ListSymbology      EQUATE(903)
 
-! Organization Chart structure
-OrgChartC2IP        CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+BSO                 CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+urec                    GROUP(UnitBasicRecord)
+                        END
+
+Construct               PROCEDURE()
+Destruct                PROCEDURE()
+
+                    END
+
+BSOCollection       CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+ul                      &UnitsList
+Construct               PROCEDURE()
+Destruct                PROCEDURE()
+                    END
+    
+
+! Generic C2IP structure
+C2IP                CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 Name                    STRING(100)
 ul                      &UnitsList
 tmpul                   &UnitsList, PRIVATE
@@ -101,11 +118,26 @@ tmpUnitName             STRING(100), PRIVATE
 
 ! Draw representation
 drwImg                  &Draw
-! Previewer representation
-!prwImg                  &Draw
 
 ! referenced C2IPs list
 refC2IPs                &C2IPsList
+
+labelEditMode           BOOL, PRIVATE
+
+Construct               PROCEDURE
+Destruct                PROCEDURE
+InitDraw                PROCEDURE(Draw pDraw), LONG
+
+                    END
+
+! Organization Chart structure
+OrgChartC2IP        CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+!Name                    STRING(100)
+!ul                      &UnitsList
+!tmpul                   &UnitsList, PRIVATE
+!tmpUnitName             STRING(100), PRIVATE
+
+
 
 ! Unit basic record structure
 urec                    GROUP
@@ -124,15 +156,13 @@ selTreePos              LONG, PRIVATE
 maxTreePos              LONG, PRIVATE
 selQueuePos             LONG, PRIVATE
 
-labelEditMode           BOOL, PRIVATE
+!labelEditMode           BOOL, PRIVATE
 uNameEntry              STRING(100), PRIVATE
 bIsHQEntry              BOOL, PRIVATE
 nEchelon                LONG, PRIVATE
 
 
-Construct               PROCEDURE
-InitDraw                PROCEDURE(Draw pDraw), LONG                           
-!InitPreview             PROCEDURE(Draw pDraw), LONG
+Construct               PROCEDURE                           
 
 Redraw                  PROCEDURE, PRIVATE
 DrawNode                PROCEDURE(LONG nUnitType=0), LONG, PRIVATE
@@ -150,6 +180,7 @@ Draw_innerSmallClepsydra        PROCEDURE(), PRIVATE
 Draw_innerSmallRoundPapillon    PROCEDURE(), PRIVATE
 Draw_innerRoundPapillon PROCEDURE(), PRIVATE
 Draw_innerTriangle      PROCEDURE(), PRIVATE
+Draw_innerFork          PROCEDURE(), PRIVATE
 
 DrawNode_Amphibious     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 DrawNode_Antiarmor     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
@@ -182,7 +213,10 @@ DrawNode_Reconnaissance_Recon       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRI
 DrawNode_Reconnaissance_Marine      PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 DrawNode_Reconnaissance_Motorized   PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 
-
+DrawNode_Engineer       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Engineer_Mechanized       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Engineer_Motorized        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
+DrawNode_Engineer_Recon           PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 
 DrawNode_Echelon        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 
@@ -238,6 +272,17 @@ EchelonMenuOptions      PROCEDURE(), STRING, PRIVATE
 TakeHostility           PROCEDURE(LONG nOption), LONG, PRIVATE
 HostilityMenuOptions    PROCEDURE(), STRING, PRIVATE
                     END
+
+! Overlay structure
+OverlayC2IP         CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+!Name                    STRING(100)
+ul                      &UnitsList
+
+
+Construct               PROCEDURE
+Destruct                PROCEDURE
+                    END
+
 
 
 
