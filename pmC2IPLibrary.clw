@@ -44,9 +44,10 @@ tmpUnitName     STRING(100)
         
         RETURN tmpUnitName
         
-BSOCollection.prepFirstNode PROCEDURE
+BSOCollection.insertFirstNode PROCEDURE
     CODE
-        SELF.ul.UnitName        = tmpUnitName
+        sst.Trace('START:BSOCollection.insertFirstNode')
+        SELF.ul.UnitName        = SELF.prepRndName()
         SELF.ul.UnitType        = uTpy:notDefined
         SELF.ul.UnitTypeCode    = ''
         SELF.ul.Echelon         = echTpy:notDefined        
@@ -57,128 +58,69 @@ BSOCollection.prepFirstNode PROCEDURE
         SELF.ul.markForDel      = FALSE
         SELF.ul.markForDisbl    = FALSE
         ADD(SELF.ul)
+        IF NOT ERRORCODE() THEN
+            SELF.selTreePos     = 1     
+            SELF.maxTreePos     = 1
+            SELF.selQueuePos    = POINTER(SELF.ul)
+            sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+            sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+            sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+        ELSE
+            sst.Trace('ADD(SELF.ul) error')
+        END
+        sst.Trace('END:BSOCollection.insertFirstNode')
         
-        SELF.selTreePos = 1     
-        SELF.maxTreePos = 1
-        SELF.selQueuePos    = 1
         
-BSOCollection.prepNewNode   PROCEDURE
+        
+        
+        
+BSOCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
     CODE
+        sst.Trace('START:BSOCollection.prepNewNode')        
         CLEAR(SELF.urec)
-        SELF.urec.TreePos   = SELF.selTreePos
-        SELF.urec.UnitName  = tmpUnitName
+        SELF.urec.TreePos       = SELF.selTreePos
+        SELF.urec.UnitName      = SELF.prepRndName()
         ! Unit Type, Echelon and  IsHQ are similare as the current ones
-        SELF.urec.UnitType  = SELF.ul.UnitType
+        SELF.urec.UnitType      = SELF.ul.UnitType
         SELF.urec.UnitTypeCode  = SELF.ul.UnitTypeCode
-        SELF.urec.Echelon   = SELF.ul.Echelon
-        SELF.urec.IsHQ      = SELF.ul.IsHQ
-        SELF.urec.xPos      = (SELF.urec.TreePos-1)*50 + 1
-        SELF.urec.yPos      = curentPos#*30 + 1
+        SELF.urec.Echelon       = SELF.ul.Echelon
+        SELF.urec.IsHQ          = SELF.ul.IsHQ
+        SELF.urec.xPos          = (SELF.urec.TreePos-1)*50 + 1
+        SELF.urec.yPos          = (nNewRecPosition - 1)*30 + 1
+        sst.Trace('END:BSOCollection.prepNewNode')        
         
 BSOCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
     CODE
+        sst.Trace('START:BSOCollection.moveNodesToTmp')        
         FREE(SELF.tmpul)       
-        LOOP i# = (nStartPos+1) TO nEndPos
+        LOOP i# = nStartPos TO nEndPos
             GET(SELF.ul, i#)
             IF NOT ERRORCODE() THEN
-                SELF.tmpul.TreePos = SELF.ul.TreePos
-                SELF.tmpul.UnitName = SELF.ul.UnitName
-                SELF.tmpul.UnitType = SELF.ul.UnitType
+                SELF.tmpul.TreePos      = SELF.ul.TreePos
+                SELF.tmpul.UnitName     = SELF.ul.UnitName
+                SELF.tmpul.UnitType     = SELF.ul.UnitType
                 SELF.tmpul.UnitTypeCode = SELF.ul.UnitTypeCode
-                SELF.tmpul.Echelon  = SELF.ul.Echelon
-                SELF.tmpul.xPos = SELF.ul.xPos
-                SELF.tmpul.yPos = SELF.ul.yPos + 30
+                SELF.tmpul.Echelon      = SELF.ul.Echelon
+                SELF.tmpul.xPos         = SELF.ul.xPos
+                SELF.tmpul.yPos         = SELF.ul.yPos + 30
                 ADD(SELF.tmpul)
             END            
         END
+        sst.Trace('END:BSOCollection.moveNodesToTmp')        
         
-BSOCollection.insertEmptyNode       PROCEDURE
+BSOCollection.addEmptyNode       PROCEDURE
     CODE
+        sst.Trace('START:BSOCollection.insertEmptyNode')        
         ADD(SELF.ul)
+        IF NOT ERRORCODE() THEN
+        END        
+        sst.Trace('END:BSOCollection.insertEmptyNode')        
         
-        
-        
-BSOCollection.InsertNode    PROCEDURE
-tmpUnitName     STRING(100)
-CODE
-    ! insert a new node to the current collection
-        
-    tmpUnitName    = SELF.prepRndName()
-    
-    IF RECORDS(SELF.ul) = 0 THEN
-        ! 1st records
-        SELF.prepFirstNode()                              
-    ELSE
-        ! inside the queue
-        
-        ! increment Tree Position
-        SELF.selTreePos  = SELF.ul.TreePos + 1
-        IF SELF.selTreePos > SELF.maxTreePos THEN
-            SELF.maxTreePos = SELF.selTreePos
-        END
-        curentPos# = POINTER(SELF.ul)
-        allPos# = RECORDS(SELF.ul)
-        SELF.selQueuePos    = curentPos#
-        
-        ! prepare the new record
-        SELF.prepNewNode()                
-        
-        ! move to temporary queue
-        ! move yPos
-        IF curentPos# < allPos# THEN
-            ! in the middle of queue
-            SELF.moveNodesToTmp(i#, allPos#)
-                                    
-            ! add empty record
-            SELF.insertEmptyNode()            
-            
-            ! insert current record
-            GET(SELF.ul, curentPos#+1)
-            IF NOT ERRORCODE() THEN
-                SELF.ul.TreePos     = SELF.urec.TreePos
-                SELF.ul.UnitName    = SELF.urec.UnitName
-                SELF.ul.UnitType    = SELF.urec.UnitType
-                SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
-                SELF.ul.Echelon     = SELF.urec.Echelon
-                SELF.ul.xPos        = SELF.urec.xPos
-                SELF.ul.yPos        = SELF.urec.yPos
-                SELF.ul.markForDel  = FALSE
-                SELF.ul.markForDisbl    = FALSE
-                PUT(SELF.ul)
-            END
-            
-            ! copy back records
-            IF POINTER(SELF.tmpul)>0 THEN
-                j# = 0
-                LOOP i# = (curentPos#+2) TO RECORDS(SELF.ul)
-                    j# = j# + 1
-                    GET(SELF.ul, i#)
-                    IF NOT ERRORCODE() THEN
-                        GET(SELF.tmpul, j#)
-                        IF NOT ERRORCODE() THEN
-                            SELF.ul.TreePos     = SELF.tmpul.TreePos
-                            SELF.ul.UnitName    = SELF.tmpul.UnitName
-                            SELF.ul.UnitType    = SELF.tmpul.UnitType
-                            SELF.ul.UnitTypeCode    = SELF.tmpul.UnitTypeCode
-                            SELF.ul.Echelon     = SELF.tmpul.Echelon
-                            SELF.ul.xPos        = SELF.tmpul.xPos
-                            SELF.ul.yPos        = SELF.tmpul.yPos
-                            SELF.ul.markForDel  = FALSE
-                            SELF.ul.markForDisbl    = FALSE
-                            PUT(SELF.ul)
-                        END                    
-                    END            
-                END
-            END    
-            
-            ! current Position
-            GET(SELF.ul, curentPos# + 1)
-            IF NOT ERRORCODE() THEN
-                SELF.selTreePos = SELF.ul.TreePos
-            END
-            
-        ELSE
-            ! last on queue
+BSOCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
+    CODE
+        sst.Trace('START:BSOCollection.insertCurrentNode')        
+        GET(SELF.ul, nPosition)
+        IF NOT ERRORCODE() THEN
             SELF.ul.TreePos     = SELF.urec.TreePos
             SELF.ul.UnitName    = SELF.urec.UnitName
             SELF.ul.UnitType    = SELF.urec.UnitType
@@ -188,15 +130,141 @@ CODE
             SELF.ul.yPos        = SELF.urec.yPos
             SELF.ul.markForDel  = FALSE
             SELF.ul.markForDisbl    = FALSE
-            ADD(SELF.ul)    
-            
-            MESSAGE('at the end')
-        END                
+            PUT(SELF.ul)
+        END
+        sst.Trace('END:BSOCollection.insertCurrentNode')        
         
-        SELF.selQueuePos = POINTER(SELF.ul)      
-        SELF.selTreePos = SELF.ul.TreePos
-              
-    END        
+BSOCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)        
+    CODE
+        sst.Trace('START:BSOCollection.moveNodesBackFromTmp')        
+        j# = 0
+        LOOP i# = nStartPos TO RECORDS(SELF.ul)
+            j# = j# + 1
+            GET(SELF.ul, i#)
+            IF NOT ERRORCODE() THEN
+                GET(SELF.tmpul, j#)
+                IF NOT ERRORCODE() THEN
+                    SELF.ul.TreePos     = SELF.tmpul.TreePos
+                    SELF.ul.UnitName    = SELF.tmpul.UnitName
+                    SELF.ul.UnitType    = SELF.tmpul.UnitType
+                    SELF.ul.UnitTypeCode    = SELF.tmpul.UnitTypeCode
+                    SELF.ul.Echelon     = SELF.tmpul.Echelon
+                    SELF.ul.xPos        = SELF.tmpul.xPos
+                    SELF.ul.yPos        = SELF.tmpul.yPos
+                    SELF.ul.markForDel  = FALSE
+                    SELF.ul.markForDisbl    = FALSE
+                    PUT(SELF.ul)
+                END                    
+            END            
+        END        
+        sst.Trace('END:BSOCollection.moveNodesBackFromTmp')        
+        
+BSOCollection.insertLastNode        PROCEDURE()
+    CODE
+        sst.Trace('START:BSOCollection.insertLastNode')        
+        SELF.ul.TreePos         = SELF.urec.TreePos
+        SELF.ul.UnitName        = SELF.urec.UnitName
+        SELF.ul.UnitType        = SELF.urec.UnitType
+        SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
+        SELF.ul.Echelon         = SELF.urec.Echelon
+        SELF.ul.xPos            = SELF.urec.xPos
+        SELF.ul.yPos            = SELF.urec.yPos
+        SELF.ul.markForDel      = FALSE
+        SELF.ul.markForDisbl    = FALSE
+        ADD(SELF.ul)   
+        IF NOT ERRORCODE() THEN
+            SELF.selQueuePos    = POINTER(SELF.ul)
+            SELF.selTreePos     = SELF.ul.TreePos
+            sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+            sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+            sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+        ELSE
+            sst.Trace('ADD(SELF.ul) error')
+        END        
+        sst.Trace('END:BSOCollection.insertLastNode')        
+        
+        
+        
+BSOCollection.InsertNode    PROCEDURE
+tmpUnitName     STRING(100)
+CODE
+    ! insert a new node to the current collection
+    sst.Trace('START:BSOCollection.InsertNode')
+        
+    tmpUnitName    = SELF.prepRndName()
+    
+    IF RECORDS(SELF.ul) = 0 THEN
+        ! 1st records
+        sst.Trace('1st queue record')        
+        sst.Trace('CALL:SELF.insertFirstNode()')
+        SELF.insertFirstNode()                   
+    ELSE
+        ! inside the queue
+        sst.Trace('inside the queue')
+        
+        ! increment Tree Position
+        sst.Trace('increment Tree Position')
+        SELF.selTreePos  = SELF.ul.TreePos + 1
+        IF SELF.selTreePos > SELF.maxTreePos THEN
+            SELF.maxTreePos = SELF.selTreePos
+        END
+        
+        ! preserve current position and all records number
+        sst.Trace('preserve current position and all records number')
+        allPos# = RECORDS(SELF.ul)
+                
+        ! prepare the new record
+        sst.Trace('prepare the new record')
+        sst.Trace('CALL:SELF.prepNewNode()')
+        SELF.prepNewNode(SELF.selQueuePos + 1)               
+        
+        ! check the position inside the queue
+        ! move to the temporary queue
+        ! change yPos values
+        sst.Trace('check the position inside the queue')
+        IF (SELF.selQueuePos + 1) < (allPos# + 1) THEN            
+            ! in the middle of queue
+            sst.Trace('in the middle of queue')           
+            sst.Trace('CALL:SELF.moveNodesToTmp(SELF.selQueuePos + 1, allPos#)')           
+            SELF.moveNodesToTmp(SELF.selQueuePos + 1, allPos#)
+                                    
+            ! add empty record
+            sst.Trace('add empty record')
+            sst.Trace('CALL:SELF.addEmptyNode()')           
+            SELF.addEmptyNode()            
+            
+            
+            ! insert current record
+            sst.Trace('insert current record')
+            sst.Trace('CALL:SELF.insertCurrentNode(SELF.selQueuePos + 1)')           
+            SELF.insertCurrentPrepNode(SELF.selQueuePos + 1)        
+                        
+            ! copy back records
+            sst.Trace('copy back records')
+            IF POINTER(SELF.tmpul) > 0 THEN
+                sst.Trace('CALL:SELF.moveNodesBackFromTmp(SELF.selQueuePos + 2)')                                           
+                SELF.moveNodesBackFromTmp(SELF.selQueuePos + 2)
+                
+            END    
+            
+            ! get new current Position            
+            sst.Trace('get new current Position')
+            SELF.selQueuePos    = SELF.selQueuePos + 1
+            GET(SELF.ul, SELF.selQueuePos + 1)
+            IF NOT ERRORCODE() THEN
+                SELF.selTreePos = SELF.ul.TreePos
+            END                        
+        ELSE
+            ! last on queue
+            sst.Trace('last on queue')
+            sst.Trace('CALL:SELF.insertLastNode()')             
+            SELF.insertLastNode()            
+        END                              
+    END
+    sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+    sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+    sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+    sst.Trace('END:BSOCollection.InsertNode')
     
     
 BSOCollection.InsertNode    PROCEDURE(*UnitBasicRecord pURec)

@@ -82,9 +82,13 @@ C2IPPath                STRING(100)
 C2IPName                STRING(100)
                     END
 ! JSON objects
+json                JSONClass
+collection          &JSONClass
 
-json        JSONClass
-collection  &JSONClass
+
+! string theory objects
+sst                 stringtheory
+
 ! entry fields
 
 ?uNameEntry         EQUATE(900)
@@ -116,8 +120,14 @@ Construct               PROCEDURE()
 Destruct                PROCEDURE()
 
 prepRndName             PROCEDURE(), STRING, PRIVATE
-prepFirstNode           PROCEDURE(), PRIVATE
-prepNewNode             PROCEDURE(), PRIVATE
+insertFirstNode         PROCEDURE(), PRIVATE
+prepNewNode             PROCEDURE(LONG nPosition), PRIVATE
+moveNodesToTmp          PROCEDURE(LONG nStartPos, LONG nEndPos), PRIVATE
+moveNodesBackFromTmp    PROCEDURE(LONG nStartPos), PRIVATE
+addEmptyNode            PROCEDURE(), PRIVATE
+insertCurrentPrepNode   PROCEDURE(LONG nPosition), PRIVATE
+insertLastNode          PROCEDURE(), PRIVATE
+
 InsertNode              PROCEDURE
 InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
 GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
