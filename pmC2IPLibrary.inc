@@ -104,16 +104,37 @@ Destruct                PROCEDURE()
 
 BSOCollection       CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 ul                      &UnitsList
+tmpul                   &UnitsList, PRIVATE
+urec                    GROUP(UnitBasicRecord)
+                        END
+
+selTreePos              LONG, PRIVATE
+maxTreePos              LONG, PRIVATE
+selQueuePos             LONG, PRIVATE
+
 Construct               PROCEDURE()
 Destruct                PROCEDURE()
+
+InsertNode              PROCEDURE
+InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
+GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
+DeleteNode              PROCEDURE
+DisableNode             PROCEDURE
+
+SelUp                   PROCEDURE
+SelDown                 PROCEDURE
+SelLeft                 PROCEDURE
+SelRight                PROCEDURE
                     END
     
 
 ! Generic C2IP structure
 C2IP                CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 Name                    STRING(100)
-ul                      &UnitsList
-tmpul                   &UnitsList, PRIVATE
+!ul                      &UnitsList
+!tmpul                   &UnitsList, PRIVATE
+ul                      &BSOCollection
+tmpul                   &BSOCollection
 tmpUnitName             STRING(100), PRIVATE
 
 ! Draw representation
@@ -132,31 +153,15 @@ InitDraw                PROCEDURE(Draw pDraw), LONG
 
 ! Organization Chart structure
 OrgChartC2IP        CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
-!Name                    STRING(100)
-!ul                      &UnitsList
-!tmpul                   &UnitsList, PRIVATE
-!tmpUnitName             STRING(100), PRIVATE
-
-
 
 ! Unit basic record structure
-urec                    GROUP
-UnitName                    STRING(100)
-UnitType                    LONG
-UnitTypeCode                STRING(10)
-Echelon                     LONG
-Hostility                   LONG
-IsHQ                        BOOL
-xPos                        LONG
-yPos                        LONG
-TreePos                     LONG
+urec                    GROUP(UnitBasicRecord)
                         END
 
 selTreePos              LONG, PRIVATE
 maxTreePos              LONG, PRIVATE
 selQueuePos             LONG, PRIVATE
 
-!labelEditMode           BOOL, PRIVATE
 uNameEntry              STRING(100), PRIVATE
 bIsHQEntry              BOOL, PRIVATE
 nEchelon                LONG, PRIVATE
@@ -170,7 +175,6 @@ DrawNode                PROCEDURE(LONG nUnitType=0), LONG, PRIVATE
 !DrawNode variants
 DrawNode_Default        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 
-    ! inner sinus
 Draw_innerSine          PROCEDURE(), PRIVATE
 Draw_innerEllipse       PROCEDURE(), PRIVATE
 Draw_medianLine         PROCEDURE(), PRIVATE
@@ -225,12 +229,15 @@ InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
 GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
 DeleteNode              PROCEDURE
 DisableNode             PROCEDURE
+
 DisplaySelection        PROCEDURE, PRIVATE
 DisplayUnselection      PROCEDURE, PRIVATE
+
 SelUp                   PROCEDURE
 SelDown                 PROCEDURE
 SelLeft                 PROCEDURE
 SelRight                PROCEDURE
+
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 Unselect                PROCEDURE(), LONG
 Destruct                PROCEDURE
@@ -276,8 +283,7 @@ HostilityMenuOptions    PROCEDURE(), STRING, PRIVATE
 ! Overlay structure
 OverlayC2IP         CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 !Name                    STRING(100)
-ul                      &UnitsList
-
+!ul                      &UnitsList
 
 Construct               PROCEDURE
 Destruct                PROCEDURE

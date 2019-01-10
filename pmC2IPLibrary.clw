@@ -27,17 +27,419 @@ BSO.Destruct        PROCEDURE()
 BSOCollection.Construct     PROCEDURE()
     CODE
         SELF.ul     &= NEW(UnitsList)
+        SELF.tmpul  &=NEW(UnitsList)
         
 BSOCollection.Destruct      PROCEDURE()
-    CODE            
-        DISPOSE(SELF.ul)        
+    CODE         
+        DISPOSE(SELF.tmpul)
+        DISPOSE(SELF.ul)   
         
+BSOCollection.InsertNode    PROCEDURE
+tmpUnitName     STRING(100)
+CODE
+    ! insert a new node to the current collection
+        
+    tmpUnitName    = ''
+    LOOP 10 TIMES
+        tmpUnitName = CLIP(tmpUnitName) & CHR(RANDOM(97, 122))    
+    END
+    
+    IF RECORDS(SELF.ul) = 0 THEN
+        ! 1st records
+        SELF.ul.UnitName = tmpUnitName
+        SELF.ul.UnitType        = uTpy:notDefined
+        SELF.ul.UnitTypeCode    = ''
+        SELF.ul.Echelon     = echTpy:notDefined        
+        SELF.ul.IsHQ        = FALSE
+        SELF.ul.xPos = 1
+        SELF.ul.yPos = 1
+        SELF.ul.TreePos = 1
+        SELF.ul.markForDel      = FALSE
+        SELF.ul.markForDisbl    = FALSE
+        ADD(SELF.ul)
+        
+        SELF.selTreePos = 1     
+        SELF.maxTreePos = 1
+        SELF.selQueuePos    = 1              
+    ELSE
+        ! inside the queue
+        
+        ! increment Tree Position
+        SELF.selTreePos  = SELF.ul.TreePos + 1
+        IF SELF.selTreePos > SELF.maxTreePos THEN
+            SELF.maxTreePos = SELF.selTreePos
+        END
+        curentPos# = POINTER(SELF.ul)
+        allPos# = RECORDS(SELF.ul)
+        SELF.selQueuePos    = curentPos#
+        
+        ! prepare the new record
+        CLEAR(SELF.urec)
+        SELF.urec.TreePos   = SELF.selTreePos
+        SELF.urec.UnitName  = tmpUnitName
+        ! Unit Type, Echelon and  IsHQ are similare as the current ones
+        SELF.urec.UnitType  = SELF.ul.UnitType
+        SELF.urec.UnitTypeCode  = SELF.ul.UnitTypeCode
+        SELF.urec.Echelon   = SELF.ul.Echelon
+        SELF.urec.IsHQ      = SELF.ul.IsHQ
+        SELF.urec.xPos      = (SELF.urec.TreePos-1)*50 + 1
+        SELF.urec.yPos      = curentPos#*30 + 1
+        
+        ! move to temporary queue
+        ! move yPos
+        IF curentPos# < allPos# THEN
+            ! in the middle of queue
+            FREE(SELF.tmpul)       
+            LOOP i# = (curentPos#+1) TO allPos#
+                GET(SELF.ul, i#)
+                IF NOT ERRORCODE() THEN
+                    SELF.tmpul.TreePos = SELF.ul.TreePos
+                    SELF.tmpul.UnitName = SELF.ul.UnitName
+                    SELF.tmpul.UnitType = SELF.ul.UnitType
+                    SELF.tmpul.UnitTypeCode = SELF.ul.UnitTypeCode
+                    SELF.tmpul.Echelon  = SELF.ul.Echelon
+                    SELF.tmpul.xPos = SELF.ul.xPos
+                    SELF.tmpul.yPos = SELF.ul.yPos + 30
+                    ADD(SELF.tmpul)
+                END            
+            END
+            
+            ! add empty record
+            ADD(SELF.ul)        
+            
+            ! insert current record
+            GET(SELF.ul, curentPos#+1)
+            IF NOT ERRORCODE() THEN
+                SELF.ul.TreePos     = SELF.urec.TreePos
+                SELF.ul.UnitName    = SELF.urec.UnitName
+                SELF.ul.UnitType    = SELF.urec.UnitType
+                SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
+                SELF.ul.Echelon     = SELF.urec.Echelon
+                SELF.ul.xPos        = SELF.urec.xPos
+                SELF.ul.yPos        = SELF.urec.yPos
+                SELF.ul.markForDel  = FALSE
+                SELF.ul.markForDisbl    = FALSE
+                PUT(SELF.ul)
+            END
+            
+            ! copy back records
+            IF POINTER(SELF.tmpul)>0 THEN
+                j# = 0
+                LOOP i# = (curentPos#+2) TO RECORDS(SELF.ul)
+                    j# = j# + 1
+                    GET(SELF.ul, i#)
+                    IF NOT ERRORCODE() THEN
+                        GET(SELF.tmpul, j#)
+                        IF NOT ERRORCODE() THEN
+                            SELF.ul.TreePos     = SELF.tmpul.TreePos
+                            SELF.ul.UnitName    = SELF.tmpul.UnitName
+                            SELF.ul.UnitType    = SELF.tmpul.UnitType
+                            SELF.ul.UnitTypeCode    = SELF.tmpul.UnitTypeCode
+                            SELF.ul.Echelon     = SELF.tmpul.Echelon
+                            SELF.ul.xPos        = SELF.tmpul.xPos
+                            SELF.ul.yPos        = SELF.tmpul.yPos
+                            SELF.ul.markForDel  = FALSE
+                            SELF.ul.markForDisbl    = FALSE
+                            PUT(SELF.ul)
+                        END                    
+                    END            
+                END
+            END    
+            
+            ! current Position
+            GET(SELF.ul, curentPos# + 1)
+            IF NOT ERRORCODE() THEN
+                SELF.selTreePos = SELF.ul.TreePos
+            END
+            
+        ELSE
+            ! last on queue
+            SELF.ul.TreePos     = SELF.urec.TreePos
+            SELF.ul.UnitName    = SELF.urec.UnitName
+            SELF.ul.UnitType    = SELF.urec.UnitType
+            SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
+            SELF.ul.Echelon     = SELF.urec.Echelon
+            SELF.ul.xPos        = SELF.urec.xPos
+            SELF.ul.yPos        = SELF.urec.yPos
+            SELF.ul.markForDel  = FALSE
+            SELF.ul.markForDisbl    = FALSE
+            ADD(SELF.ul)                        
+        END                
+        
+        SELF.selQueuePos = POINTER(SELF.ul)      
+        SELF.selTreePos = SELF.ul.TreePos
+              
+    END        
+    
+    
+BSOCollection.InsertNode    PROCEDURE(*UnitBasicRecord pURec)
+tmpUnitName         STRING(100)
+CODE
+    ! do something
+    
+    tmpUnitName    = ''
+    LOOP 10 TIMES
+        tmpUnitName = CLIP(tmpUnitName) & CHR(RANDOM(97, 122))    
+    END
+    
+    IF RECORDS(SELF.ul) = 0 THEN
+        ! 1st records
+        SELF.ul.UnitName        = pUrec.UnitName
+        SELF.ul.UnitType        = pURec.UnitType
+        SELF.ul.UnitTypeCode    = pURec.UnitTypeCode
+        SELF.ul.Echelon         = pUrec.Echelon
+        SELF.ul.Hostility       = pUrec.Hostility
+        SELF.ul.IsHQ            = pUrec.IsHQ
+        SELF.ul.xPos            = 1
+        SELF.ul.yPos            = 1
+        SELF.ul.TreePos         = 1
+        SELF.ul.markForDel      = FALSE
+        SELF.ul.markForDisbl    = FALSE
+        ADD(SELF.ul)
+        
+        SELF.selTreePos = 1     
+        SELF.maxTreePos = 1
+        SELF.selQueuePos    = 1               
+    ELSE                
+        
+        ! inside the queue
+        
+        ! increment Tree Position
+        SELF.selTreePos  = SELF.ul.TreePos + 1
+        IF SELF.selTreePos > SELF.maxTreePos THEN
+            SELF.maxTreePos = SELF.selTreePos
+        END
+        curentPos# = POINTER(SELF.ul)
+        allPos# = RECORDS(SELF.ul)
+        SELF.selQueuePos    = curentPos#
+        
+        ! prepare the new record
+        CLEAR(SELF.urec)
+        SELF.urec.TreePos       = SELF.selTreePos
+        SELF.urec.UnitName      = pUrec.UnitName
+        ! Unit Type, Echelon and  IsHQ are similare as the current ones
+        SELF.urec.UnitType      = pUrec.UnitType
+        SELF.urec.UnitTypeCode  = pUrec.UnitTypeCode
+        SELF.urec.Echelon       = pUrec.Echelon
+        SELF.urec.Hostility     = pUrec.Hostility
+        SELF.urec.IsHQ          = pUrec.IsHQ
+        SELF.urec.xPos          = (SELF.urec.TreePos-1)*50 + 1
+        SELF.urec.yPos          = curentPos#*30 + 1
+        
+        ! move to temporary queue
+        ! move yPos
+        IF curentPos# < allPos# THEN
+            ! in the middle of queue
+            FREE(SELF.tmpul)       
+            LOOP i# = (curentPos#+1) TO allPos#
+                GET(SELF.ul, i#)
+                IF NOT ERRORCODE() THEN
+                    SELF.tmpul.TreePos      = SELF.ul.TreePos
+                    SELF.tmpul.UnitName     = SELF.ul.UnitName
+                    SELF.tmpul.UnitType     = SELF.ul.UnitType
+                    SELF.tmpul.UnitTypeCode = SELF.ul.UnitTypeCode
+                    SELF.tmpul.Echelon      = SELF.ul.Echelon
+                    SELF.tmpul.Hostility    = SELF.ul.Hostility
+                    SELF.tmpul.IsHQ         = SELF.ul.IsHQ
+                    SELF.tmpul.xPos         = SELF.ul.xPos
+                    SELF.tmpul.yPos         = SELF.ul.yPos + 30
+                    ADD(SELF.tmpul)
+                END            
+            END
+            
+            ! add empty record
+            ADD(SELF.ul)        
+            
+            ! insert current record
+            GET(SELF.ul, curentPos#+1)
+            IF NOT ERRORCODE() THEN
+                SELF.ul.TreePos     = SELF.urec.TreePos
+                SELF.ul.UnitName    = SELF.urec.UnitName
+                SELF.ul.UnitType    = SELF.urec.UnitType
+                SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
+                SELF.ul.Echelon     = SELF.urec.Echelon
+                SELF.ul.Hostility   = SELF.urec.Hostility
+                SELF.ul.xPos        = SELF.urec.xPos
+                SELF.ul.yPos        = SELF.urec.yPos
+                SELF.ul.markForDel  = FALSE
+                SELF.ul.markForDisbl    = FALSE
+                PUT(SELF.ul)
+            END
+            
+            ! copy back records
+            IF POINTER(SELF.tmpul)>0 THEN
+                j# = 0
+                LOOP i# = (curentPos#+2) TO RECORDS(SELF.ul)
+                    j# = j# + 1
+                    GET(SELF.ul, i#)
+                    IF NOT ERRORCODE() THEN
+                        GET(SELF.tmpul, j#)
+                        IF NOT ERRORCODE() THEN
+                            SELF.ul.TreePos     = SELF.tmpul.TreePos
+                            SELF.ul.UnitName    = SELF.tmpul.UnitName
+                            SELF.ul.UnitType    = SELF.tmpul.UnitType
+                            SELF.ul.UnitTypeCode    = SELF.tmpul.UnitTypeCode
+                            SELF.ul.Echelon     = SELF.tmpul.Echelon
+                            SELF.ul.Hostility   = SELF.tmpul.Hostility
+                            SELF.ul.xPos        = SELF.tmpul.xPos
+                            SELF.ul.yPos        = SELF.tmpul.yPos
+                            SELF.ul.markForDel  = FALSE
+                            SELF.ul.markForDisbl    = FALSE
+                            PUT(SELF.ul)
+                        END                    
+                    END            
+                END
+            END    
+            
+            ! current Position
+            GET(SELF.ul, curentPos# + 1)
+            IF NOT ERRORCODE() THEN
+                SELF.selTreePos = SELF.ul.TreePos
+            END
+            
+        ELSE
+            ! last on queue
+            SELF.ul.TreePos     = SELF.urec.TreePos
+            SELF.ul.UnitName    = SELF.urec.UnitName
+            SELF.ul.UnitType    = SELF.urec.UnitType
+            SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
+            SELF.ul.Echelon     = SELF.urec.Echelon
+            SELF.ul.Hostility   = SELF.urec.Hostility
+            SELF.ul.xPos        = SELF.urec.xPos
+            SELF.ul.yPos        = SELF.urec.yPos
+            SELF.ul.markForDel  = FALSE
+            SELF.ul.markForDisbl    = FALSE
+            ADD(SELF.ul)                        
+        END                
+        
+        SELF.selQueuePos = POINTER(SELF.ul)      
+        SELF.selTreePos = SELF.ul.TreePos        
+              
+    END        
+    
+    RETURN TRUE        
+        
+BSOCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
+    CODE
+        ! get current node
+    
+        GET(SELF.ul, SELF.selQueuePos)
+        IF NOT ERRORCODE() THEN
+            pUrec.UnitName          = SELF.ul.UnitName
+            pUrec.UnitType          = SELF.ul.UnitType
+            pUrec.UnitTypeCode      = SELF.ul.UnitTypeCode
+            pUrec.Echelon           = SELF.ul.Echelon
+            pURec.Hostility         = SELF.ul.Hostility
+            pUrec.IsHQ              = SELF.ul.IsHQ
+            pUrec.xPos              = SELF.ul.xPos
+            pUrec.yPos              = SELF.ul.yPos
+            pUrec.TreePos           = SELF.ul.TreePos
+            RETURN TRUE
+        ELSE
+            RETURN FALSE
+        END    
+        
+        
+BSOCollection.DeleteNode     PROCEDURE
+CODE
+    ! do something
+    
+    GET(SELF.ul, SELF.selQueuePos)
+    IF NOT ERRORCODE() THEN
+        ! Mark for deletion current record
+        currentTreePos# = SELF.ul.TreePos
+        SELF.ul.markForDel  = TRUE
+        PUT(SELF.ul)
+        !DELETE(SELF.ul)
+        
+        ! Mark for deletion all below records in deeper tree postions        
+        LOOP i# = POINTER(SELF.ul)+1 TO RECORDS(SELF.ul)
+            GET(SELF.ul, i#)
+            IF NOT ERRORCODE() THEN
+                IF SELF.ul.TreePos > currentTreePos# THEN
+                    SELF.ul.markForDel  = TRUE
+                    PUT(SELF.ul)                    
+                ELSE
+                    BREAK
+                END                
+            END            
+        END
+        
+    END
+
+    ! Remove all marked for deletion records
+    i# = 1
+    LOOP
+        GET(SELF.ul, i#)
+        IF NOT ERRORCODE() THEN
+            IF SELF.ul.markForDel = TRUE THEN
+                DELETE(SELF.ul)
+                IF ERRORCODE() THEN
+                    BREAK
+                END
+                i# = 1
+            ELSE
+                SELF.ul.yPos    = (POINTER(SELF.ul)-1)*30 + 1
+                PUT(SELF.ul)
+                i# = i# + 1
+            END            
+        ELSE
+            BREAK
+        END
+        
+    END                
+    
+BSOCollection.DisableNode    PROCEDURE
+CODE
+    ! do something
+    
+    GET(SELF.ul, SELF.selQueuePos)
+    IF NOT ERRORCODE() THEN
+        ! Mark for disableling for new drag&drop selection
+        SELF.ul.markForDisbl  = TRUE
+        PUT(SELF.ul)
+    END   
+    
+BSOCollection.SelUp     PROCEDURE
+CODE
+    ! do something
+    
+    IF SELF.selQueuePos>1 THEN
+        !SELF.DisplayUnselection()
+        !SELF.Redraw()
+        SELF.selQueuePos = SELF.selQueuePos-1
+        !SELF.DisplaySelection()
+    END
+    
+    
+BSOCollection.SelDown     PROCEDURE
+CODE
+    ! do something
+    
+    IF SELF.selQueuePos<RECORDS(SELF.ul) THEN
+        !SELF.DisplayUnselection()
+        !SELF.Redraw()
+        SELF.selQueuePos = SELF.selQueuePos+1
+        !SELF.DisplaySelection()
+    END
+    
+    
+BSOCollection.SelLeft     PROCEDURE
+CODE
+    ! do something
+        
+    
+BSOCollection.SelRight     PROCEDURE
+CODE
+    ! do something    
      
 C2IP.Construct      PROCEDURE()
     CODE
         ! initialize default objects    
-    SELF.ul     &= NEW(UnitsList)
-    SELF.tmpul  &= NEW(UnitsList)
+    !SELF.ul     &= NEW(UnitsList)
+    !SELF.tmpul  &= NEW(UnitsList)
+        SELF.ul     &= NEW(BSOCollection)
+        SELF.tmpul  &= NEW(BSOCollection)
     
     ! default C2IP Name
     SELF.Name   = ''
@@ -78,29 +480,6 @@ CODE
     LOOP i# = 1 TO RECORDS(SELF.ul)
         GET(SELF.ul, i#)
         IF NOT ERRORCODE() THEN    
-            
-            OMIT('__unitType')
-            ! Unit Type
-            CASE SELF.ul.UnitType
-            OF uTpy:infantry
-                ! Infantry
-                IF SELF.DrawNode_Infantry(FALSE) = TRUE THEN
-                END
-                
-                
-                !SELF.drwImg.Box(SELF.ul.xPos, SELF.ul.yPos, 50, 30, COLOR:Aqua) 
-                !SELF.drwImg.Line(SELF.ul.xPos, SELF.ul.yPos, 50, 30)
-                !SELF.drwImg.Line(SELF.ul.xPos, SELF.ul.yPos + 30, 50, -30)
-                !SELF.drwImg.Show(SELF.ul.xPos + 5, SELF.ul.yPos + 11, SELF.ul.UnitName)                
-            ELSE
-                ! Default
-                IF SELF.DrawNode_Default(FALSE) = TRUE THEN
-                END
-                
-                !SELF.drwImg.Box(SELF.ul.xPos, SELF.ul.yPos, 50, 30, COLOR:Aqua) 
-                !SELF.drwImg.Show(SELF.ul.xPos + 5, SELF.ul.yPos + 11, SELF.ul.UnitName)                
-            END    
-            __unitType
             
             ! Unit Type Code
             CASE CLIP(SELF.ul.UnitTypeCode)
@@ -1146,320 +1525,16 @@ CODE
     
     RETURN TRUE
     
-OrgChartC2IP.InsertNode     PROCEDURE
-CODE
-    ! do something
-    
-    SELF.DisplayUnselection()    
-    !SELF.Redraw()
-    
-    SELF.tmpUnitName    = ''
-    LOOP 10 TIMES
-        SELF.tmpUnitName = CLIP(SELF.tmpUnitName) & CHR(RANDOM(97, 122))    
-    END
-    
-    IF RECORDS(SELF.ul) = 0 THEN
-        ! 1st records
-        SELF.ul.UnitName = SELF.tmpUnitName
-        SELF.ul.UnitType        = uTpy:notDefined
-        SELF.ul.UnitTypeCode    = ''
-        SELF.ul.Echelon     = echTpy:notDefined        
-        SELF.ul.IsHQ        = FALSE
-        SELF.ul.xPos = 1
-        SELF.ul.yPos = 1
-        SELF.ul.TreePos = 1
-        SELF.ul.markForDel      = FALSE
-        SELF.ul.markForDisbl    = FALSE
-        ADD(SELF.ul)
-        
-        SELF.selTreePos = 1     
-        SELF.maxTreePos = 1
-        SELF.selQueuePos    = 1
-        
-        ASSERT(SELF.DrawNode(), 'OrgChartC2IP.InsertNode()->SELF.DrawNode()')        
-    ELSE
-        ! inside the queue
-        
-        ! increment Tree Position
-        SELF.selTreePos  = SELF.ul.TreePos + 1
-        IF SELF.selTreePos > SELF.maxTreePos THEN
-            SELF.maxTreePos = SELF.selTreePos
-        END
-        curentPos# = POINTER(SELF.ul)
-        allPos# = RECORDS(SELF.ul)
-        SELF.selQueuePos    = curentPos#
-        
-        ! prepare the new record
-        CLEAR(SELF.urec)
-        SELF.urec.TreePos   = SELF.selTreePos
-        SELF.urec.UnitName  = SELF.tmpUnitName
-        ! Unit Type, Echelon and  IsHQ are similare as the current ones
-        SELF.urec.UnitType  = SELF.ul.UnitType
-        SELF.urec.UnitTypeCode  = SELF.ul.UnitTypeCode
-        SELF.urec.Echelon   = SELF.ul.Echelon
-        SELF.urec.IsHQ      = SELF.ul.IsHQ
-        SELF.urec.xPos      = (SELF.urec.TreePos-1)*50 + 1
-        SELF.urec.yPos      = curentPos#*30 + 1
-        
-        ! move to temporary queue
-        ! move yPos
-        IF curentPos# < allPos# THEN
-            ! in the middle of queue
-            FREE(SELF.tmpul)       
-            LOOP i# = (curentPos#+1) TO allPos#
-                GET(SELF.ul, i#)
-                IF NOT ERRORCODE() THEN
-                    SELF.tmpul.TreePos = SELF.ul.TreePos
-                    SELF.tmpul.UnitName = SELF.ul.UnitName
-                    SELF.tmpul.UnitType = SELF.ul.UnitType
-                    SELF.tmpul.UnitTypeCode = SELF.ul.UnitTypeCode
-                    SELF.tmpul.Echelon  = SELF.ul.Echelon
-                    SELF.tmpul.xPos = SELF.ul.xPos
-                    SELF.tmpul.yPos = SELF.ul.yPos + 30
-                    ADD(SELF.tmpul)
-                END            
-            END
-            
-            ! add empty record
-            ADD(SELF.ul)        
-            
-            ! insert current record
-            GET(SELF.ul, curentPos#+1)
-            IF NOT ERRORCODE() THEN
-                SELF.ul.TreePos     = SELF.urec.TreePos
-                SELF.ul.UnitName    = SELF.urec.UnitName
-                SELF.ul.UnitType    = SELF.urec.UnitType
-                SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
-                SELF.ul.Echelon     = SELF.urec.Echelon
-                SELF.ul.xPos        = SELF.urec.xPos
-                SELF.ul.yPos        = SELF.urec.yPos
-                SELF.ul.markForDel  = FALSE
-                SELF.ul.markForDisbl    = FALSE
-                PUT(SELF.ul)
-            END
-            
-            ! copy back records
-            IF POINTER(SELF.tmpul)>0 THEN
-                j# = 0
-                LOOP i# = (curentPos#+2) TO RECORDS(SELF.ul)
-                    j# = j# + 1
-                    GET(SELF.ul, i#)
-                    IF NOT ERRORCODE() THEN
-                        GET(SELF.tmpul, j#)
-                        IF NOT ERRORCODE() THEN
-                            SELF.ul.TreePos     = SELF.tmpul.TreePos
-                            SELF.ul.UnitName    = SELF.tmpul.UnitName
-                            SELF.ul.UnitType    = SELF.tmpul.UnitType
-                            SELF.ul.UnitTypeCode    = SELF.tmpul.UnitTypeCode
-                            SELF.ul.Echelon     = SELF.tmpul.Echelon
-                            SELF.ul.xPos        = SELF.tmpul.xPos
-                            SELF.ul.yPos        = SELF.tmpul.yPos
-                            SELF.ul.markForDel  = FALSE
-                            SELF.ul.markForDisbl    = FALSE
-                            PUT(SELF.ul)
-                        END                    
-                    END            
-                END
-            END    
-            
-            ! current Position
-            GET(SELF.ul, curentPos# + 1)
-            IF NOT ERRORCODE() THEN
-                SELF.selTreePos = SELF.ul.TreePos
-            END
-            
-        ELSE
-            ! last on queue
-            SELF.ul.TreePos     = SELF.urec.TreePos
-            SELF.ul.UnitName    = SELF.urec.UnitName
-            SELF.ul.UnitType    = SELF.urec.UnitType
-            SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
-            SELF.ul.Echelon     = SELF.urec.Echelon
-            SELF.ul.xPos        = SELF.urec.xPos
-            SELF.ul.yPos        = SELF.urec.yPos
-            SELF.ul.markForDel  = FALSE
-            SELF.ul.markForDisbl    = FALSE
-            ADD(SELF.ul)                        
-        END                
 
-        ASSERT(SELF.DrawNode(), 'SELF.DrawNode()')        
-        
-        SELF.selQueuePos = POINTER(SELF.ul)      
-        SELF.selTreePos = SELF.ul.TreePos
-              
-    END
-    
-    SELF.Redraw()
-    
-    SELF.DisplaySelection()
-    
-    !SELF.Redraw()
     
     
     
-OrgChartC2IP.InsertNode     PROCEDURE(*UnitBasicRecord pURec)
-CODE
-    ! do something
-    
-    SELF.DisplayUnselection()        
-    
-    SELF.tmpUnitName    = ''
-    LOOP 10 TIMES
-        SELF.tmpUnitName = CLIP(SELF.tmpUnitName) & CHR(RANDOM(97, 122))    
-    END
-    
-    IF RECORDS(SELF.ul) = 0 THEN
-        ! 1st records
-        SELF.ul.UnitName        = pUrec.UnitName
-        SELF.ul.UnitType        = pURec.UnitType
-        SELF.ul.UnitTypeCode    = pURec.UnitTypeCode
-        SELF.ul.Echelon         = pUrec.Echelon
-        SELF.ul.Hostility       = pUrec.Hostility
-        SELF.ul.IsHQ            = pUrec.IsHQ
-        SELF.ul.xPos            = 1
-        SELF.ul.yPos            = 1
-        SELF.ul.TreePos         = 1
-        SELF.ul.markForDel      = FALSE
-        SELF.ul.markForDisbl    = FALSE
-        ADD(SELF.ul)
-        
-        SELF.selTreePos = 1     
-        SELF.maxTreePos = 1
-        SELF.selQueuePos    = 1
-        
-        ASSERT(SELF.DrawNode(), 'OrgChartC2IP.InsertNode()->SELF.DrawNode()')        
-    ELSE                
-        
-        ! inside the queue
-        
-        ! increment Tree Position
-        SELF.selTreePos  = SELF.ul.TreePos + 1
-        IF SELF.selTreePos > SELF.maxTreePos THEN
-            SELF.maxTreePos = SELF.selTreePos
-        END
-        curentPos# = POINTER(SELF.ul)
-        allPos# = RECORDS(SELF.ul)
-        SELF.selQueuePos    = curentPos#
-        
-        ! prepare the new record
-        CLEAR(SELF.urec)
-        SELF.urec.TreePos       = SELF.selTreePos
-        SELF.urec.UnitName      = pUrec.UnitName
-        ! Unit Type, Echelon and  IsHQ are similare as the current ones
-        SELF.urec.UnitType      = pUrec.UnitType
-        SELF.urec.UnitTypeCode  = pUrec.UnitTypeCode
-        SELF.urec.Echelon       = pUrec.Echelon
-        SELF.urec.Hostility     = pUrec.Hostility
-        SELF.urec.IsHQ          = pUrec.IsHQ
-        SELF.urec.xPos          = (SELF.urec.TreePos-1)*50 + 1
-        SELF.urec.yPos          = curentPos#*30 + 1
-        
-        ! move to temporary queue
-        ! move yPos
-        IF curentPos# < allPos# THEN
-            ! in the middle of queue
-            FREE(SELF.tmpul)       
-            LOOP i# = (curentPos#+1) TO allPos#
-                GET(SELF.ul, i#)
-                IF NOT ERRORCODE() THEN
-                    SELF.tmpul.TreePos      = SELF.ul.TreePos
-                    SELF.tmpul.UnitName     = SELF.ul.UnitName
-                    SELF.tmpul.UnitType     = SELF.ul.UnitType
-                    SELF.tmpul.UnitTypeCode = SELF.ul.UnitTypeCode
-                    SELF.tmpul.Echelon      = SELF.ul.Echelon
-                    SELF.tmpul.Hostility    = SELF.ul.Hostility
-                    SELF.tmpul.IsHQ         = SELF.ul.IsHQ
-                    SELF.tmpul.xPos         = SELF.ul.xPos
-                    SELF.tmpul.yPos         = SELF.ul.yPos + 30
-                    ADD(SELF.tmpul)
-                END            
-            END
-            
-            ! add empty record
-            ADD(SELF.ul)        
-            
-            ! insert current record
-            GET(SELF.ul, curentPos#+1)
-            IF NOT ERRORCODE() THEN
-                SELF.ul.TreePos     = SELF.urec.TreePos
-                SELF.ul.UnitName    = SELF.urec.UnitName
-                SELF.ul.UnitType    = SELF.urec.UnitType
-                SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
-                SELF.ul.Echelon     = SELF.urec.Echelon
-                SELF.ul.Hostility   = SELF.urec.Hostility
-                SELF.ul.xPos        = SELF.urec.xPos
-                SELF.ul.yPos        = SELF.urec.yPos
-                SELF.ul.markForDel  = FALSE
-                SELF.ul.markForDisbl    = FALSE
-                PUT(SELF.ul)
-            END
-            
-            ! copy back records
-            IF POINTER(SELF.tmpul)>0 THEN
-                j# = 0
-                LOOP i# = (curentPos#+2) TO RECORDS(SELF.ul)
-                    j# = j# + 1
-                    GET(SELF.ul, i#)
-                    IF NOT ERRORCODE() THEN
-                        GET(SELF.tmpul, j#)
-                        IF NOT ERRORCODE() THEN
-                            SELF.ul.TreePos     = SELF.tmpul.TreePos
-                            SELF.ul.UnitName    = SELF.tmpul.UnitName
-                            SELF.ul.UnitType    = SELF.tmpul.UnitType
-                            SELF.ul.UnitTypeCode    = SELF.tmpul.UnitTypeCode
-                            SELF.ul.Echelon     = SELF.tmpul.Echelon
-                            SELF.ul.Hostility   = SELF.tmpul.Hostility
-                            SELF.ul.xPos        = SELF.tmpul.xPos
-                            SELF.ul.yPos        = SELF.tmpul.yPos
-                            SELF.ul.markForDel  = FALSE
-                            SELF.ul.markForDisbl    = FALSE
-                            PUT(SELF.ul)
-                        END                    
-                    END            
-                END
-            END    
-            
-            ! current Position
-            GET(SELF.ul, curentPos# + 1)
-            IF NOT ERRORCODE() THEN
-                SELF.selTreePos = SELF.ul.TreePos
-            END
-            
-        ELSE
-            ! last on queue
-            SELF.ul.TreePos     = SELF.urec.TreePos
-            SELF.ul.UnitName    = SELF.urec.UnitName
-            SELF.ul.UnitType    = SELF.urec.UnitType
-            SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
-            SELF.ul.Echelon     = SELF.urec.Echelon
-            SELF.ul.Hostility   = SELF.urec.Hostility
-            SELF.ul.xPos        = SELF.urec.xPos
-            SELF.ul.yPos        = SELF.urec.yPos
-            SELF.ul.markForDel  = FALSE
-            SELF.ul.markForDisbl    = FALSE
-            ADD(SELF.ul)                        
-        END                
-
-        ASSERT(SELF.DrawNode(), 'SELF.DrawNode()')        
-        
-        SELF.selQueuePos = POINTER(SELF.ul)      
-        SELF.selTreePos = SELF.ul.TreePos        
-              
-    END
-    
-    SELF.Redraw()
-    
-    SELF.DisplaySelection()
-    
-    !SELF.Redraw()
-    
-    RETURN TRUE
     
     
     
 OrgChartC2IP.GetNode     PROCEDURE(*UnitBasicRecord pURec)
 CODE
-    ! do something
+    ! get current node
     
     GET(SELF.ul, SELF.selQueuePos)
     IF NOT ERRORCODE() THEN
@@ -1476,6 +1551,7 @@ CODE
     ELSE
         RETURN FALSE
     END    
+    
 OrgChartC2IP.DeleteNode     PROCEDURE
 CODE
     ! do something
