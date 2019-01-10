@@ -205,3 +205,9 @@ OrgChartLibrary.CLW
 OrgChartLibrary.INC
 obj/release/learnMil005.obj
 obj/release/learnMil_BC2.obj
+obj/release/learnMil005.obj
+obj/release/learnMil_BC2.obj
+UnitTests/map/release/UnitTests.MAP
+UnitTests/obj/release/UnitTests.lib
+UnitTests/obj/release/UnitTests.cwproj.FileList.xml
+UnitTests/UnitTests.exe

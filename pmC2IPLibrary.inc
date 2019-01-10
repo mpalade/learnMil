@@ -115,16 +115,39 @@ selQueuePos             LONG, PRIVATE
 Construct               PROCEDURE()
 Destruct                PROCEDURE()
 
+prepRndName             PROCEDURE(), STRING, PRIVATE
+prepFirstNode           PROCEDURE(), PRIVATE
+prepNewNode             PROCEDURE(), PRIVATE
 InsertNode              PROCEDURE
 InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
 GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
+GetNode                 PROCEDURE(), BOOl
 DeleteNode              PROCEDURE
 DisableNode             PROCEDURE
 
-SelUp                   PROCEDURE
-SelDown                 PROCEDURE
-SelLeft                 PROCEDURE
-SelRight                PROCEDURE
+SelUp                   PROCEDURE(), BOOL
+SelDown                 PROCEDURE(), BOOL
+SelLeft                 PROCEDURE(), BOOL
+SelRight                PROCEDURE(), BOOL
+
+Records                 PROCEDURE(), LONG
+Get                     PROCEDURE(LONG nPointer), BOOL
+UnitType                PROCEDURE(), LONG
+SetUnitType             PROCEDURE(LONG nUnitType), BOOL
+UnitTypeCode            PROCEDURE(), STRING
+SetUnitTypeCode         PROCEDURE(STRING sUnitTypeCode), BOOL
+Echelon                 PROCEDURE(), LONG
+SetEchelon              PROCEDURE(LONG nEchelon), BOOL
+xPos                    PROCEDURE(), LONG
+yPos                    PROCEDURE(), LONG
+Hostility               PROCEDURE(), LONG
+SetHostility            PROCEDURE(LONG nHostility), LONG
+markForDisbl            PROCEDURE(), BOOL
+isHQ                    PROCEDURE(), BOOL
+SetHQ                   PROCEDURE(BOOL bIsHQ), BOOL
+UnitName                PROCEDURE(), STRING
+SetUnitName             PROCEDURE(STRING sUnitName), BOOL
+TreePos                 PROCEDURE(), LONG
                     END
     
 
