@@ -542,19 +542,37 @@ CODE
                    
 BSOCollection.Records       PROCEDURE()        
     CODE
+        sst.Trace('BEGIN:BSOCollection.Records')
+        sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
+        sst.Trace('END:BSOCollection.Records')
         RETURN RECORDS(SELF.ul)
         
-BSOCollection.Get        PROCEDURE(LONG nPointer)
+BSOCollection.Pointer       PROCEDURE()
     CODE
-        GET(SELF.ul, nPointer)
+        sst.Trace('BEGIN:BSOCollection.Pointer')
+        sst.Trace('POINTER(SELF.ul) = ' & POINTER(SELF.ul))
+        sst.Trace('END:BSOCollection.Pointer')
+        RETURN POINTER(SELF.ul)
+        
+                                
+
+BSOCollection.Get        PROCEDURE()
+    CODE
+        sst.Trace('BEGIN:BSOCollection.Get()')
+        GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
-            RETURN TRUE
+            succes# = TRUE
         ELSE
-            RETURN FALSE
+            success# = FALSE
         END
+        sst.Trace('END:BSOCollection.Get')
+        RETURN success#
 
 BSOCollection.UnitTypeCode  PROCEDURE()
     CODE
+        sst.Trace('BEGIN:BSOCollection.UnitTypeCode')
+        sst.Trace('SELF.ul.UnitTypeCode = ' & SELF.ul.UnitTypeCode)
+        sst.Trace('END:BSOCollection.UnitTypeCode')
         RETURN SELF.ul.UnitTypeCode
         
 BSOCOllection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
@@ -574,14 +592,10 @@ BSOCOllection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
         
 BSOCollection.Echelon      PROCEDURE()        
     CODE
-        !RETURN SELF.ul.Echelon
-        
-        GET(SELF.ul, SELF.selQueuePos)
-        IF NOT ERRORCODE() THEN
-            RETURN SELF.ul.Echelon
-        ELSE
-            RETURN 0
-        END
+        sst.Trace('BEGIN:BSOCollection.Echelon')
+        sst.Trace('SELF.ul.Echelon = ' & SELF.ul.Echelon)
+        sst.Trace('END:BSOCollection.Echelon')
+        RETURN SELF.ul.Echelon                
 
 BSOCollection.SetEchelon    PROCEDURE(LONG nEchelon)
     CODE
@@ -610,12 +624,10 @@ BSOCollection.yPos  PROCEDURE()
         
 BSOCollection.Hostility     PROCEDURE()
     CODE
-        GET(SELF.ul, SELF.selQueuePos)
-        IF NOT ERRORCODE() THEN
-            RETURN SELF.ul.Hostility
-        ELSE
-            RETURN 0
-        END    
+        sst.Trace('BEGIN:BSOCollection.Hostility')
+        sst.Trace('SELF.ul.Hostility = ' & SELF.ul.Hostility)
+        sst.Trace('END:BSOCollection.Hostility')
+        RETURN SELF.ul.Hostility
         
 BSOCollection.SetHostility  PROCEDURE(LONG nHostility)
     CODE
@@ -641,12 +653,7 @@ BSOCollection.markForDisbl  PROCEDURE()
 BSOCollection.IsHQ  PROCEDURE()
     CODE
         ! do something
-        GET(SELF.ul, SELF.selQueuePos)
-        IF NOT ERRORCODE() THEN
-            RETURN SELF.ul.IsHQ
-        ELSE
-            RETURN FALSE
-        END   
+        RETURN SELF.ul.IsHQ
 
 BSOCollection.SetHQ PROCEDURE(BOOL bIsHQ)
     CODE
@@ -682,27 +689,8 @@ BSOCollection.SetUnitName   PROCEDURE(STRING sUnitName)
         ELSE
             RETURN FALSE
         END
-        
-        
-BSOCollection.UnitType      PROCEDURE
-    CODE
-        RETURN SELF.ul.UnitType
-        
-BSOCollection.SetUnitType   PROCEDURE(LONG nUnitType)
-    CODE
-        GET(SELF.ul, SELF.selQueuePos)
-        IF NOT ERRORCODE() THEN
-            SELF.ul.UnitType    = nUnitType        
-            PUT(SELF.ul)
-            IF NOT ERRORCODE() THEN
-                RETURN TRUE             
-            ELSE
-                RETURN FALSE            
-        END        
-        ELSE
-            RETURN FALSE
-        END    
-        
+               
+                
 BSOCollection.TreePos       PROCEDURE
     CODE
         RETURN SELF.ul.TreePos
@@ -746,15 +734,20 @@ OrgChartC2IP.Construct     PROCEDURE()
 OrgChartC2IP.Redraw PROCEDURE()
 nCurrentUnitType    LONG
 CODE
-    ! do something
+    ! redraw OrgChar C2IP content
+    sst.Trace('BEGIN:OrgChartC2IP.Redraw')
     
     SELF.drwImg.Blank(COLOR:White)
     SELF.drwImg.Setpencolor(COLOR:Black)
     SELF.drwImg.SetPenWidth(1)
     
-    LOOP i# = 1 TO SELF.ul.Records()
-        IF SELF.ul.Get(i#) THEN
+    sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
+    LOOP i# = 1 TO RECORDS(SELF.ul)
+        GET(SELF.ul.ul, i#)
+        sst.Trace('i# = ' & i#)
+        IF NOT ERRORCODE() THEN
             ! Unit Type Code
+            sst.Trace('! Unit Type Code = ' & CLIP(SELF.ul.UnitTypeCode()) )
             CASE CLIP(SELF.ul.UnitTypeCode())
             OF '120300'
                 ! Amphibious
@@ -1070,6 +1063,7 @@ CODE
     END
     
     SELF.drwImg.Display()
+    sst.Trace('END:OrgChartC2IP.Redraw')
     
 
 OrgChartC2IP.DrawNode       PROCEDURE(LONG nUnitType=0)
@@ -1099,53 +1093,58 @@ CODE
 !OrgChartC2IP.DrawNode_*.*
 OrgChartC2IP.DrawNode_Default       PROCEDURE(BOOL bAutoDisplay)
 nFillColor      LONG
-CODE
-    SELF.drwImg.Setpencolor(COLOR:Black)
-    SELF.drwImg.SetPenWidth(1)
+    CODE
+        sst.Trace('BEGIN:OrgChartC2IP.DrawNode_Default')
+        SELF.drwImg.Setpencolor(COLOR:Black)
+        SELF.drwImg.SetPenWidth(1)
+        
+        ! Fill color depending on Hostility
+        sst.Trace('SELF.ul.Hostility() = ' & SELF.ul.Hostility())
+        CASE SELF.ul.Hostility()
+        OF hTpy:Unknown
+            ! yellow
+            nFillColor  = COLOR:Unknown
+        OF hTpy:AssumedFriend
+            ! blue
+            nFillColor  = COLOR:AssumedFriend
+        OF hTpy:Friend
+            ! blue
+            nFillColor  = COLOR:Friend
+        OF hTpY:Neutral
+            ! green
+            nFillColor  = COLOR:Neutral
+        OF hTpy:Suspect
+            ! red
+            nFillColor  = COLOR:Suspect
+        OF hTpy:Hostile
+            ! red
+            nFillColor  = COLOR:Hostile        
+        ELSE
+            nFillColor  = COLOR:Unknown
+        END            
+        
+        ! Fill color depeding on Enable/Disable status for new drag&drop selections
+        sst.Trace('SELF.ul.markForDisbl() = ' & SELF.ul.markForDisbl())
+        IF SELF.ul.markForDisbl() = TRUE THEN
+            ! Display as unable for newer selections
+            nFillColor  = COLOR:NodeDisabled    
+        END    
+        SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
+        SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())   
+        
+        sst.Trace('SELF.ul.IsHQ() = ' & SELF.ul.IsHQ())
+        IF SELF.ul.IsHQ() THEN
+            ! Is HQ
+            SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 0, 10)
+        END
+        
+        sst.Trace('bAutoDisplay = ' & bAutoDisplay)
+        IF bAutoDisplay THEN
+            SELF.drwImg.Display()
+        END
     
-    ! Fill color depending on Hostility
-    CASE SELF.ul.Hostility()
-    OF hTpy:Unknown
-        ! yellow
-        nFillColor  = COLOR:Unknown
-    OF hTpy:AssumedFriend
-        ! blue
-        nFillColor  = COLOR:AssumedFriend
-    OF hTpy:Friend
-        ! blue
-        nFillColor  = COLOR:Friend
-    OF hTpY:Neutral
-        ! green
-        nFillColor  = COLOR:Neutral
-    OF hTpy:Suspect
-        ! red
-        nFillColor  = COLOR:Suspect
-    OF hTpy:Hostile
-        ! red
-        nFillColor  = COLOR:Hostile        
-    ELSE
-        nFillColor  = COLOR:Unknown
-    END            
-    
-    ! Fill color depeding on Enable/Disable status for new drag&drop selections
-    IF SELF.ul.markForDisbl() = TRUE THEN
-        ! Display as unable for newer selections
-        nFillColor  = COLOR:NodeDisabled    
-    END    
-    SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
-    SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())   
-    
-    IF SELF.ul.IsHQ() THEN
-        ! Is HQ
-        SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 0, 10)
-    END
-    
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    
-    RETURN TRUE      
+        sst.Trace('END:OrgChartC2IP.DrawNode_Default')
+        RETURN TRUE      
     
 OrgChartC2IP.Draw_innerSine PROCEDURE()
     CODE
@@ -1821,10 +1820,10 @@ OrgChartC2IP.GetNode     PROCEDURE(*UnitBasicRecord pURec)
 CODE
     ! get current node
     
-    GET(SELF.ul, SELF.selQueuePos)
+    GET(SELF.ul.ul, SELF.selQueuePos)
     IF NOT ERRORCODE() THEN
         pUrec.UnitName          = SELF.ul.UnitName()
-        pUrec.UnitType          = SELF.ul.UnitType()
+        !pUrec.UnitType          = SELF.ul.UnitType()
         pUrec.UnitTypeCode      = SELF.ul.UnitTypeCode()
         pUrec.Echelon           = SELF.ul.Echelon()
         pURec.Hostility         = SELF.ul.Hostility()
@@ -1958,14 +1957,14 @@ CODE
     END
     SELF.DisplaySelection()
     
-    OMIT('__reeeng')
+    OMIT('__reeng')
     IF SELF.selQueuePos<RECORDS(SELF.ul) THEN
         SELF.DisplayUnselection()
         !SELF.Redraw()
         SELF.selQueuePos = SELF.selQueuePos+1
         SELF.DisplaySelection()
     END
-    __reeeng
+    __reeng
     
     
 OrgChartC2IP.SelLeft     PROCEDURE
@@ -1985,10 +1984,20 @@ CODE
 OrgChartC2IP.SelectByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
 CODE
     ! do something
+    sst.Trace('BEGIN:OrgChartC2IP.SelectByMouse')
+    
+    curSel# = SELF.ul.Pointer()
+    IF SELF.ul.SelectByMouse(nXPos, nYPos) = TRUE THEN
+        SELF.DisplayUnselection()
+        SELF.selTreePos     = SELF.ul.TreePos()
+        SELF.selQueuePos    = SELF.ul.Pointer()
+        SELF.DisplaySelection()
+    END
+    
     
     unitFound# = FALSE
     LOOP i# = 1 TO RECORDS(SELF.ul)
-        GET(SELF.ul, i#)
+        GET(SELF.ul.ul, i#)
         IF NOT ERRORCODE() THEN
             IF (SELF.ul.xPos() < nXPos) AND (nXPos < SELF.ul.xPos() + 50) THEN
                 IF (SELF.ul.yPos() < nYPos) AND (nYPos < SELF.ul.yPos() + 30) THEN
@@ -2004,6 +2013,7 @@ CODE
         END
     END
     
+    sst.Trace('END:OrgChartC2IP.SelectByMouse')
     RETURN unitFound#
     
     
@@ -2029,8 +2039,7 @@ CODE
 OrgChartC2IP.GetUnitName     PROCEDURE
 CODE
     ! do something
-    GET(SELF.ul, SELF.selQueuePos)
-    IF NOT ERRORCODE() THEN
+    IF SELF.ul.Get() = TRUE THEN
         RETURN SELF.ul.UnitName()
     ELSE
         RETURN ''
@@ -2039,8 +2048,7 @@ CODE
 OrgChartC2IP.SetUnitName     PROCEDURE(STRING sUnitName)
 CODE
     ! do something
-    GET(SELF.ul, SELF.selQueuePos)
-    IF NOT ERRORCODE() THEN
+    IF SELF.ul.Get() = TRUE THEN
         IF SELF.ul.SetUnitName(sUnitName) = TRUE THEN
             SELF.Redraw()
             SELF.DisplaySelection()          
@@ -2048,30 +2056,19 @@ CODE
         ELSE
             RETURN FALSE            
         END
-        
-    ELSE
-        RETURN FALSE
-    END    
-    
-OrgChartC2IP.GetUnitType     PROCEDURE
-CODE
-    ! do something
-    RETURN SELF.ul.UnitType()
-    
-OrgChartC2IP.SetUnitType     PROCEDURE(LONG nUnitType)
-CODE
-    ! do something
-    IF SELF.ul.SetUnitType(nUnitType) = TRUE THEN
-        SELF.Redraw()
-        SELF.DisplaySelection()
-        RETURN TRUE
     ELSE
         RETURN FALSE
     END
     
-    
-   
-    
+OrgChartC2IP.GetUnitTypeCode    PROCEDURE
+    CODE
+        IF SELF.ul.Get() = TRUE THEN
+            RETURN SELF.ul.UnitTypeCode()
+        ELSE
+            RETURN ''
+        END    
+        
+           
 OrgChartC2IP.SetUnitTypeCode     PROCEDURE(STRING sUnitTypeCode)
 CODE
     ! do something

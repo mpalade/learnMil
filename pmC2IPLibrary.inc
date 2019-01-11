@@ -141,9 +141,10 @@ SelLeft                 PROCEDURE(), BOOL
 SelRight                PROCEDURE(), BOOL
 
 Records                 PROCEDURE(), LONG
-Get                     PROCEDURE(LONG nPointer), BOOL
-UnitType                PROCEDURE(), LONG
-SetUnitType             PROCEDURE(LONG nUnitType), BOOL
+Pointer                 PROCEDURE(), LONG
+Get                     PROCEDURE(), BOOL
+UnitName                PROCEDURE(), STRING
+SetUnitName             PROCEDURE(STRING sUnitName), BOOL
 UnitTypeCode            PROCEDURE(), STRING
 SetUnitTypeCode         PROCEDURE(STRING sUnitTypeCode), BOOL
 Echelon                 PROCEDURE(), LONG
@@ -155,8 +156,6 @@ SetHostility            PROCEDURE(LONG nHostility), LONG
 markForDisbl            PROCEDURE(), BOOL
 isHQ                    PROCEDURE(), BOOL
 SetHQ                   PROCEDURE(BOOL bIsHQ), BOOL
-UnitName                PROCEDURE(), STRING
-SetUnitName             PROCEDURE(STRING sUnitName), BOOL
 TreePos                 PROCEDURE(), LONG
                     END
     
@@ -278,8 +277,7 @@ Destruct                PROCEDURE
 GetUnitName             PROCEDURE(), STRING
 SetUnitName             PROCEDURE(STRING sUnitName), LONG
 
-GetUnitType             PROCEDURE(), STRING
-SetUnitType             PROCEDURE(LONG nUnitType), LONG
+GetUnitTypeCode         PROCEDURE(), STRING
 SetUnitTypeCode         PROCEDURE(STRING sUnitTypeCode), LONG
 
 GetEchelon              PROCEDURE(), LONG
