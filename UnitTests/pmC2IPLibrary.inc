@@ -1,9 +1,3 @@
-aClass              CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
-aValue                  LONG
-aProcedure              PROCEDURE
-bProcedure              PROCEDURE(LONG)
-                    END
-
 ! Unit Types Equates
 uTpy:notDefined     EQUATE(1000)
 uTpy:infantry       EQUATE(1001)
@@ -46,6 +40,11 @@ COLOR:Hostile       EQUATE(COLOR:Red)
 ! Disable for selection color
 COLOR:NodeDisabled  EQUATE(COLOR:Gray)
 
+! entry fields
+!?uNameEntry         EQUATE(900)
+!?uTypeList          EQUATE(901)
+!?uHQ                EQUATE(902)
+!?ListSymbology      EQUATE(903)
 
 ! Units Queue Structure
 UnitsList           QUEUE, TYPE
@@ -75,23 +74,12 @@ yPos                        LONG
 TreePos                     LONG
                     END
 
-
 ! Reference C2IPs Queue Structure
 C2IPsList           QUEUE, TYPE
 C2IPPath                STRING(100)
 C2IPName                STRING(100)
                     END
-! JSON objects
 
-json        JSONClass
-collection  &JSONClass
-! entry fields
-
-?uNameEntry         EQUATE(900)
-?uTypeList          EQUATE(901)
-?uHQ                EQUATE(902)
-
-?ListSymbology      EQUATE(903)
 
 BSO                 CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 urec                    GROUP(UnitBasicRecord)
@@ -115,6 +103,15 @@ selQueuePos             LONG, PRIVATE
 Construct               PROCEDURE()
 Destruct                PROCEDURE()
 
+prepRndName             PROCEDURE(), STRING, PRIVATE
+insertFirstNode         PROCEDURE(), PRIVATE
+prepNewNode             PROCEDURE(LONG nPosition), PRIVATE
+moveNodesToTmp          PROCEDURE(LONG nStartPos, LONG nEndPos), PRIVATE
+moveNodesBackFromTmp    PROCEDURE(LONG nStartPos), PRIVATE
+addEmptyNode            PROCEDURE(), PRIVATE
+insertCurrentPrepNode   PROCEDURE(LONG nPosition), PRIVATE
+insertLastNode          PROCEDURE(), PRIVATE
+
 InsertNode              PROCEDURE
 InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
 GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
@@ -128,9 +125,10 @@ SelLeft                 PROCEDURE(), BOOL
 SelRight                PROCEDURE(), BOOL
 
 Records                 PROCEDURE(), LONG
-Get                     PROCEDURE(LONG nPointer), BOOL
-UnitType                PROCEDURE(), LONG
-SetUnitType             PROCEDURE(LONG nUnitType), BOOL
+Pointer                 PROCEDURE(), LONG
+Get                     PROCEDURE(), BOOL
+UnitName                PROCEDURE(), STRING
+SetUnitName             PROCEDURE(STRING sUnitName), BOOL
 UnitTypeCode            PROCEDURE(), STRING
 SetUnitTypeCode         PROCEDURE(STRING sUnitTypeCode), BOOL
 Echelon                 PROCEDURE(), LONG
@@ -142,9 +140,9 @@ SetHostility            PROCEDURE(LONG nHostility), LONG
 markForDisbl            PROCEDURE(), BOOL
 isHQ                    PROCEDURE(), BOOL
 SetHQ                   PROCEDURE(BOOL bIsHQ), BOOL
-UnitName                PROCEDURE(), STRING
-SetUnitName             PROCEDURE(STRING sUnitName), BOOL
 TreePos                 PROCEDURE(), LONG
+
+SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
     
 
@@ -188,6 +186,7 @@ nEchelon                LONG, PRIVATE
 
 
 Construct               PROCEDURE                           
+Destruct                PROCEDURE
 
 Redraw                  PROCEDURE, PRIVATE
 DrawNode                PROCEDURE(LONG nUnitType=0), LONG, PRIVATE
@@ -251,7 +250,9 @@ DeleteNode              PROCEDURE
 DisableNode             PROCEDURE
 
 DisplaySelection        PROCEDURE, PRIVATE
+DisplaySelection        PROCEDURE(LONG nXPos, LONG nYPos), PRIVATE
 DisplayUnselection      PROCEDURE, PRIVATE
+DisplayUnselection      PROCEDURE(LONG nXPos, LONG nYPos), PRIVATE
 
 SelUp                   PROCEDURE
 SelDown                 PROCEDURE
@@ -260,13 +261,12 @@ SelRight                PROCEDURE
 
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 Unselect                PROCEDURE(), LONG
-Destruct                PROCEDURE
+
 
 GetUnitName             PROCEDURE(), STRING
 SetUnitName             PROCEDURE(STRING sUnitName), LONG
 
-GetUnitType             PROCEDURE(), STRING
-SetUnitType             PROCEDURE(LONG nUnitType), LONG
+GetUnitTypeCode         PROCEDURE(), STRING
 SetUnitTypeCode         PROCEDURE(STRING sUnitTypeCode), LONG
 
 GetEchelon              PROCEDURE(), LONG

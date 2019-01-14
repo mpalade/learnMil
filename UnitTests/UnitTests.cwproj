@@ -7,6 +7,9 @@
     <RootNamespace>UnitTests</RootNamespace>
     <AssemblyName>UnitTests</AssemblyName>
     <OutputName>UnitTests</OutputName>
+    <DefineConstants>DrawLinkMode=&gt;1%3bDrawDllMode=&gt;0%3bDrawImage=&gt;0%3bjFilesLinkMode=&gt;1%3bjFilesDllMode=&gt;0%3bStringTheoryLinkMode=&gt;1%3bStringTheoryDllMode=&gt;0%3bMD5=&gt;0%3b_ABCDllMode_=&gt;0%3b_ABCLinkMode_=&gt;1%3basserts=&gt;on</DefineConstants>
+    <stack_size>16384</stack_size>
+    <CopyCore>True</CopyCore>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>True</DebugSymbols>
@@ -21,10 +24,24 @@
     <vid>off</vid>
     <check_stack>False</check_stack>
     <check_index>False</check_index>
+    <warnings>on</warnings>
+    <GenerateMap>True</GenerateMap>
+    <line_numbers>False</line_numbers>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="pmC2IPLibrary.clw" />
     <Compile Include="UnitTests.clw" />
+    <Compile Include="UT_BSOCollection.clw" />
+    <None Include="cs_libpng.dll" />
+    <None Include="FreeImage.dll" />
+    <None Include="pmC2IPLibrary.inc" />
+    <None Include="UT_BSOCollection.inc" />
+    <None Include="zlib.dll" />
+    <None Include="zlibwapi.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <FileDriver Include="DOS" />
+    <FileDriver Include="TOPSPEED" />
   </ItemGroup>
   <Import Project="$(ClarionBinPath)\SoftVelocity.Build.Clarion.targets" />
 </Project>

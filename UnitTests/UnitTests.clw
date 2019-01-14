@@ -13,6 +13,7 @@ StringTheory:TemplateVersion        equate('2.58')
     include('StringTheory.Inc'),ONCE
 
     INCLUDE('pmC2IPLibrary.inc'), ONCE
+    INCLUDE('UT_BSOCollection.inc'), ONCE
 
 
 OMIT('***')
@@ -24,7 +25,19 @@ OMIT('***')
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  ***
 
-  MAP
+                    MAP
+
+HelloWorld              PROCEDURE
+
   END
 
-  CODE
+
+testBSOCollection   UT_BSOCollection
+    CODE
+        HelloWorld()
+        testBSOCollection.InsertNode()
+        
+        
+HelloWorld          PROCEDURE
+    CODE
+        MESSAGE('Hello World')
