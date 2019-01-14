@@ -1,4 +1,54 @@
-    MEMBER('learnmil.clw')
+    MEMBER('learnMil')
+
+
+! Unit Types Equates
+uTpy:notDefined     EQUATE(1000)
+uTpy:infantry       EQUATE(1001)
+
+! Echelon Equates
+echTpy:notDefined   EQUATE(1100)
+echTpy:Team         EQUATE(1101)
+echTpy:Squad        EQUATE(1102)
+echTpy:Section      EQUATE(1103)
+echTpy:Platoon      EQUATE(1104)
+echTpy:Company      EQUATE(1105)
+echTpy:Battalion    EQUATE(1106)
+echTpy:Regiment     EQUATE(1107)
+echTpy:Brigade      EQUATE(1108)
+echTpy:Division     EQUATE(1109)
+echTpy:Corps        EQUATE(1110)
+echTpy:Army         EQUATE(1111)
+echTpy:ArmyGroup    EQUATE(1112)
+echTpy:Theater      EQUATE(1113)
+echTpy:Command      EQUATE(1114)
+
+! Hostility Equates
+hTpy:notDefined     EQUATE(1500)
+hTpy:Unknown        EQUATE(1501)
+hTpy:AssumedFriend  EQUATE(1502)
+hTpy:Friend         EQUATE(1503)
+hTpy:Neutral        EQUATE(1504)
+hTpy:Suspect        EQUATE(1505)
+hTpy:Hostile        EQUATE(1506)
+
+! Hostility Color
+COLOR:notDefined    EQUATE(COLOR:Yellow)
+COLOR:Unknown       EQUATE(COLOR:Yellow)
+COLOR:AssumedFriend EQUATE(COLOR:Aqua)
+COLOR:Friend        EQUATE(COLOR:Aqua)
+COLOR:Neutral       EQUATE(COLOR:Green)
+COLOR:Suspect       EQUATE(COLOR:Red)
+COLOR:Hostile       EQUATE(COLOR:Red)
+
+! Disable for selection color
+COLOR:NodeDisabled  EQUATE(COLOR:Gray)
+
+! entry fields
+!?uNameEntry         EQUATE(900)
+!?uTypeList          EQUATE(901)
+!?uHQ                EQUATE(902)
+!?ListSymbology      EQUATE(903)
+
 
     MAP
     END
@@ -6,17 +56,14 @@
     INCLUDE('Equates.CLW'),ONCE
     INCLUDE('pmC2IPLibrary.INC'),ONCE
 
-aClass.aProcedure   PROCEDURE()
-localV                  LONG
-    CODE
-        localV  = 5
-        SELF.aValue =localV
-        MESSAGE('value = ' & SELF.aValue)
-        
-        
-aClass.bProcedure    PROCEDURE(LONG nPrm)
-    CODE
-        SELF.aValue = nPrm
+! Local objects
+
+! JSON objects
+json                JSONClass
+collection          &JSONClass
+
+! string theory objects
+sst                 stringtheory
         
 BSO.Construct       PROCEDURE()
     CODE
@@ -694,6 +741,25 @@ BSOCollection.SetUnitName   PROCEDURE(STRING sUnitName)
 BSOCollection.TreePos       PROCEDURE
     CODE
         RETURN SELF.ul.TreePos
+        
+        
+BSOCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)        
+    CODE
+        LOOP i# = 1 TO RECORDS(SELF.ul)
+            GET(SELF.ul, i#)
+            IF NOT ERRORCODE() THEN
+                IF (SELF.ul.xPos < nXPos) AND (nXPos < SELF.ul.xPos + 50) THEN
+                    IF (SELF.ul.yPos < nYPos) AND (nYPos < SELF.ul.yPos + 30) THEN
+                        ! found Unit selection
+                        SELF.selTreePos     = SELF.ul.TreePos
+                        SELF.selQueuePos    = i#
+                        RETURN i#
+                    END                
+                END            
+            END
+        END
+        
+        RETURN 0
         
      
 C2IP.Construct      PROCEDURE()
@@ -1804,8 +1870,10 @@ CODE
     
 OrgChartC2IP.InsertNode     PROCEDURE
     CODE
+        SELF.DisplayUnselection()
         SELF.ul.InsertNode()
         SELF.Redraw()
+        SELF.DisplaySelection()
         
 OrgChartC2IP.InsertNode     PROCEDURE(*UnitBasicRecord pURec)
     CODE
@@ -1915,19 +1983,31 @@ CODE
 OrgChartC2IP.DisplaySelection     PROCEDURE
 CODE
     ! display SELECTION frame (red) for the current selection
+    sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection')
     IF SELF.ul.GetNode() = TRUE THEN
         SELF.drwImg.Setpencolor(COLOR:Red)
         SELF.drwImg.SetPenWidth(3)
         SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(),50,30)
-        SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())
+        !SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())
         SELF.drwImg.Display()
     END
+    sst.Trace('END:OrgChartC2IP.DisplaySelection')
+    
+OrgChartC2IP.DisplaySelection       PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection(' & nXPos & ', ' & nYPos & ')')
+        SELF.drwImg.Setpencolor(COLOR:Red)
+        SELF.drwImg.SetPenWidth(3)
+        SELF.drwImg.Box(nXPos, nYPos,50,30)        
+        SELF.drwImg.Display()
+        sst.Trace('END:OrgChartC2IP.DisplaySelection')
+        
     
     
 OrgChartC2IP.DisplayUnselection     PROCEDURE
 CODE
     ! display NORMAL frame (black) for the current selection
-    
+    sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection')
     IF SELF.ul.GetNode() = TRUE THEN
         SELF.drwImg.Setpencolor(COLOR:White)
         SELF.drwImg.SetPenWidth(3)
@@ -1937,6 +2017,20 @@ CODE
         SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(),50,30)
         SELF.drwImg.Display()
     END
+    sst.Trace('END:OrgChartC2IP.DisplayUnselection')
+    
+OrgChartC2IP.DisplayUnselection     PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection (' & nXPos & ', ' & nYPos & ')')
+        SELF.drwImg.Setpencolor(COLOR:White)
+        SELF.drwImg.SetPenWidth(3)
+        SELF.drwImg.Box(nXPos, nYPos,50,30)
+        SELF.drwImg.Setpencolor(COLOR:Black)
+        SELF.drwImg.SetPenWidth(1)
+        SELF.drwImg.Box(nXPos, nYPos,50,30)
+        SELF.drwImg.Display()
+        sst.Trace('END:OrgChartC2IP.DisplayUnselection')
+        
     
 OrgChartC2IP.SelUp     PROCEDURE
 CODE
@@ -1986,40 +2080,30 @@ CODE
     ! do something
     sst.Trace('BEGIN:OrgChartC2IP.SelectByMouse')
     
-    curSel# = SELF.ul.Pointer()
-    IF SELF.ul.SelectByMouse(nXPos, nYPos) = TRUE THEN
-        SELF.DisplayUnselection()
+    curSel#     = SELF.ul.Pointer()
+    curXPos#    = SELF.ul.xPos()
+    curYPos#    = SELF.ul.yPos()
+        
+    nodeFoundPos#   = SELF.ul.SelectByMouse(nXPos, nYPos)
+    IF nodeFoundPos# > 0 THEN
+        sst.Trace('node found')
+        sst.Trace('curSel# = ' & curSel#)
+        sst.Trace('curXPos# = ' & curXPos#)
+        sst.Trace('curYPos# = ' & curYPos#)
+        SELF.DisplayUnselection(curXPos#, curYPos#)
+        
         SELF.selTreePos     = SELF.ul.TreePos()
         SELF.selQueuePos    = SELF.ul.Pointer()
         SELF.DisplaySelection()
     END
-    
-    
-    unitFound# = FALSE
-    LOOP i# = 1 TO RECORDS(SELF.ul)
-        GET(SELF.ul.ul, i#)
-        IF NOT ERRORCODE() THEN
-            IF (SELF.ul.xPos() < nXPos) AND (nXPos < SELF.ul.xPos() + 50) THEN
-                IF (SELF.ul.yPos() < nYPos) AND (nYPos < SELF.ul.yPos() + 30) THEN
-                    ! found Unit selection
-                    unitFound# = TRUE
-                    SELF.DisplayUnselection()
-                    SELF.selTreePos     = SELF.ul.TreePos()
-                    SELF.selQueuePos    = i#
-                    SELF.DisplaySelection()
-                    BREAK
-                END                
-            END            
-        END
-    END
-    
+                
     sst.Trace('END:OrgChartC2IP.SelectByMouse')
-    RETURN unitFound#
-    
-    
-    
-    
-    
+    IF nodeFoundPos# > 0 THEN
+        RETURN TRUE
+    ELSE
+        RETURN FALSE
+    END
+        
 OrgChartC2IP.Unselect     PROCEDURE()
 CODE
     ! do something
@@ -2274,19 +2358,18 @@ CODE
     CASE nOption
     OF 1
         ! Unit Name
-        CREATE(?uNameEntry, CREATE:entry)
-        SELF.uNameEntry = ''
-        ?uNameEntry{PROP:use} = SELF.uNameEntry
-        ?uNameEntry{PROP:text} = '@s100'
-        ?uNameEntry{PROP:Xpos} = 30
-        ?uNameEntry{PROP:Ypos} = 200
-        !?uNameEntry{PROP:
-        UNHIDE(?uNameEntry)
-        SELECT(?uNameEntry)
+!        CREATE(?uNameEntry, CREATE:entry)
+!        SELF.uNameEntry = ''
+!        ?uNameEntry{PROP:use} = SELF.uNameEntry
+!        ?uNameEntry{PROP:text} = '@s100'
+!        ?uNameEntry{PROP:Ypos} = 200
+!        !?uNameEntry{PROP:
+!        UNHIDE(?uNameEntry)
+!        SELECT(?uNameEntry)
     OF 2
-        ! Unit Type        
-        UNHIDE(?ListSymbology)
-        SELECT(?ListSymbology)
+!        ! Unit Type        
+!        UNHIDE(?ListSymbology)
+!        SELECT(?ListSymbology)
     OF 3
         ! Echelon
         IF SELF.TakeEchelon(POPUP(SELF.EchelonMenuOptions())) = TRUE THEN
@@ -2297,14 +2380,14 @@ CODE
         END        
     OF 5
         ! HQ
-        CREATE(?uHQ, CREATE:check)
-        ?uHQ{PROP:Use} = SELF.bIsHQEntry
-        ?uHQ{PROP:TrueValue} = TRUE
-        ?uHQ{PROP:FalseValue} = FALSE
-        ?uHQ{PROP:XPos} = 30
-        ?uHQ{PROP:Ypos} = 200
-        UNHIDE(?uHQ)
-        SELECT(?uHQ)
+!        CREATE(?uHQ, CREATE:check)
+!        ?uHQ{PROP:Use} = SELF.bIsHQEntry
+!        ?uHQ{PROP:TrueValue} = TRUE
+!        ?uHQ{PROP:FalseValue} = FALSE
+!        ?uHQ{PROP:XPos} = 30
+!        ?uHQ{PROP:Ypos} = 200
+!        UNHIDE(?uHQ)
+!        SELECT(?uHQ)
     END
     
     RETURN TRUE    

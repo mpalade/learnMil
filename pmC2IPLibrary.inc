@@ -1,52 +1,3 @@
-aClass              CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
-aValue                  LONG
-aProcedure              PROCEDURE
-bProcedure              PROCEDURE(LONG)
-                    END
-
-! Unit Types Equates
-uTpy:notDefined     EQUATE(1000)
-uTpy:infantry       EQUATE(1001)
-
-! Echelon Equates
-echTpy:notDefined   EQUATE(1100)
-echTpy:Team         EQUATE(1101)
-echTpy:Squad        EQUATE(1102)
-echTpy:Section      EQUATE(1103)
-echTpy:Platoon      EQUATE(1104)
-echTpy:Company      EQUATE(1105)
-echTpy:Battalion    EQUATE(1106)
-echTpy:Regiment     EQUATE(1107)
-echTpy:Brigade      EQUATE(1108)
-echTpy:Division     EQUATE(1109)
-echTpy:Corps        EQUATE(1110)
-echTpy:Army         EQUATE(1111)
-echTpy:ArmyGroup    EQUATE(1112)
-echTpy:Theater      EQUATE(1113)
-echTpy:Command      EQUATE(1114)
-
-! Hostility Equates
-hTpy:notDefined     EQUATE(1500)
-hTpy:Unknown        EQUATE(1501)
-hTpy:AssumedFriend  EQUATE(1502)
-hTpy:Friend         EQUATE(1503)
-hTpy:Neutral        EQUATE(1504)
-hTpy:Suspect        EQUATE(1505)
-hTpy:Hostile        EQUATE(1506)
-
-! Hostility Color
-COLOR:notDefined    EQUATE(COLOR:Yellow)
-COLOR:Unknown       EQUATE(COLOR:Yellow)
-COLOR:AssumedFriend EQUATE(COLOR:Aqua)
-COLOR:Friend        EQUATE(COLOR:Aqua)
-COLOR:Neutral       EQUATE(COLOR:Green)
-COLOR:Suspect       EQUATE(COLOR:Red)
-COLOR:Hostile       EQUATE(COLOR:Red)
-
-! Disable for selection color
-COLOR:NodeDisabled  EQUATE(COLOR:Gray)
-
-
 ! Units Queue Structure
 UnitsList           QUEUE, TYPE
 UnitName                STRING(100)
@@ -75,27 +26,12 @@ yPos                        LONG
 TreePos                     LONG
                     END
 
-
 ! Reference C2IPs Queue Structure
 C2IPsList           QUEUE, TYPE
 C2IPPath                STRING(100)
 C2IPName                STRING(100)
                     END
-! JSON objects
-json                JSONClass
-collection          &JSONClass
 
-
-! string theory objects
-sst                 stringtheory
-
-! entry fields
-
-?uNameEntry         EQUATE(900)
-?uTypeList          EQUATE(901)
-?uHQ                EQUATE(902)
-
-?ListSymbology      EQUATE(903)
 
 BSO                 CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 urec                    GROUP(UnitBasicRecord)
@@ -157,6 +93,8 @@ markForDisbl            PROCEDURE(), BOOL
 isHQ                    PROCEDURE(), BOOL
 SetHQ                   PROCEDURE(BOOL bIsHQ), BOOL
 TreePos                 PROCEDURE(), LONG
+
+SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
     
 
@@ -200,6 +138,7 @@ nEchelon                LONG, PRIVATE
 
 
 Construct               PROCEDURE                           
+Destruct                PROCEDURE
 
 Redraw                  PROCEDURE, PRIVATE
 DrawNode                PROCEDURE(LONG nUnitType=0), LONG, PRIVATE
@@ -263,7 +202,9 @@ DeleteNode              PROCEDURE
 DisableNode             PROCEDURE
 
 DisplaySelection        PROCEDURE, PRIVATE
+DisplaySelection        PROCEDURE(LONG nXPos, LONG nYPos), PRIVATE
 DisplayUnselection      PROCEDURE, PRIVATE
+DisplayUnselection      PROCEDURE(LONG nXPos, LONG nYPos), PRIVATE
 
 SelUp                   PROCEDURE
 SelDown                 PROCEDURE
@@ -272,7 +213,7 @@ SelRight                PROCEDURE
 
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 Unselect                PROCEDURE(), LONG
-Destruct                PROCEDURE
+
 
 GetUnitName             PROCEDURE(), STRING
 SetUnitName             PROCEDURE(STRING sUnitName), LONG
