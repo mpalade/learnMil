@@ -237,6 +237,7 @@ insertLastNode          PROCEDURE(), PRIVATE
 
 InsertNode              PROCEDURE
 InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
+AddNode                 PROCEDURE(*UnitBasicRecord pUrec), LONG
 GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
 GetNode                 PROCEDURE(), BOOl
 DeleteNode              PROCEDURE
@@ -273,8 +274,6 @@ SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 ! Generic C2IP structure
 C2IP                CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 Name                    STRING(100)
-!ul                      &UnitsList
-!tmpul                   &UnitsList, PRIVATE
 ul                      &BSOCollection
 tmpul                   &BSOCollection
 tmpUnitName             STRING(100), PRIVATE
@@ -290,6 +289,61 @@ labelEditMode           BOOL, PRIVATE
 Construct               PROCEDURE
 Destruct                PROCEDURE
 InitDraw                PROCEDURE(Draw pDraw), LONG
+
+!DrawNode variants
+DrawNode_MainSymbol     PROCEDURE(), PROTECTED
+DrawNode_HQ             PROCEDURE(), PROTECTED
+
+DrawNode_Default        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+
+Draw_innerSine          PROCEDURE(), PROTECTED
+Draw_innerEllipse       PROCEDURE(), PROTECTED
+Draw_medianLine         PROCEDURE(), PROTECTED
+Draw_secondDiag         PROCEDURE(), PROTECTED
+Draw_innerPapillon      PROCEDURE(), PROTECTED
+Draw_innerSmallClepsydra        PROCEDURE(), PROTECTED
+Draw_innerSmallRoundPapillon    PROCEDURE(), PROTECTED
+Draw_innerRoundPapillon PROCEDURE(), PROTECTED
+Draw_innerTriangle      PROCEDURE(), PROTECTED
+Draw_innerFork          PROCEDURE(), PROTECTED
+
+DrawNode_Amphibious     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Antiarmor     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Antiarmor_Armored     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Antiarmor_Motorized    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+
+DrawNode_Armor          PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Armor_Recon    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Armor_Amphibious       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+
+DrawNode_ArmyAviation       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_ArmyAviation_Recon PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_AviationComposite   PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_AviationFixedWing  PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Combat             PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_CombinedArms       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+
+DrawNode_Infantry       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Infantry_Amphibious    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Infantry_Armored       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Infantry_MainGunSystem PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Infantry_Motorized     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Infantry_FightingVehicle       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+
+DrawNode_Observer       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+
+DrawNode_Reconnaissance         PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Reconnaissance_Recon       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Reconnaissance_Marine      PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Reconnaissance_Motorized   PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+
+DrawNode_Engineer       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Engineer_Mechanized       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Engineer_Motorized        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+DrawNode_Engineer_Recon           PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
+
+DrawNode_Echelon        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
 
                     END
 
@@ -313,59 +367,8 @@ Construct               PROCEDURE
 Destruct                PROCEDURE
 
 Redraw                  PROCEDURE, PRIVATE
-DrawNode                PROCEDURE(LONG nUnitType=0), LONG, PRIVATE
 
-!DrawNode variants
-DrawNode_Default        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 
-Draw_innerSine          PROCEDURE(), PRIVATE
-Draw_innerEllipse       PROCEDURE(), PRIVATE
-Draw_medianLine         PROCEDURE(), PRIVATE
-Draw_secondDiag         PROCEDURE(), PRIVATE
-Draw_innerPapillon      PROCEDURE(), PRIVATE
-Draw_innerSmallClepsydra        PROCEDURE(), PRIVATE
-Draw_innerSmallRoundPapillon    PROCEDURE(), PRIVATE
-Draw_innerRoundPapillon PROCEDURE(), PRIVATE
-Draw_innerTriangle      PROCEDURE(), PRIVATE
-Draw_innerFork          PROCEDURE(), PRIVATE
-
-DrawNode_Amphibious     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Antiarmor     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Antiarmor_Armored     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Antiarmor_Motorized    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-
-DrawNode_Armor          PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Armor_Recon    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Armor_Amphibious       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-
-DrawNode_ArmyAviation       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_ArmyAviation_Recon PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_AviationComposite   PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_AviationFixedWing  PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Combat             PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_CombinedArms       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-
-DrawNode_Infantry       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Infantry_Amphibious    PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Infantry_Armored       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Infantry_MainGunSystem PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Infantry_Motorized     PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Infantry_FightingVehicle       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-
-DrawNode_Observer       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-
-DrawNode_Reconnaissance         PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Reconnaissance_Recon       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Reconnaissance_Marine      PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Reconnaissance_Motorized   PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-
-DrawNode_Engineer       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Engineer_Mechanized       PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Engineer_Motorized        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-DrawNode_Engineer_Recon           PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
-
-DrawNode_Echelon        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PRIVATE
 
 InsertNode              PROCEDURE
 InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
@@ -431,6 +434,13 @@ OverlayC2IP         CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrar
 
 Construct               PROCEDURE
 Destruct                PROCEDURE
+
+Redraw                  PROCEDURE
+
+DeployBSO               PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG nYPos), BOOL
+
+! referenced C2IPs
+AttachC2IP              PROCEDURE(STRING sFileName), LONG
                     END
 
 

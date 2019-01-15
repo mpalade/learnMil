@@ -237,6 +237,7 @@ insertLastNode          PROCEDURE(), PRIVATE
 
 InsertNode              PROCEDURE
 InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
+AddNode                 PROCEDURE(*UnitBasicRecord pUrec), LONG
 GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
 GetNode                 PROCEDURE(), BOOl
 DeleteNode              PROCEDURE
@@ -273,8 +274,6 @@ SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 ! Generic C2IP structure
 C2IP                CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 Name                    STRING(100)
-!ul                      &UnitsList
-!tmpul                   &UnitsList, PRIVATE
 ul                      &BSOCollection
 tmpul                   &BSOCollection
 tmpUnitName             STRING(100), PRIVATE
@@ -431,6 +430,13 @@ OverlayC2IP         CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrar
 
 Construct               PROCEDURE
 Destruct                PROCEDURE
+
+Redraw                  PROCEDURE
+
+DeployBSO               PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG nYPos), BOOL
+
+! referenced C2IPs
+AttachC2IP              PROCEDURE(STRING sFileName), LONG
                     END
 
 

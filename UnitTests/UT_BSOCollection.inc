@@ -14,6 +14,7 @@ InsertTwoNodesSelectUpUp        PROCEDURE(), BOOL
 InsertTwoNodesSelectDown        PROCEDURE(), BOOL
 InsertTwoNodesSelectDownDown    PROCEDURE(), BOOL
 
-InsertSpecificNode              PROCEDURE(*UnitBasicRecord pURec), BOOL
+InsertSpecificNode      PROCEDURE(*UnitBasicRecord pURec), BOOL
+AddSpecificNode         PROCEDURE(*UnitBasicRecord pURec), BOOL
     END
     

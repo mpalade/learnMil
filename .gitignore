@@ -223,3 +223,9 @@ UnitTests/UnitTests.sln.cache
 *.obj
 obj/release/learnMil005.obj
 obj/release/learnMil_BC2.obj
+sync.txt
+learnMil005.clw
+learnMil006.clw
+learnMil007.clw
+obj/release/learnMil005.obj
+obj/release/learnMil_BC2.obj

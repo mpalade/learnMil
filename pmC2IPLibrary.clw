@@ -416,6 +416,25 @@ CODE
     END        
     
     RETURN TRUE        
+    
+BSOCOllection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
+    CODE
+        SELF.ul.UnitName        = pUrec.UnitName
+        SELF.ul.UnitType        = pURec.UnitType
+        SELF.ul.UnitTypeCode    = pURec.UnitTypeCode
+        SELF.ul.Echelon         = pUrec.Echelon
+        SELF.ul.Hostility       = pUrec.Hostility
+        SELF.ul.IsHQ            = pUrec.IsHQ
+        SELF.ul.xPos            = pUrec.xPos
+        SELF.ul.yPos            = pUrec.yPos
+        
+        !SELF.ul.TreePos         = 1
+        !SELF.ul.markForDel      = FALSE
+        !SELF.ul.markForDisbl    = FALSE
+        ADD(SELF.ul)
+        
+        SELF.selQueuePos    = POINTER(SELF.ul)
+        RETURN TRUE
         
 BSOCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
     CODE
@@ -754,9 +773,17 @@ C2IP.Destruct       PROCEDURE()
 C2IP.InitDraw     PROCEDURE(Draw pDraw)
 CODE
     ! Init Drawing Object    
-    SELF.drwImg     &= pDraw        
+    SELF.drwImg     &= pDraw            
                   
-OrgChartC2IP.Construct     PROCEDURE()
+C2IP.DrawNode_HQ    PROCEDURE()
+    CODE
+        IF SELF.ul.IsHQ() THEN
+            ! Is HQ
+            SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 0, 10)
+        END
+        
+
+OrgChartC2IP.Construct      PROCEDURE()
     CODE
         PARENT.Construct()    
 
@@ -765,7 +792,7 @@ nCurrentUnitType    LONG
 CODE
     ! redraw OrgChar C2IP content
     sst.Trace('BEGIN:OrgChartC2IP.Redraw')
-    
+   
     SELF.drwImg.Blank(COLOR:White)
     SELF.drwImg.Setpencolor(COLOR:Black)
     SELF.drwImg.SetPenWidth(1)
@@ -775,318 +802,10 @@ CODE
         GET(SELF.ul.ul, i#)
         sst.Trace('i# = ' & i#)
         IF NOT ERRORCODE() THEN
-            ! Unit Type Code
-            sst.Trace('! Unit Type Code = ' & CLIP(SELF.ul.UnitTypeCode()) )
-            CASE CLIP(SELF.ul.UnitTypeCode())
-            OF '120300'
-                ! Amphibious
-                IF SELF.DrawNode_Amphibious(FALSE) = TRUE THEN
-                END
-            OF '120400'
-                ! Antitank/Antiarmor
-                IF SELF.DrawNode_Antiarmor(FALSE) = TRUE THEN
-                END
-            OF '120401'
-                ! Antitank/Antiarmor->Armored
-                IF SELF.DrawNode_Antiarmor_Armored(FALSE) = TRUE THEN
-                END
-            OF '120402'
-                ! Antitank/Antiarmor->Motorized
-                IF SELF.DrawNode_Antiarmor_Motorized(FALSE) = TRUE THEN
-                END
-            OF '120500'
-                ! Armor/Armored/Mechanized/Self-Propelled/Tracked
-                IF SELF.DrawNode_Armor(FALSE) = TRUE THEN
-                END
-            OF '120501'
-                !Armor/Armored/Mechanized/Self-Propelled/Tracked->Reconnaissance/Cavalry/Scout
-                IF SELF.DrawNode_Armor_Recon(FALSE) = TRUE THEN
-                END
-            OF '120502'
-                ! Armor/Armored/Mechanized/Self-Propelled/Tracked->Amphibious
-                IF SELF.DrawNode_Armor_Amphibious(FALSE) = TRUE THEN
-                END
-            OF '120600'
-                ! Army Aviation/Aviation Rotary Wing
-                IF SELF.DrawNode_ArmyAviation(FALSE) = TRUE THEN
-                END
-            OF '120601'
-                ! Army Aviation/Aviation Rotary Wing->Reconnaissance
-                IF SELF.DrawNode_ArmyAviation_Recon(FALSE) = TRUE THEN
-                END
-            OF '120700'
-                ! Aviation Composite
-                IF SELF.DrawNode_AviationComposite(FALSE) = TRUE THEN
-                END
-            OF '120800'
-                ! Aviation Fixed Wing
-                IF SELF.DrawNode_AviationFixedWing(FALSE) = TRUE THEN
-                END
-            OF '120801'
-                ! Aviation Fixed Wing->Reconnaissance
-                IF SELF.DrawNode_AviationFixedWing_Recon(FALSE) = TRUE THEN
-                END
-            OF '120900'
-                ! Combat
-                IF SELF.DrawNode_Combat(FALSE) = TRUE THEN
-                END
-            OF '121000'
-                ! Combined Arms
-                IF SELF.DrawNode_CombinedArms(FALSE) = TRUE THEN
-                END
-            OF '121100'
-                ! Infantry
-                IF SELF.DrawNode_Infantry(FALSE) = TRUE THEN
-                END
-            OF '121101'
-                ! Infantry Amphibious
-                IF SELF.DrawNode_Infantry_Amphibious(FALSE) = TRUE THEN
-                END
-            OF '121102'
-                ! Infantry Armored/Mechanized/Tracked
-                IF SELF.DrawNode_Infantry_Armored(FALSE) = TRUE THEN
-                END
-            OF '121103'
-                ! Infantry Main Gun System
-                IF SELF.DrawNode_Infantry_MainGunSystem(FALSE) = TRUE THEN
-                END
-            OF '121104'
-                ! Infantry Motorized
-                IF SELF.DrawNode_Infantry_Motorized(FALSE) = TRUE THEN
-                END
-            OF '121105'
-                ! Infantry Infantry Fighting Vehicle
-                IF SELF.DrawNode_Infantry_FightingVehicle(FALSE) = TRUE THEN
-                END
-            OF '121200'
-                ! Observer
-                IF SELF.DrawNode_Observer(FALSE) = TRUE THEN
-                END
-            OF '121300'
-                ! Reconnaissance/Cavalry/Scout
-                IF SELF.DrawNode_Reconnaissance(FALSE) = TRUE THEN
-                END
-            OF '121301'
-                ! Reconnaissance/Cavalry/Scout -> Reconnaissance and Surveillance
-                IF SELF.DrawNode_Reconnaissance_Recon(FALSE) = TRUE THEN
-                END
-            OF '121302'
-                ! Reconnaissance/Cavalry/Scout -> Marine
-                IF SELF.DrawNode_Reconnaissance_Marine(FALSE) = TRUE THEN
-                END
-            OF '121303'
-                ! Reconnaissance/Cavalry/Scout -> Motorized
-                IF SELF.DrawNode_Reconnaissance_Motorized(FALSE) = TRUE THEN
-                END
-            OF '121400'
-                ! Sea Air Land (SEAL)
-            OF '121500'
-                ! Snipper
-            OF '121600'
-                ! Surveillance
-            OF '121700'
-                ! Special Forces
-            OF '121800'
-                ! Special Operations Forces (SOF)
-            OF '121801'
-                ! Special Operations Forces (SOF) -> 	Fixed Wing MISO
-            OF '121802'
-                ! Special Operations Forces (SOF) -> 	Ground
-            OF '121803'
-                ! Special Operations Forces (SOF) -> 	Special Boat
-            OF '121804'
-                ! Special Operations Forces (SOF) -> 	Special SSNR
-            OF '121805'
-                ! Special Operations Forces (SOF) -> 	Underwater Demolition Team
-            OF '121900'
-                ! Unmanned Aerial Systems
-            OF '130000'
-                ! Fires
-            OF '130100'
-                ! Air Defense
-            OF '130101'
-                ! Air Defense -> Main Gun System
-            OF '130102'
-                ! Air Defense -> Missile
-            OF '130200'
-                ! Air/Land Naval Gunfire Liaison
-            OF '130300'
-                ! Field Artillery
-            OF '130301'
-                ! Field Artillery -> Self-propelled
-            OF '130302'
-                ! Field Artillery -> Target Acquisition
-            OF '130400'
-                ! Field Artillery Observer
-            OF '130500'
-                ! Joint Fire Support
-            OF '130600'
-                ! Meteorological
-            OF '130700'
-                ! Missile
-            OF '130800'
-                ! Mortar
-            OF '130801'
-                ! Mortar -> Armored/Mechanized/Tracked
-            OF '130802'
-                ! Mortar ->	Self-Propelled Wheeled
-            OF '130803'
-                ! Mortar -> Towed
-            OF '130900'
-                ! Survey
-            OF '140000'
-                ! Protection
-            OF '140100'
-                ! Chemical Biological Radiological Nuclear Defense
-            OF '140101'
-                ! Chemical Biological Radiological Nuclear Defense -> Mechanized
-            OF '140102'
-                ! Chemical Biological Radiological Nuclear Defense -> Motorized
-            OF '140103'
-                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance
-            OF '140104'
-                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Armored
-            OF '140105'
-                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Equipped
-            OF '140200'
-                ! Combat Support (Maneuver Enhancement)
-            OF '140300'
-                ! Criminal Investigation Division
-            OF '140400'
-                ! Diving
-            OF '140500'
-                ! Dog
-            OF '140600'
-                ! Drilling
-            OF '140700'
-                ! Engineer
-                IF SELF.DrawNode_Engineer(FALSE) = TRUE THEN
-                END
-            OF '140701'
-                ! Engineer -> Mechanized
-                IF SELF.DrawNode_Engineer_Mechanized(FALSE) = TRUE THEN
-                END
-            OF '140702'
-                ! Engineer -> Motorized
-                IF SELF.DrawNode_Engineer_Motorized(FALSE) = TRUE THEN
-                END
-            OF '140703'
-                ! Engineer -> Reconnaissance
-                IF SELF.DrawNode_Engineer_Recon(FALSE) = TRUE THEN
-                END
-            ELSE
-                IF SELF.DrawNode_Default(FALSE) = TRUE THEN
-                END
-            END                                    
-            
+            ! Main Symbol
+            SELF.DrawNode_MainSymbol()                                                                                    
             ! Echelon
-            CASE SELF.ul.Echelon()
-            OF echTpy:Team
-                ! Team
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-            OF echTpy:Squad
-                ! Squad
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-            OF echTpy:Section
-                ! Section
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-            OF echTpy:Platoon
-                ! Platoon
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 7, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-            OF echTpy:Company
-                ! Company
-                SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 0, 4)
-            OF echTpy:Battalion
-                ! Battalion
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 1, SELF.ul.yPos() - 6, 0, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 0, 4)
-            OF echTpy:Regiment
-                ! Regiment
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 0, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 0, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 2, SELF.ul.yPos() - 6, 0, 4)
-            OF echTpy:Brigade
-                ! Brigade
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Division
-                ! Divion
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Corps
-                ! Corps
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Army
-                ! Army
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 3, 4, -4) 
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:ArmyGroup
-                ! Army Group
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 10, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 10, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 8, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 8, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Theater
-                ! Theater
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 15, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 15, SELF.ul.yPos() - 3, 4, -4) 
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 3, 4, -4) 
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 11, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 11, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Command
-                ! Command
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 3, SELF.ul.yPos() - 6, 0, 5)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 4, 5, 0)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 0, 5)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 4, 5, 0)
-            END
+            SELF.DrawNode_Echelon()            
         END
         
     END
@@ -1094,62 +813,44 @@ CODE
     SELF.drwImg.Display()
     sst.Trace('END:OrgChartC2IP.Redraw')
     
-
-OrgChartC2IP.DrawNode       PROCEDURE(LONG nUnitType=0)
-err1                            BOOL
-err2                            BOOL
-err3                            BOOL
-
-CODE
-    ! do something
-    
-    ! Unit Type
-    CASE nUnitType
-    OF uTpy:infantry
-        err1 = SELF.DrawNode_Infantry()
-    ELSE
-        ! Default Node
-        err1 = SELF.DrawNode_Default()                       
-    END
-    
-    err2 = SELF.DrawNode_Echelon()           
-    
-    RETURN TRUE
-    
-    
-    
-
-!OrgChartC2IP.DrawNode_*.*
-OrgChartC2IP.DrawNode_Default       PROCEDURE(BOOL bAutoDisplay)
+!C2IP.DrawNode_*.*
+C2IP.DrawNode_Default       PROCEDURE(BOOL bAutoDisplay)
 nFillColor      LONG
     CODE
-        sst.Trace('BEGIN:OrgChartC2IP.DrawNode_Default')
+        sst.Trace('BEGIN:C2IP.DrawNode_Default')
         SELF.drwImg.Setpencolor(COLOR:Black)
         SELF.drwImg.SetPenWidth(1)
         
         ! Fill color depending on Hostility
         sst.Trace('SELF.ul.Hostility() = ' & SELF.ul.Hostility())
-        CASE SELF.ul.Hostility()
+        CASE CLIP(SELF.ul.Hostility())
         OF hTpy:Unknown
             ! yellow
             nFillColor  = COLOR:Unknown
+            sst.Trace('nFillColor = COLOR:Unknown')
         OF hTpy:AssumedFriend
             ! blue
             nFillColor  = COLOR:AssumedFriend
+            sst.Trace('nFillColor = COLOR:AssumedFriend')
         OF hTpy:Friend
             ! blue
             nFillColor  = COLOR:Friend
+            sst.Trace('nFillColor = COLOR:Friend')
         OF hTpY:Neutral
             ! green
             nFillColor  = COLOR:Neutral
+            sst.Trace('nFillColor = COLOR:Neutral')
         OF hTpy:Suspect
             ! red
             nFillColor  = COLOR:Suspect
+            sst.Trace('nFillColor = COLOR:Suspect')
         OF hTpy:Hostile
             ! red
             nFillColor  = COLOR:Hostile        
+            sst.Trace('nFillColor = COLOR:Hostile')
         ELSE
             nFillColor  = COLOR:Unknown
+            sst.Trace('nFillColor = COLOR:Unknown')
         END            
         
         ! Fill color depeding on Enable/Disable status for new drag&drop selections
@@ -1157,7 +858,9 @@ nFillColor      LONG
         IF SELF.ul.markForDisbl() = TRUE THEN
             ! Display as unable for newer selections
             nFillColor  = COLOR:NodeDisabled    
+            sst.Trace('nFillColor = ' & nFillColor)
         END    
+        sst.Trace('nFillColor = ' & nFillColor)
         sst.Trace('before BOX')
         SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
         sst.Trace('after BOX')
@@ -1166,20 +869,23 @@ nFillColor      LONG
         sst.Trace('after SHOW')
         
         sst.Trace('SELF.ul.IsHQ() = ' & SELF.ul.IsHQ())
+        SELF.DrawNode_HQ()
+        OMIT('__DrawNode_HQ')
         IF SELF.ul.IsHQ() THEN
             ! Is HQ
             SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 0, 10)
         END
+        __DrawNode_HQ
         
         sst.Trace('bAutoDisplay = ' & bAutoDisplay)
         IF bAutoDisplay THEN
             SELF.drwImg.Display()
         END
     
-        sst.Trace('END:OrgChartC2IP.DrawNode_Default')
+        sst.Trace('END:C2IP.DrawNode_Default')
         RETURN TRUE      
     
-OrgChartC2IP.Draw_innerSine PROCEDURE()
+C2IP.Draw_innerSine PROCEDURE()
     CODE
         ! inner sine function
         SELF.drwImg.Arc(SELF.ul.xPos() - 5, SELF.ul.yPos() + 15 + 5, 10, -10, 2700, 3599)
@@ -1189,7 +895,7 @@ OrgChartC2IP.Draw_innerSine PROCEDURE()
         SELF.drwImg.Arc(SELF.ul.xPos() + 25 + 10, SELF.ul.yPos() + 10, 10, 10, 1800, 3599)
         SELF.drwImg.Arc(SELF.ul.xPos() + 50 - 5, SELF.ul.yPos() + 20, 10, -10, 900, 1800)
         
-OrgChartC2IP.Draw_innerEllipse       PROCEDURE()
+C2IP.Draw_innerEllipse       PROCEDURE()
     CODE        
         ! inner ellipse
         SELF.drwImg.Line(SELF.ul.xPos() + 15, SELF.ul.yPos() + 10, 20, 0)
@@ -1197,17 +903,17 @@ OrgChartC2IP.Draw_innerEllipse       PROCEDURE()
         SELF.drwImg.Line(SELF.ul.xPos() + 15, SELF.ul.yPos() + 20, 20, 0)
         SELF.drwImg.Arc(SELF.ul.xPos() + 5 + 5, SELF.ul.yPos() + 10, 10, 10, 900, 2700)
         
-OrgChartC2IP.Draw_medianLine        PROCEDURE()
+C2IP.Draw_medianLine        PROCEDURE()
     CODE
         ! median line
         SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos(), 0, 30)
 
-OrgChartC2IP.Draw_secondDiag        PROCEDURE()
+C2IP.Draw_secondDiag        PROCEDURE()
     CODE        
         ! second diagonal
         SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 50, -30)
         
-OrgChartC2IP.Draw_innerFork     PROCEDURE()
+C2IP.Draw_innerFork     PROCEDURE()
     CODE
         ! inner fork
     SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() + 15 - 5, 10, 0)
@@ -1216,7 +922,7 @@ OrgChartC2IP.Draw_innerFork     PROCEDURE()
     SELF.drwImg.Line(SELF.ul.xPos() + 25 + 5, SELF.ul.yPos() + 15 - 5, 0, 10)
         
         
-OrgChartC2IP.Draw_innerPapillon     PROCEDURE()
+C2IP.Draw_innerPapillon     PROCEDURE()
 pVertices    LONG, DIM(6)
     CODE
         ! inner papillon
@@ -1235,7 +941,7 @@ pVertices    LONG, DIM(6)
         pVertices[6] = SELF.ul.yPos() + 15 + 5
         SELF.drwImg.Polygon(pVertices, COLOR:Black)
         
-OrgChartC2IP.Draw_innerSmallClepsydra    PROCEDURE()
+C2IP.Draw_innerSmallClepsydra    PROCEDURE()
 pVertices    LONG, DIM(6)
     CODE
         ! inner clepsydra
@@ -1254,7 +960,7 @@ pVertices    LONG, DIM(6)
         pVertices[6] = SELF.ul.yPos() + 15 + 5
         SELF.drwImg.Polygon(pVertices, COLOR:Black)        
         
-OrgChartC2IP.Draw_innerSmallRoundPapillon        PROCEDURE()
+C2IP.Draw_innerSmallRoundPapillon        PROCEDURE()
 pVertices    LONG, DIM(6)
     CODE
         ! inner small papillon
@@ -1281,7 +987,7 @@ pVertices    LONG, DIM(6)
         SELF.drwImg.Arc(SELF.ul.xPos() + 25 + 4 + 2, SELF.ul.yPos() + 15 - 1, 2, 3, 0, 900)
         
     
-OrgChartC2IP.Draw_innerRoundPapillon      PROCEDURE()
+C2IP.Draw_innerRoundPapillon      PROCEDURE()
 pVertices           LONG, DIM(6)
     CODE
         ! inner papillon
@@ -1294,7 +1000,7 @@ pVertices           LONG, DIM(6)
         SELF.drwImg.Arc(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 - 5, 10, 10, 0, 900)
         !SELF.drwImg.Chord(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 - 5, 10, 10, 0, 900, COLOR:Black)
         
-OrgChartC2IP.Draw_innerTriangle PROCEDURE
+C2IP.Draw_innerTriangle PROCEDURE
 pVertices           LONG, DIM(6)
     CODE
         ! inner triangle
@@ -1307,7 +1013,7 @@ pVertices           LONG, DIM(6)
         SELF.drwImg.Polygon(pVertices, COLOR:Black, COLOR:Black)
                
                                                      
-OrgChartC2IP.DrawNode_Amphibious PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Amphibious PROCEDURE(BOOL bAutoDisplay)
     CODE
         erroCode#   = SELF.DrawNode_Default(bAutoDisplay)    
         
@@ -1320,7 +1026,7 @@ OrgChartC2IP.DrawNode_Amphibious PROCEDURE(BOOL bAutoDisplay)
         
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Antiarmor PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Antiarmor PROCEDURE(BOOL bAutoDisplay)
     CODE
         erroCode#   = SELF.DrawNode_Default(bAutoDisplay)    
         
@@ -1334,7 +1040,7 @@ OrgChartC2IP.DrawNode_Antiarmor PROCEDURE(BOOL bAutoDisplay)
         
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Antiarmor_Armored PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Antiarmor_Armored PROCEDURE(BOOL bAutoDisplay)
     CODE
         
         errCode#    = SELF.DrawNode_Antiarmor(bAutoDisplay)
@@ -1346,7 +1052,7 @@ OrgChartC2IP.DrawNode_Antiarmor_Armored PROCEDURE(BOOL bAutoDisplay)
         
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Antiarmor_Motorized       PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Antiarmor_Motorized       PROCEDURE(BOOL bAutoDisplay)
     CODE        
         errCode#    = SELF.DrawNode_Antiarmor(bAutoDisplay)
         SELF.Draw_medianLine()
@@ -1357,7 +1063,7 @@ OrgChartC2IP.DrawNode_Antiarmor_Motorized       PROCEDURE(BOOL bAutoDisplay)
         
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Armor      PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Armor      PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#   = SELF.DrawNode_Default(bAutoDisplay)    
         
@@ -1370,7 +1076,7 @@ OrgChartC2IP.DrawNode_Armor      PROCEDURE(BOOL bAutoDisplay)
         
     RETURN TRUE
 
-OrgChartC2IP.DrawNode_Armor_Recon        PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Armor_Recon        PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Armor(bAutoDisplay)
         ! 2nd diagonal
@@ -1382,7 +1088,7 @@ OrgChartC2IP.DrawNode_Armor_Recon        PROCEDURE(BOOL bAutoDisplay)
         
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Armor_Amphibious   PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Armor_Amphibious   PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Armor(bAutoDisplay)
         ! inner sine
@@ -1393,7 +1099,7 @@ OrgChartC2IP.DrawNode_Armor_Amphibious   PROCEDURE(BOOL bAutoDisplay)
         END 
                 RETURN TRUE
         
-OrgChartC2IP.DrawNode_ArmyAviation  PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_ArmyAviation  PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#   = SELF.DrawNode_Default(bAutoDisplay)
         ! inner papillon
@@ -1404,7 +1110,7 @@ OrgChartC2IP.DrawNode_ArmyAviation  PROCEDURE(BOOL bAutoDisplay)
         END 
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_ArmyAviation_Recon     PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_ArmyAviation_Recon     PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_ArmyAviation(bAutoDisplay)
         ! second diagonale
@@ -1415,7 +1121,7 @@ OrgChartC2IP.DrawNode_ArmyAviation_Recon     PROCEDURE(BOOL bAutoDisplay)
         END 
         RETURN TRUE                
         
-OrgChartC2IP.DrawNode_AviationComposite     PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_AviationComposite     PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Default()
         ! clepsydra
@@ -1428,7 +1134,7 @@ OrgChartC2IP.DrawNode_AviationComposite     PROCEDURE(BOOL bAutoDisplay)
         END 
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_AviationFixedWing     PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_AviationFixedWing     PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Default()
         ! inner round papillon
@@ -1439,7 +1145,7 @@ OrgChartC2IP.DrawNode_AviationFixedWing     PROCEDURE(BOOL bAutoDisplay)
         END 
         RETURN TRUE        
         
-OrgChartC2IP.DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_AviationFixedWing(bAutoDisplay)        
         ! inner second diagonal
@@ -1451,7 +1157,7 @@ OrgChartC2IP.DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay)
         RETURN TRUE        
                 
         
-OrgChartC2IP.DrawNode_Combat         PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Combat         PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Default()
         ! CBT
@@ -1462,7 +1168,7 @@ OrgChartC2IP.DrawNode_Combat         PROCEDURE(BOOL bAutoDisplay)
         END 
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_CombinedArms   PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_CombinedArms   PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Default(bAutoDisplay)
         
@@ -1482,7 +1188,7 @@ OrgChartC2IP.DrawNode_CombinedArms   PROCEDURE(BOOL bAutoDisplay)
         
         
     
-OrgChartC2IP.DrawNode_Infantry      PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Infantry      PROCEDURE(BOOL bAutoDisplay)
 nFillColor          LONG
 CODE
 
@@ -1497,7 +1203,7 @@ CODE
     RETURN TRUE
     
     
-OrgChartC2IP.DrawNode_Infantry_Amphibious        PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Infantry_Amphibious        PROCEDURE(BOOL bAutoDisplay)
 CODE
     errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)
     
@@ -1510,7 +1216,7 @@ CODE
     
     RETURN TRUE
     
-OrgChartC2IP.DrawNode_Infantry_Armored   PROCEDURE(BOOL bAutoDisplay)    
+C2IP.DrawNode_Infantry_Armored   PROCEDURE(BOOL bAutoDisplay)    
 CODE
     errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)
     
@@ -1522,7 +1228,7 @@ CODE
     
     RETURN TRUE
     
-OrgChartC2IP.DrawNode_Infantry_MainGunSystem   PROCEDURE(BOOL bAutoDisplay)    
+C2IP.DrawNode_Infantry_MainGunSystem   PROCEDURE(BOOL bAutoDisplay)    
 CODE
     errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)    
 
@@ -1535,7 +1241,7 @@ CODE
     
     RETURN TRUE
     
-OrgChartC2IP.DrawNode_Infantry_Motorized   PROCEDURE(BOOL bAutoDisplay)    
+C2IP.DrawNode_Infantry_Motorized   PROCEDURE(BOOL bAutoDisplay)    
 CODE
     errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)    
     
@@ -1548,7 +1254,7 @@ CODE
     
     RETURN TRUE    
     
-OrgChartC2IP.DrawNode_Infantry_FightingVehicle   PROCEDURE(BOOL bAutoDisplay)    
+C2IP.DrawNode_Infantry_FightingVehicle   PROCEDURE(BOOL bAutoDisplay)    
 CODE
     errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)    
     
@@ -1568,8 +1274,8 @@ CODE
 
     
         
-!OrgChartC2IP.DrawNode_Observer
-OrgChartC2IP.DrawNode_Observer      PROCEDURE(BOOL bAutoDisplay)    
+!C2IP.DrawNode_Observer
+C2IP.DrawNode_Observer      PROCEDURE(BOOL bAutoDisplay)    
 nFillColor      LONG
 CODE
     SELF.drwImg.Setpencolor(COLOR:Black)
@@ -1622,7 +1328,7 @@ CODE
     
     RETURN TRUE
     
-OrgChartC2IP.DrawNode_Reconnaissance        PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Reconnaissance        PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Default()        
         ! inner second diagonal
@@ -1633,7 +1339,7 @@ OrgChartC2IP.DrawNode_Reconnaissance        PROCEDURE(BOOL bAutoDisplay)
         END
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Reconnaissance_Recon  PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Reconnaissance_Recon  PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
         ! inner triangle
@@ -1644,7 +1350,7 @@ OrgChartC2IP.DrawNode_Reconnaissance_Recon  PROCEDURE(BOOL bAutoDisplay)
         END
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Reconnaissance_Marine PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Reconnaissance_Marine PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
         ! inner ellipse
@@ -1655,7 +1361,7 @@ OrgChartC2IP.DrawNode_Reconnaissance_Marine PROCEDURE(BOOL bAutoDisplay)
         END
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Reconnaissance_Motorized      PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Reconnaissance_Motorized      PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
         ! inner middle line
@@ -1667,7 +1373,7 @@ OrgChartC2IP.DrawNode_Reconnaissance_Motorized      PROCEDURE(BOOL bAutoDisplay)
         RETURN TRUE
         
         
-OrgChartC2IP.DrawNode_Engineer      PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Engineer      PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Default()        
         ! inner fork
@@ -1678,7 +1384,7 @@ OrgChartC2IP.DrawNode_Engineer      PROCEDURE(BOOL bAutoDisplay)
         END
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Engineer_Mechanized   PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Engineer_Mechanized   PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
         ! inner ellipse
@@ -1689,7 +1395,7 @@ OrgChartC2IP.DrawNode_Engineer_Mechanized   PROCEDURE(BOOL bAutoDisplay)
         END
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Engineer_Motorized    PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Engineer_Motorized    PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
         ! inner median line
@@ -1700,7 +1406,7 @@ OrgChartC2IP.DrawNode_Engineer_Motorized    PROCEDURE(BOOL bAutoDisplay)
         END
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Engineer_Recon        PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Engineer_Recon        PROCEDURE(BOOL bAutoDisplay)
     CODE
         errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
         ! inner second diagonal
@@ -1711,7 +1417,7 @@ OrgChartC2IP.DrawNode_Engineer_Recon        PROCEDURE(BOOL bAutoDisplay)
         END
         RETURN TRUE
     
-OrgChartC2IP.DrawNode_Echelon       PROCEDURE(BOOL bAutoDisplay)
+C2IP.DrawNode_Echelon       PROCEDURE(BOOL bAutoDisplay)
 CODE
     SELF.drwImg.Setpencolor(COLOR:Black)
     SELF.drwImg.SetPenWidth(1)        
@@ -1844,7 +1550,7 @@ OrgChartC2IP.InsertNode     PROCEDURE
         
 OrgChartC2IP.InsertNode     PROCEDURE(*UnitBasicRecord pURec)
     CODE
-        errCode#    = SELF.InsertNode(pUrec)
+        errCode#    = SELF.ul.InsertNode(pUrec)
         IF errCode# = TRUE THEN
             SELF.Redraw()
         END
@@ -2491,4 +2197,270 @@ OverlayC2IP.Destruct        PROCEDURE()
         PARENT.Destruct()
         
         
+OverlayC2IP.Redraw  PROCEDURE()
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        SELF.drwImg.Setpencolor(COLOR:Black)
+        SELF.drwImg.SetPenWidth(1)
         
+        LOOP i# = 1 TO RECORDS(SELF.ul)
+            GET(SELF.ul.ul, i#)
+            IF NOT ERRORCODE() THEN
+                ! Draw Main Symbol
+                SELF.DrawNode_MainSymbol()
+                ! Draw Echelon
+                SELF.DrawNode_Echelon()
+                ! Draw HQ
+                SELF.DrawNode_HQ()
+            END
+        END
+ 
+        SELF.drwImg.Display()
+
+        
+        
+OverlayC2IP.DeployBSO       PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG nYPos)
+    CODE
+        sst.Trace('BEGIN:OverlayC2IP.DeployBSO')
+        sst.Trace('nXPos = ' & nXPos & ', nYPos = ' & nYPos)
+        pUrec.xPos  = nXPos
+        pUrec.yPos  = nYPos
+        
+        errCode#    = SELF.ul.AddNode(pUrec)
+        IF errCode# = TRUE THEN
+            SELF.Redraw()
+        END
+        
+        sst.Trace('END:OverlayC2IP.DeployBSO')
+        RETURN TRUE
+        
+OverlayC2IP.AttachC2IP      PROCEDURE(STRING sFileName)
+jsonItem        &JSONClass
+sC2IPName       STRING(100)
+CODE
+    ! do something
+    
+    json.LoadFile(sFileName)    
+    i# = json.Records()
+    
+    ! C2IP Name
+    jsonItem &= json.GetByName('C2IPName')
+    IF NOT jsonItem &= Null THEN
+        sC2IPName   = json.GetValueByName('C2IPName')
+        
+        SELF.refC2IPs.C2IPPath  = sFileName
+        SELF.refC2IPs.C2IPName  = sC2IPName
+        ADD(SELF.refC2IPs)
+                
+        RETURN TRUE
+    ELSE
+        RETURN FALSE
+    END        
+    
+    
+C2IP.DrawNode_MainSymbol    PROCEDURE
+    CODE
+        
+        ! Unit Type Code
+            sst.Trace('! Unit Type Code = ' & CLIP(SELF.ul.UnitTypeCode()) )
+            CASE CLIP(SELF.ul.UnitTypeCode())
+            OF '120300'
+                ! Amphibious
+                IF SELF.DrawNode_Amphibious(FALSE) = TRUE THEN
+                END
+            OF '120400'
+                ! Antitank/Antiarmor
+                IF SELF.DrawNode_Antiarmor(FALSE) = TRUE THEN
+                END
+            OF '120401'
+                ! Antitank/Antiarmor->Armored
+                IF SELF.DrawNode_Antiarmor_Armored(FALSE) = TRUE THEN
+                END
+            OF '120402'
+                ! Antitank/Antiarmor->Motorized
+                IF SELF.DrawNode_Antiarmor_Motorized(FALSE) = TRUE THEN
+                END
+            OF '120500'
+                ! Armor/Armored/Mechanized/Self-Propelled/Tracked
+                IF SELF.DrawNode_Armor(FALSE) = TRUE THEN
+                END
+            OF '120501'
+                !Armor/Armored/Mechanized/Self-Propelled/Tracked->Reconnaissance/Cavalry/Scout
+                IF SELF.DrawNode_Armor_Recon(FALSE) = TRUE THEN
+                END
+            OF '120502'
+                ! Armor/Armored/Mechanized/Self-Propelled/Tracked->Amphibious
+                IF SELF.DrawNode_Armor_Amphibious(FALSE) = TRUE THEN
+                END
+            OF '120600'
+                ! Army Aviation/Aviation Rotary Wing
+                IF SELF.DrawNode_ArmyAviation(FALSE) = TRUE THEN
+                END
+            OF '120601'
+                ! Army Aviation/Aviation Rotary Wing->Reconnaissance
+                IF SELF.DrawNode_ArmyAviation_Recon(FALSE) = TRUE THEN
+                END
+            OF '120700'
+                ! Aviation Composite
+                IF SELF.DrawNode_AviationComposite(FALSE) = TRUE THEN
+                END
+            OF '120800'
+                ! Aviation Fixed Wing
+                IF SELF.DrawNode_AviationFixedWing(FALSE) = TRUE THEN
+                END
+            OF '120801'
+                ! Aviation Fixed Wing->Reconnaissance
+                IF SELF.DrawNode_AviationFixedWing_Recon(FALSE) = TRUE THEN
+                END
+            OF '120900'
+                ! Combat
+                IF SELF.DrawNode_Combat(FALSE) = TRUE THEN
+                END
+            OF '121000'
+                ! Combined Arms
+                IF SELF.DrawNode_CombinedArms(FALSE) = TRUE THEN
+                END
+            OF '121100'
+                ! Infantry
+                IF SELF.DrawNode_Infantry(FALSE) = TRUE THEN
+                END
+            OF '121101'
+                ! Infantry Amphibious
+                IF SELF.DrawNode_Infantry_Amphibious(FALSE) = TRUE THEN
+                END
+            OF '121102'
+                ! Infantry Armored/Mechanized/Tracked
+                IF SELF.DrawNode_Infantry_Armored(FALSE) = TRUE THEN
+                END
+            OF '121103'
+                ! Infantry Main Gun System
+                IF SELF.DrawNode_Infantry_MainGunSystem(FALSE) = TRUE THEN
+                END
+            OF '121104'
+                ! Infantry Motorized
+                IF SELF.DrawNode_Infantry_Motorized(FALSE) = TRUE THEN
+                END
+            OF '121105'
+                ! Infantry Infantry Fighting Vehicle
+                IF SELF.DrawNode_Infantry_FightingVehicle(FALSE) = TRUE THEN
+                END
+            OF '121200'
+                ! Observer
+                IF SELF.DrawNode_Observer(FALSE) = TRUE THEN
+                END
+            OF '121300'
+                ! Reconnaissance/Cavalry/Scout
+                IF SELF.DrawNode_Reconnaissance(FALSE) = TRUE THEN
+                END
+            OF '121301'
+                ! Reconnaissance/Cavalry/Scout -> Reconnaissance and Surveillance
+                IF SELF.DrawNode_Reconnaissance_Recon(FALSE) = TRUE THEN
+                END
+            OF '121302'
+                ! Reconnaissance/Cavalry/Scout -> Marine
+                IF SELF.DrawNode_Reconnaissance_Marine(FALSE) = TRUE THEN
+                END
+            OF '121303'
+                ! Reconnaissance/Cavalry/Scout -> Motorized
+                IF SELF.DrawNode_Reconnaissance_Motorized(FALSE) = TRUE THEN
+                END
+            OF '121400'
+                ! Sea Air Land (SEAL)
+            OF '121500'
+                ! Snipper
+            OF '121600'
+                ! Surveillance
+            OF '121700'
+                ! Special Forces
+            OF '121800'
+                ! Special Operations Forces (SOF)
+            OF '121801'
+                ! Special Operations Forces (SOF) -> 	Fixed Wing MISO
+            OF '121802'
+                ! Special Operations Forces (SOF) -> 	Ground
+            OF '121803'
+                ! Special Operations Forces (SOF) -> 	Special Boat
+            OF '121804'
+                ! Special Operations Forces (SOF) -> 	Special SSNR
+            OF '121805'
+                ! Special Operations Forces (SOF) -> 	Underwater Demolition Team
+            OF '121900'
+                ! Unmanned Aerial Systems
+            OF '130000'
+                ! Fires
+            OF '130100'
+                ! Air Defense
+            OF '130101'
+                ! Air Defense -> Main Gun System
+            OF '130102'
+                ! Air Defense -> Missile
+            OF '130200'
+                ! Air/Land Naval Gunfire Liaison
+            OF '130300'
+                ! Field Artillery
+            OF '130301'
+                ! Field Artillery -> Self-propelled
+            OF '130302'
+                ! Field Artillery -> Target Acquisition
+            OF '130400'
+                ! Field Artillery Observer
+            OF '130500'
+                ! Joint Fire Support
+            OF '130600'
+                ! Meteorological
+            OF '130700'
+                ! Missile
+            OF '130800'
+                ! Mortar
+            OF '130801'
+                ! Mortar -> Armored/Mechanized/Tracked
+            OF '130802'
+                ! Mortar ->	Self-Propelled Wheeled
+            OF '130803'
+                ! Mortar -> Towed
+            OF '130900'
+                ! Survey
+            OF '140000'
+                ! Protection
+            OF '140100'
+                ! Chemical Biological Radiological Nuclear Defense
+            OF '140101'
+                ! Chemical Biological Radiological Nuclear Defense -> Mechanized
+            OF '140102'
+                ! Chemical Biological Radiological Nuclear Defense -> Motorized
+            OF '140103'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance
+            OF '140104'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Armored
+            OF '140105'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Equipped
+            OF '140200'
+                ! Combat Support (Maneuver Enhancement)
+            OF '140300'
+                ! Criminal Investigation Division
+            OF '140400'
+                ! Diving
+            OF '140500'
+                ! Dog
+            OF '140600'
+                ! Drilling
+            OF '140700'
+                ! Engineer
+                IF SELF.DrawNode_Engineer(FALSE) = TRUE THEN
+                END
+            OF '140701'
+                ! Engineer -> Mechanized
+                IF SELF.DrawNode_Engineer_Mechanized(FALSE) = TRUE THEN
+                END
+            OF '140702'
+                ! Engineer -> Motorized
+                IF SELF.DrawNode_Engineer_Motorized(FALSE) = TRUE THEN
+                END
+            OF '140703'
+                ! Engineer -> Reconnaissance
+                IF SELF.DrawNode_Engineer_Recon(FALSE) = TRUE THEN
+                END
+            ELSE
+                IF SELF.DrawNode_Default(FALSE) = TRUE THEN
+                END
+            END

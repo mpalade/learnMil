@@ -416,6 +416,25 @@ CODE
     END        
     
     RETURN TRUE        
+    
+BSOCOllection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
+    CODE
+        SELF.ul.UnitName        = pUrec.UnitName
+        SELF.ul.UnitType        = pURec.UnitType
+        SELF.ul.UnitTypeCode    = pURec.UnitTypeCode
+        SELF.ul.Echelon         = pUrec.Echelon
+        SELF.ul.Hostility       = pUrec.Hostility
+        SELF.ul.IsHQ            = pUrec.IsHQ
+        SELF.ul.xPos            = pUrec.xPos
+        SELF.ul.yPos            = pUrec.yPos
+        
+        !SELF.ul.TreePos         = 1
+        !SELF.ul.markForDel      = FALSE
+        !SELF.ul.markForDisbl    = FALSE
+        ADD(SELF.ul)
+        
+        SELF.selQueuePos    = POINTER(SELF.ul)
+        RETURN TRUE
         
 BSOCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
     CODE
@@ -1129,27 +1148,34 @@ nFillColor      LONG
         
         ! Fill color depending on Hostility
         sst.Trace('SELF.ul.Hostility() = ' & SELF.ul.Hostility())
-        CASE SELF.ul.Hostility()
+        CASE CLIP(SELF.ul.Hostility())
         OF hTpy:Unknown
             ! yellow
             nFillColor  = COLOR:Unknown
+            sst.Trace('nFillColor = COLOR:Unknown')
         OF hTpy:AssumedFriend
             ! blue
             nFillColor  = COLOR:AssumedFriend
+            sst.Trace('nFillColor = COLOR:AssumedFriend')
         OF hTpy:Friend
             ! blue
             nFillColor  = COLOR:Friend
+            sst.Trace('nFillColor = COLOR:Friend')
         OF hTpY:Neutral
             ! green
             nFillColor  = COLOR:Neutral
+            sst.Trace('nFillColor = COLOR:Neutral')
         OF hTpy:Suspect
             ! red
             nFillColor  = COLOR:Suspect
+            sst.Trace('nFillColor = COLOR:Suspect')
         OF hTpy:Hostile
             ! red
             nFillColor  = COLOR:Hostile        
+            sst.Trace('nFillColor = COLOR:Hostile')
         ELSE
             nFillColor  = COLOR:Unknown
+            sst.Trace('nFillColor = COLOR:Unknown')
         END            
         
         ! Fill color depeding on Enable/Disable status for new drag&drop selections
@@ -1157,7 +1183,9 @@ nFillColor      LONG
         IF SELF.ul.markForDisbl() = TRUE THEN
             ! Display as unable for newer selections
             nFillColor  = COLOR:NodeDisabled    
+            sst.Trace('nFillColor = ' & nFillColor)
         END    
+        sst.Trace('nFillColor = ' & nFillColor)
         sst.Trace('before BOX')
         SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
         sst.Trace('after BOX')
@@ -1844,7 +1872,7 @@ OrgChartC2IP.InsertNode     PROCEDURE
         
 OrgChartC2IP.InsertNode     PROCEDURE(*UnitBasicRecord pURec)
     CODE
-        errCode#    = SELF.InsertNode(pUrec)
+        errCode#    = SELF.ul.InsertNode(pUrec)
         IF errCode# = TRUE THEN
             SELF.Redraw()
         END
@@ -2491,4 +2519,57 @@ OverlayC2IP.Destruct        PROCEDURE()
         PARENT.Destruct()
         
         
+OverlayC2IP.Redraw  PROCEDURE()
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        SELF.drwImg.Setpencolor(COLOR:Black)
+        SELF.drwImg.SetPenWidth(1)
         
+        LOOP i# = 1 TO RECORDS(SELF.ul)
+            GET(SELF.ul.ul, i#)
+            IF NOT ERRORCODE() THEN
+                SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, COLOR:Aqua)
+            END
+        END
+ 
+        SELF.drwImg.Display()
+
+        
+        
+OverlayC2IP.DeployBSO       PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG nYPos)
+    CODE
+        sst.Trace('BEGIN:OverlayC2IP.DeployBSO')
+        sst.Trace('nXPos = ' & nXPos & ', nYPos = ' & nYPos)
+        pUrec.xPos  = nXPos
+        pUrec.yPos  = nYPos
+        
+        errCode#    = SELF.ul.InsertNode(pUrec)
+        IF errCode# = TRUE THEN
+            SELF.Redraw()
+        END
+        
+        sst.Trace('END:OverlayC2IP.DeployBSO')
+        RETURN TRUE
+        
+OverlayC2IP.AttachC2IP      PROCEDURE(STRING sFileName)
+jsonItem        &JSONClass
+sC2IPName       STRING(100)
+CODE
+    ! do something
+    
+    json.LoadFile(sFileName)    
+    i# = json.Records()
+    
+    ! C2IP Name
+    jsonItem &= json.GetByName('C2IPName')
+    IF NOT jsonItem &= Null THEN
+        sC2IPName   = json.GetValueByName('C2IPName')
+        
+        SELF.refC2IPs.C2IPPath  = sFileName
+        SELF.refC2IPs.C2IPName  = sC2IPName
+        ADD(SELF.refC2IPs)
+                
+        RETURN TRUE
+    ELSE
+        RETURN FALSE
+    END        

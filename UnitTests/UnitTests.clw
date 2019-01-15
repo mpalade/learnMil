@@ -94,6 +94,17 @@ testOrgChart        UT_OrgChartC2IP
             testOrgChart.InsertNode()
         OrgChartDestroyContext()
         
+        InitContext()
+        aRecord.UnitName    = 'myName'
+        aRecord.UnitTypeCode    = uTpy:Amphibious
+        aRecord.Echelon         = echTpy:Brigade
+        aRecord.Hostility       = hTpy:Hostile
+        aRecord.IsHQ            = TRUE
+        aRecord.xPos            = 100
+        aRecord.yPos            = 100
+            testBSOCollection.AddSpecificNode(aRecord)
+        DestroyContext()
+        
         
 HelloWorld          PROCEDURE
     CODE

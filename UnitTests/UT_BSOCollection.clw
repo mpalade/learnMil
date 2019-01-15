@@ -123,6 +123,13 @@ UT_BSOCollection.InsertSpecificNode PROCEDURE(*UnitBasicRecord pURec)
         ASSERT(aCollection.isHQ() = pURec.IsHQ, 'UT_BSOCollection.InsertSpecificNode:aCollection.isHQ() = ' & aCollection.isHQ())
         RETURN TRUE
         
+UT_BSOCollection.AddSpecificNode    PROCEDURE(*UnitBasicRecord pURec)        
+    CODE
+        aCollection.AddNode(pURec)
+        ASSERT(aCollection.xPos() = pURec.xPos, 'UT_BSOCollection.AddSpecificNode:aCollection.xPos() = ' & pURec.xPos)
+        ASSERT(aCollection.yPos() = pURec.yPos, 'UT_BSOCollection.AddSpecificNode:aCollection.yPos() = ' & pURec.yPos)
+        RETURN TRUE
+        
         
         
         
