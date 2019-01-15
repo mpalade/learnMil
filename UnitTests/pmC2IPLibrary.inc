@@ -1,6 +1,129 @@
 ! Unit Types Equates
-uTpy:notDefined     EQUATE(1000)
-uTpy:infantry       EQUATE(1001)
+uTpy:notDefined     EQUATE('')
+!uTpy:infantry       EQUATE(1001)
+
+uTpy:Amphibious                             EQUATE('120300')    ! Amphibious                
+uTpy:Antitank_Antiarmor                     EQUATE('120400')    ! Antitank/Antiarmor                
+uTpy:Antitank_Antiarmor:Armored             EQUATE('120401')    ! Antitank/Antiarmor->Armored                
+uTpy:Antitank_Antiarmor:Motorized           EQUATE('120402')    ! Antitank/Antiarmor->Motorized
+uTpy:Armor_Armored_Mechanized:Self_Propelled_Tracked                EQUATE('120500')    ! Armor/Armored/Mechanized/Self-Propelled/Tracked
+uTpy:Armor_Armored_Mechanized:Self_Propelled_Tracked:Reconnaissance_Cavalry_Scout   EQUATE('120501')    !Armor/Armored/Mechanized/Self-Propelled/Tracked->Reconnaissance/Cavalry/Scout
+uTpy:Armor_Armored_Mechanized:Self_Propelled_Tracked:Amphibious     EQUATE('120502')    ! Armor/Armored/Mechanized/Self-Propelled/Tracked->Amphibious
+uTpy:Army_Aviation_Aviation_Rotary_Wing                             EQUATE('120600')    ! Army Aviation/Aviation Rotary Wing
+uTpy:Army_Aviation_Aviation_Rotary_Wing:Reconnaissance              EQUATE('120601')    ! Army Aviation/Aviation Rotary Wing->Reconnaissance
+uTpy:Aviation_Composite                     EQUATE('120700')        ! Aviation Composite
+uTpy:Aviation_Fixed_Wing                    EQUATE('120800')        ! Aviation Fixed Wing
+uTpy:Aviation_Fixed_Wing:Reconnaissance     EQUATE('120801')    ! Aviation Fixed Wing->Reconnaissance
+uTpy:Combat                                 EQUATE('120900')        ! Combat
+uTpy:Combined_Arms                          EQUATE('121000')        ! Combined Arms
+uTpy:Infantry                               EQUATE('121100')        ! Infantry
+uTpy:Infantry_Amphibious                    EQUATE('121101')    ! Infantry Amphibious
+uTpy:Infantry_Armored_Mechanized_Tracked    EQUATE('121102')    ! Infantry Armored/Mechanized/Tracked
+uTpy:Infantry_Main_Gun_System               EQUATE('121103')    ! Infantry Main Gun System
+uTpy:Infantry_Motorized                     EQUATE('121104')    ! Infantry Motorized
+uTpy:Infantry_Infantry_Fighting_Vehicle     EQUATE('121105')    ! Infantry Infantry Fighting Vehicle
+uTpy:Observer                               EQUATE('121200')    ! Observer
+uTpy:Reconnaissance_Cavalry_Scout           EQUATE('121300')    ! Reconnaissance/Cavalry/Scout
+uTpy:Reconnaissance_Cavalry_Scout:Reconnaissance_Surveillance       EQUATE('121301')    ! Reconnaissance/Cavalry/Scout -> Reconnaissance and Surveillance
+uTpy:Reconnaissance_Cavalry_Scout_Marine    EQUATE('121302')    ! Reconnaissance/Cavalry/Scout -> Marine
+uTpy:Reconnaissance_Cavalry_Scout_Motorized EQUATE('121303')    ! Reconnaissance/Cavalry/Scout -> Motorized
+uTpy:Sea_Air_Land_SEAL                      EQUATE('121400')    ! Sea Air Land (SEAL)
+uTpy:Snipper                                EQUATE('121500')    ! Snipper
+            
+
+OMIT('__uTpyEquates')
+            OF '121600'
+                ! Surveillance
+            OF '121700'
+                ! Special Forces
+            OF '121800'
+                ! Special Operations Forces (SOF)
+            OF '121801'
+                ! Special Operations Forces (SOF) -> 	Fixed Wing MISO
+            OF '121802'
+                ! Special Operations Forces (SOF) -> 	Ground
+            OF '121803'
+                ! Special Operations Forces (SOF) -> 	Special Boat
+            OF '121804'
+                ! Special Operations Forces (SOF) -> 	Special SSNR
+            OF '121805'
+                ! Special Operations Forces (SOF) -> 	Underwater Demolition Team
+            OF '121900'
+                ! Unmanned Aerial Systems
+            OF '130000'
+                ! Fires
+            OF '130100'
+                ! Air Defense
+            OF '130101'
+                ! Air Defense -> Main Gun System
+            OF '130102'
+                ! Air Defense -> Missile
+            OF '130200'
+                ! Air/Land Naval Gunfire Liaison
+            OF '130300'
+                ! Field Artillery
+            OF '130301'
+                ! Field Artillery -> Self-propelled
+            OF '130302'
+                ! Field Artillery -> Target Acquisition
+            OF '130400'
+                ! Field Artillery Observer
+            OF '130500'
+                ! Joint Fire Support
+            OF '130600'
+                ! Meteorological
+            OF '130700'
+                ! Missile
+            OF '130800'
+                ! Mortar
+            OF '130801'
+                ! Mortar -> Armored/Mechanized/Tracked
+            OF '130802'
+                ! Mortar ->	Self-Propelled Wheeled
+            OF '130803'
+                ! Mortar -> Towed
+            OF '130900'
+                ! Survey
+            OF '140000'
+                ! Protection
+            OF '140100'
+                ! Chemical Biological Radiological Nuclear Defense
+            OF '140101'
+                ! Chemical Biological Radiological Nuclear Defense -> Mechanized
+            OF '140102'
+                ! Chemical Biological Radiological Nuclear Defense -> Motorized
+            OF '140103'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance
+            OF '140104'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Armored
+            OF '140105'
+                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Equipped
+            OF '140200'
+                ! Combat Support (Maneuver Enhancement)
+            OF '140300'
+                ! Criminal Investigation Division
+            OF '140400'
+                ! Diving
+            OF '140500'
+                ! Dog
+            OF '140600'
+                ! Drilling
+            OF '140700'
+                ! Engineer
+                IF SELF.DrawNode_Engineer(FALSE) = TRUE THEN
+                END
+            OF '140701'
+                ! Engineer -> Mechanized
+                IF SELF.DrawNode_Engineer_Mechanized(FALSE) = TRUE THEN
+                END
+            OF '140702'
+                ! Engineer -> Motorized
+                IF SELF.DrawNode_Engineer_Motorized(FALSE) = TRUE THEN
+                END
+    OF '140703'
+        
+        
+        __uTpyEquates
 
 ! Echelon Equates
 echTpy:notDefined   EQUATE(1100)
@@ -126,6 +249,7 @@ SelRight                PROCEDURE(), BOOL
 
 Records                 PROCEDURE(), LONG
 Pointer                 PROCEDURE(), LONG
+GetCurrentSelPos        PROCEDURE(), LONG
 Get                     PROCEDURE(), BOOL
 UnitName                PROCEDURE(), STRING
 SetUnitName             PROCEDURE(STRING sUnitName), BOOL

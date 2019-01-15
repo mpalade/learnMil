@@ -45,7 +45,7 @@ BSOCollection.insertFirstNode PROCEDURE
     CODE
         sst.Trace('START:BSOCollection.insertFirstNode')
         SELF.ul.UnitName        = SELF.prepRndName()
-        SELF.ul.UnitType        = uTpy:notDefined
+        !SELF.ul.UnitType        = uTpy:notDefined
         SELF.ul.UnitTypeCode    = ''
         SELF.ul.Echelon         = echTpy:notDefined        
         SELF.ul.Hostility       = hTpy:Unknown
@@ -556,6 +556,13 @@ BSOCollection.Pointer       PROCEDURE()
         sst.Trace('POINTER(SELF.ul) = ' & POINTER(SELF.ul))
         sst.Trace('END:BSOCollection.Pointer')
         RETURN POINTER(SELF.ul)
+        
+BSOCollection.GetCurrentSelPos      PROCEDURE()
+    CODE
+        sst.Trace('BEGIN:BSOCollection.GetCurrentSelPos')
+        sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+        sst.Trace('END:BSOCollection.GetCurrentSelPos')
+        RETURN SELF.selQueuePos
         
                                 
 
@@ -1151,8 +1158,12 @@ nFillColor      LONG
             ! Display as unable for newer selections
             nFillColor  = COLOR:NodeDisabled    
         END    
+        sst.Trace('before BOX')
         SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
+        sst.Trace('after BOX')
+        sst.Trace('before SHOW')
         SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())   
+        sst.Trace('after SHOW')
         
         sst.Trace('SELF.ul.IsHQ() = ' & SELF.ul.IsHQ())
         IF SELF.ul.IsHQ() THEN

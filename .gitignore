@@ -218,3 +218,8 @@ obj/release/learnMil005.obj
 obj/release/learnMil_BC2.obj
 learnMil006.clw
 UnitTests/UnitTests.sln.cache
+*.LOG
+*.obj
+*.obj
+obj/release/learnMil005.obj
+obj/release/learnMil_BC2.obj

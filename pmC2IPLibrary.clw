@@ -1,55 +1,5 @@
     MEMBER('learnMil')
 
-
-! Unit Types Equates
-uTpy:notDefined     EQUATE(1000)
-uTpy:infantry       EQUATE(1001)
-
-! Echelon Equates
-echTpy:notDefined   EQUATE(1100)
-echTpy:Team         EQUATE(1101)
-echTpy:Squad        EQUATE(1102)
-echTpy:Section      EQUATE(1103)
-echTpy:Platoon      EQUATE(1104)
-echTpy:Company      EQUATE(1105)
-echTpy:Battalion    EQUATE(1106)
-echTpy:Regiment     EQUATE(1107)
-echTpy:Brigade      EQUATE(1108)
-echTpy:Division     EQUATE(1109)
-echTpy:Corps        EQUATE(1110)
-echTpy:Army         EQUATE(1111)
-echTpy:ArmyGroup    EQUATE(1112)
-echTpy:Theater      EQUATE(1113)
-echTpy:Command      EQUATE(1114)
-
-! Hostility Equates
-hTpy:notDefined     EQUATE(1500)
-hTpy:Unknown        EQUATE(1501)
-hTpy:AssumedFriend  EQUATE(1502)
-hTpy:Friend         EQUATE(1503)
-hTpy:Neutral        EQUATE(1504)
-hTpy:Suspect        EQUATE(1505)
-hTpy:Hostile        EQUATE(1506)
-
-! Hostility Color
-COLOR:notDefined    EQUATE(COLOR:Yellow)
-COLOR:Unknown       EQUATE(COLOR:Yellow)
-COLOR:AssumedFriend EQUATE(COLOR:Aqua)
-COLOR:Friend        EQUATE(COLOR:Aqua)
-COLOR:Neutral       EQUATE(COLOR:Green)
-COLOR:Suspect       EQUATE(COLOR:Red)
-COLOR:Hostile       EQUATE(COLOR:Red)
-
-! Disable for selection color
-COLOR:NodeDisabled  EQUATE(COLOR:Gray)
-
-! entry fields
-!?uNameEntry         EQUATE(900)
-!?uTypeList          EQUATE(901)
-!?uHQ                EQUATE(902)
-!?ListSymbology      EQUATE(903)
-
-
     MAP
     END
 
@@ -95,9 +45,10 @@ BSOCollection.insertFirstNode PROCEDURE
     CODE
         sst.Trace('START:BSOCollection.insertFirstNode')
         SELF.ul.UnitName        = SELF.prepRndName()
-        SELF.ul.UnitType        = uTpy:notDefined
+        !SELF.ul.UnitType        = uTpy:notDefined
         SELF.ul.UnitTypeCode    = ''
         SELF.ul.Echelon         = echTpy:notDefined        
+        SELF.ul.Hostility       = hTpy:Unknown
         SELF.ul.IsHQ            = FALSE
         SELF.ul.xPos            = 1
         SELF.ul.yPos            = 1
@@ -131,6 +82,7 @@ BSOCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
         SELF.urec.UnitType      = SELF.ul.UnitType
         SELF.urec.UnitTypeCode  = SELF.ul.UnitTypeCode
         SELF.urec.Echelon       = SELF.ul.Echelon
+        SELF.ul.Hostility       = SELF.ul.Hostility
         SELF.urec.IsHQ          = SELF.ul.IsHQ
         SELF.urec.xPos          = (SELF.urec.TreePos-1)*50 + 1
         SELF.urec.yPos          = (nNewRecPosition - 1)*30 + 1
@@ -148,6 +100,7 @@ BSOCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
                 SELF.tmpul.UnitType     = SELF.ul.UnitType
                 SELF.tmpul.UnitTypeCode = SELF.ul.UnitTypeCode
                 SELF.tmpul.Echelon      = SELF.ul.Echelon
+                SELF.tmpul.Hostility    = SELF.ul.Hostility
                 SELF.tmpul.xPos         = SELF.ul.xPos
                 SELF.tmpul.yPos         = SELF.ul.yPos + 30
                 ADD(SELF.tmpul)
@@ -173,6 +126,7 @@ BSOCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
             SELF.ul.UnitType    = SELF.urec.UnitType
             SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
             SELF.ul.Echelon     = SELF.urec.Echelon
+            SELF.ul.Hostility   = SELF.urec.Hostility
             SELF.ul.xPos        = SELF.urec.xPos
             SELF.ul.yPos        = SELF.urec.yPos
             SELF.ul.markForDel  = FALSE
@@ -196,6 +150,7 @@ BSOCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)
                     SELF.ul.UnitType    = SELF.tmpul.UnitType
                     SELF.ul.UnitTypeCode    = SELF.tmpul.UnitTypeCode
                     SELF.ul.Echelon     = SELF.tmpul.Echelon
+                    SELF.ul.Hostility   = SELF.tmpul.Hostility
                     SELF.ul.xPos        = SELF.tmpul.xPos
                     SELF.ul.yPos        = SELF.tmpul.yPos
                     SELF.ul.markForDel  = FALSE
@@ -214,6 +169,7 @@ BSOCollection.insertLastNode        PROCEDURE()
         SELF.ul.UnitType        = SELF.urec.UnitType
         SELF.ul.UnitTypeCode    = SELF.urec.UnitTypeCode
         SELF.ul.Echelon         = SELF.urec.Echelon
+        SELF.ul.Hostility       = SELF.urec.Hostility
         SELF.ul.xPos            = SELF.urec.xPos
         SELF.ul.yPos            = SELF.urec.yPos
         SELF.ul.markForDel      = FALSE
@@ -600,6 +556,13 @@ BSOCollection.Pointer       PROCEDURE()
         sst.Trace('POINTER(SELF.ul) = ' & POINTER(SELF.ul))
         sst.Trace('END:BSOCollection.Pointer')
         RETURN POINTER(SELF.ul)
+        
+BSOCollection.GetCurrentSelPos      PROCEDURE()
+    CODE
+        sst.Trace('BEGIN:BSOCollection.GetCurrentSelPos')
+        sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+        sst.Trace('END:BSOCollection.GetCurrentSelPos')
+        RETURN SELF.selQueuePos
         
                                 
 
@@ -1195,8 +1158,12 @@ nFillColor      LONG
             ! Display as unable for newer selections
             nFillColor  = COLOR:NodeDisabled    
         END    
+        sst.Trace('before BOX')
         SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
+        sst.Trace('after BOX')
+        sst.Trace('before SHOW')
         SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())   
+        sst.Trace('after SHOW')
         
         sst.Trace('SELF.ul.IsHQ() = ' & SELF.ul.IsHQ())
         IF SELF.ul.IsHQ() THEN
