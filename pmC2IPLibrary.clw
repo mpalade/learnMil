@@ -1553,6 +1553,7 @@ OrgChartC2IP.InsertNode     PROCEDURE(*UnitBasicRecord pURec)
         errCode#    = SELF.ul.InsertNode(pUrec)
         IF errCode# = TRUE THEN
             SELF.Redraw()
+            SELF.DisplaySelection()
         END
         
         
@@ -1653,7 +1654,7 @@ CODE
     
     
     
-OrgChartC2IP.DisplaySelection     PROCEDURE
+C2IP.DisplaySelection     PROCEDURE
 CODE
     ! display SELECTION frame (red) for the current selection
     sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection')
@@ -1666,7 +1667,7 @@ CODE
     END
     sst.Trace('END:OrgChartC2IP.DisplaySelection')
     
-OrgChartC2IP.DisplaySelection       PROCEDURE(LONG nXPos, LONG nYPos)
+C2IP.DisplaySelection       PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
         sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection(' & nXPos & ', ' & nYPos & ')')
         SELF.drwImg.Setpencolor(COLOR:Red)
@@ -1677,7 +1678,7 @@ OrgChartC2IP.DisplaySelection       PROCEDURE(LONG nXPos, LONG nYPos)
         
     
     
-OrgChartC2IP.DisplayUnselection     PROCEDURE
+C2IP.DisplayUnselection     PROCEDURE
 CODE
     ! display NORMAL frame (black) for the current selection
     sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection')
@@ -1692,7 +1693,7 @@ CODE
     END
     sst.Trace('END:OrgChartC2IP.DisplayUnselection')
     
-OrgChartC2IP.DisplayUnselection     PROCEDURE(LONG nXPos, LONG nYPos)
+C2IP.DisplayUnselection     PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
         sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection (' & nXPos & ', ' & nYPos & ')')
         SELF.drwImg.Setpencolor(COLOR:White)
@@ -1767,6 +1768,8 @@ CODE
         
         SELF.selTreePos     = SELF.ul.TreePos()
         SELF.selQueuePos    = SELF.ul.Pointer()
+        SELF.DisplaySelection()
+    ELSE
         SELF.DisplaySelection()
     END
                 
@@ -2203,6 +2206,12 @@ OverlayC2IP.Redraw  PROCEDURE()
         SELF.drwImg.Setpencolor(COLOR:Black)
         SELF.drwImg.SetPenWidth(1)
         
+        ! background map
+        IF LEN(CLIP(SELF.map)) > 0 THEN
+            SELF.drwImg.Image(1, 1, , , SELF.map)
+        END
+        
+        
         LOOP i# = 1 TO RECORDS(SELF.ul)
             GET(SELF.ul.ul, i#)
             IF NOT ERRORCODE() THEN
@@ -2229,6 +2238,7 @@ OverlayC2IP.DeployBSO       PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG n
         errCode#    = SELF.ul.AddNode(pUrec)
         IF errCode# = TRUE THEN
             SELF.Redraw()
+            SELF.DisplaySelection()
         END
         
         sst.Trace('END:OverlayC2IP.DeployBSO')
@@ -2256,6 +2266,15 @@ CODE
     ELSE
         RETURN FALSE
     END        
+    
+    
+OverlayC2IP.AttachMap       PROCEDURE(STRING sFileName)
+    CODE
+        MESSAGE('sFileName = ' & sFileName)
+        SELF.map    = sFileName
+        !SELF.drwImg.Image(1, 1, , , sFileName)
+        SELF.Redraw()        
+        RETURN TRUE
     
     
 C2IP.DrawNode_MainSymbol    PROCEDURE

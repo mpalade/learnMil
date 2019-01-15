@@ -290,6 +290,11 @@ Construct               PROCEDURE
 Destruct                PROCEDURE
 InitDraw                PROCEDURE(Draw pDraw), LONG
 
+DisplaySelection        PROCEDURE, PROTECTED
+DisplaySelection        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+DisplayUnselection      PROCEDURE, PROTECTED
+DisplayUnselection      PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+
 !DrawNode variants
 DrawNode_MainSymbol     PROCEDURE(), PROTECTED
 DrawNode_HQ             PROCEDURE(), PROTECTED
@@ -376,11 +381,6 @@ GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
 DeleteNode              PROCEDURE
 DisableNode             PROCEDURE
 
-DisplaySelection        PROCEDURE, PRIVATE
-DisplaySelection        PROCEDURE(LONG nXPos, LONG nYPos), PRIVATE
-DisplayUnselection      PROCEDURE, PRIVATE
-DisplayUnselection      PROCEDURE(LONG nXPos, LONG nYPos), PRIVATE
-
 SelUp                   PROCEDURE
 SelDown                 PROCEDURE
 SelLeft                 PROCEDURE
@@ -431,6 +431,7 @@ HostilityMenuOptions    PROCEDURE(), STRING, PRIVATE
 OverlayC2IP         CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 !Name                    STRING(100)
 !ul                      &UnitsList
+map                     STRING(100)
 
 Construct               PROCEDURE
 Destruct                PROCEDURE
@@ -441,6 +442,7 @@ DeployBSO               PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG nYPos
 
 ! referenced C2IPs
 AttachC2IP              PROCEDURE(STRING sFileName), LONG
+AttachMap               PROCEDURE(STRING sFileName), LONG
                     END
 
 
