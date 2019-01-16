@@ -162,13 +162,19 @@ OverlayC2IP.AttachMap       PROCEDURE(STRING sFileName)
         
         
 OverlayC2IP.TakeNodeAction   PROCEDURE(LONG nOption)
+startPos                            GROUP(PosRecord)
+                                    END
 
+endPos                              GROUP(PosRecord)
+                                    END
 CODE
     ! do something
     
     CASE nOption
     OF 1
         ! Supporting Attack
+        SELF.TakePoints(startPos, endPos)       
+        SELF.DA_SupportingAttack(startPos, endPos)
     END
     
     RETURN TRUE    
@@ -177,13 +183,27 @@ CODE
     
     
 OverlayC2IP.NodeActionsMenuOptions   PROCEDURE()
-
 CODE
-    ! do something
-    
+    ! do something    
     RETURN 'Supporting Attack'        
     
+OverlayC2IP.DA_SupportingAttack     PROCEDURE(PosRecord startPos, PosRecord endPos)
+    CODE
+        dX#   = endPos.xPos - startPos.xPos
+        dY#    = endPos.yPos - startPos.yPos
+        i#     = SQRT(dX#*dX# + dY#*dY#)
+        
+        SELF.drwImg.Line(startPos.xPos, startPos.yPos, dX#, dY#)
+        SELF.drwImg.Line(endPos.xPos, endPos.yPos, -(0.15*i#), -(0.15*i#))
+        SELF.drwImg.Line(endPos.xPos, endPos.yPos, -(0.15*i#), +(0.15*i#))
+        SELF.drwImg.Display()
     
+OverlayC2IP.TakePoints      PROCEDURE(PosRecord startPos, PosRecord endPos)    
+    CODE
+        startPos.xPos   = SELF.ul.xPos()
+        startPos.yPos   = SELF.ul.yPos()
+        endPos.xPos     = startPos.xPos + 50
+        endPos.yPos     = startPos.yPos - 30
 
 
 

@@ -184,6 +184,12 @@ markForDel              BOOL
 markForDisbl            BOOL
                     END
 
+PosRecord           GROUP, TYPE
+xPos                        LONG
+yPos                        LONG
+                    END
+
+
 ! Unit Basic Record Structure
 UnitBasicRecord     GROUP, TYPE
 UnitName                    STRING(100)
@@ -450,6 +456,9 @@ MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 
 TakeNodeAction          PROCEDURE(LONG nOption), LONG
 NodeActionsMenuOptions  PROCEDURE(), STRING
+
+DA_SupportingAttack     PROCEDURE(PosRecord startPos,PosRecord endPos)
+TakePoints              PROCEDURE(PosRecord startPos, PosRecord endPos)    
                     END
 
 
