@@ -268,11 +268,12 @@ SetHQ                   PROCEDURE(BOOL bIsHQ), BOOL
 TreePos                 PROCEDURE(), LONG
 
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
+ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
     
 
 ! Generic C2IP structure
-C2IP                CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+C2IP                CLASS, MODULE('C2IP.clw'), LINK('C2IP.clw'), TYPE
 Name                    STRING(100)
 ul                      &BSOCollection
 tmpul                   &BSOCollection
@@ -288,6 +289,9 @@ labelEditMode           BOOL, PRIVATE
 
 Construct               PROCEDURE
 Destruct                PROCEDURE
+Redraw                  PROCEDURE, PROTECTED, VIRTUAL
+
+
 InitDraw                PROCEDURE(Draw pDraw), LONG
 
 DisplaySelection        PROCEDURE, PROTECTED
@@ -350,10 +354,28 @@ DrawNode_Engineer_Recon           PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTE
 
 DrawNode_Echelon        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
 
+SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+Unselect                PROCEDURE(), LONG
+MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+
+GetUnitName             PROCEDURE(), STRING
+SetUnitName             PROCEDURE(STRING sUnitName), LONG
+
+GetUnitTypeCode         PROCEDURE(), STRING
+SetUnitTypeCode         PROCEDURE(STRING sUnitTypeCode), LONG
+
+GetEchelon              PROCEDURE(), LONG
+SetEchelon              PROCEDURE(LONG nEchelon), LONG
+
+GetHostility            PROCEDURE(), LONG
+SetHostility            PROCEDURE(LONG nHostility), LONG
+
+GetHQ                   PROCEDURE(), BOOL
+SetHQ                   PROCEDURE(BOOL bIsHQ), BOOL
                     END
 
 ! Organization Chart structure
-OrgChartC2IP        CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+OrgChartC2IP        CLASS(C2IP), MODULE('OrgChartC2IP.clw'), LINK('OrgChartC2IP.clw'), TYPE
 
 ! Unit basic record structure
 urec                    GROUP(UnitBasicRecord)
@@ -371,7 +393,7 @@ nEchelon                LONG, PRIVATE
 Construct               PROCEDURE                           
 Destruct                PROCEDURE
 
-Redraw                  PROCEDURE, PRIVATE
+Redraw                  PROCEDURE, PROTECTED, VIRTUAL
 
 
 
@@ -383,27 +405,8 @@ DisableNode             PROCEDURE
 
 SelUp                   PROCEDURE
 SelDown                 PROCEDURE
-SelLeft                 PROCEDURE
-SelRight                PROCEDURE
 
-SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
-Unselect                PROCEDURE(), LONG
-
-
-GetUnitName             PROCEDURE(), STRING
-SetUnitName             PROCEDURE(STRING sUnitName), LONG
-
-GetUnitTypeCode         PROCEDURE(), STRING
-SetUnitTypeCode         PROCEDURE(STRING sUnitTypeCode), LONG
-
-GetEchelon              PROCEDURE(), LONG
-SetEchelon              PROCEDURE(LONG nEchelon), LONG
-
-GetHostility            PROCEDURE(), LONG
-SetHostility            PROCEDURE(LONG nHostility), LONG
-
-GetHQ                   PROCEDURE(), BOOL
-SetHQ                   PROCEDURE(BOOL bIsHQ), BOOL
+SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 
 ! persistence layer
 Save                    PROCEDURE(), LONG
@@ -428,21 +431,25 @@ HostilityMenuOptions    PROCEDURE(), STRING, PRIVATE
                     END
 
 ! Overlay structure
-OverlayC2IP         CLASS(C2IP), MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
-!Name                    STRING(100)
-!ul                      &UnitsList
+OverlayC2IP         CLASS(C2IP), MODULE('OverlayC2IP.clw'), LINK('OverlayC2IP.clw'), TYPE
 map                     STRING(100)
 
 Construct               PROCEDURE
 Destruct                PROCEDURE
 
-Redraw                  PROCEDURE
+Redraw                  PROCEDURE, PROTECTED, VIRTUAL
 
 DeployBSO               PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG nYPos), BOOL
 
 ! referenced C2IPs
 AttachC2IP              PROCEDURE(STRING sFileName), LONG
 AttachMap               PROCEDURE(STRING sFileName), LONG
+
+SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+
+TakeNodeAction          PROCEDURE(LONG nOption), LONG
+NodeActionsMenuOptions  PROCEDURE(), STRING
                     END
 
 
