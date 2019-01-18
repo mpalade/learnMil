@@ -169,6 +169,13 @@ COLOR:NodeDisabled  EQUATE(COLOR:Gray)
 !?uHQ                EQUATE(902)
 !?ListSymbology      EQUATE(903)
 
+! geometries
+g:NotDefined        EQUATE(1000)
+g:Point             EQUATE(1001)
+g:Line              EQUATE(1002)
+g:FreeLine          EQUATE(1003)
+g:AxisAdvance       EQUATE(1010)
+
 ! Units Queue Structure
 UnitsList           QUEUE, TYPE
 UnitName                STRING(100)
@@ -188,6 +195,12 @@ PosRecord           GROUP, TYPE
 xPos                        LONG
 yPos                        LONG
                     END
+
+PosList            QUEUE, TYPE
+xPos                        LONG
+yPos                        LONG
+                    END
+
 
 
 ! Unit Basic Record Structure
@@ -287,6 +300,21 @@ tmpUnitName             STRING(100), PRIVATE
 
 ! Draw representation
 drwImg                  &Draw
+TakeEvent               PROCEDURE()
+geometry                LONG        ! geometry equates
+isPointsCollection      BOOL, PROTECTED
+isSelection             BOOL, PROTECTED
+Preview_Line            PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+Draw_AxisAdvance        PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
+
+p1x                     LONG, PRIVATE
+p1y                     LONG, PRIVATE
+PolyPoints              LONG, PRIVATE
+pp                      &PosList, PRIVATE
+
+TakePoints              PROCEDURE(LONG nGeometry)
 
 ! referenced C2IPs list
 refC2IPs                &C2IPsList

@@ -43,11 +43,20 @@ C2IP.Construct      PROCEDURE()
     ! referenced C2IPs list
     SELF.refC2IPs   &= NEW(C2IPsList)
     
-    SELF.labelEditMode  = FALSE
+        SELF.labelEditMode  = FALSE
+    
+    SELF.isSelection        = FALSE        
+    SELF.isPointsCollection = FALSE
+        
+    SELF.PolyPoints = 0    
+    SELF.pp     &= NEW(PosList)    
+    
         
 C2IP.Destruct       PROCEDURE()
     CODE    
         ! destroy default objects    
+        DISPOSE(SELF.pp)
+        
         DISPOSE(SELF.refC2IPs)        
         DISPOSE(SELF.tmpul)
         DISPOSE(SELF.ul)
@@ -1159,3 +1168,144 @@ C2IP.DrawNode_MainSymbol    PROCEDURE
 C2IP.Redraw         PROCEDURE()
     CODE
         ! nothing to redraw at this class level    
+        
+C2IP.TakeEvent      PROCEDURE()
+    CODE
+        CASE EVENT()
+        OF EVENT:MouseUp
+            ! mouse up     
+            IF SELF.isPointsCollection = TRUE THEN
+                ! points collected
+                CASE SELF.geometry
+                OF g:Point
+                    ! finalize point
+                OF g:Line
+                    ! final line
+                OF g:FreeLine                    
+                    ! final dree line
+                OF g:AxisAdvance
+                    ! Axis of Advance
+                    SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
+                END
+                SELF.isPointsCollection = FALSE
+            END
+            
+        OF EVENT:MouseMove
+            ! mouse move
+            IF SELF.isPointsCollection = TRUE THEN
+                CASE SELF.geometry
+                OF g:Point
+                    ! Point                    
+                OF g:Line
+                    ! Line
+                    SELF.Preview_Line(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                    !SELF.PreviewArrow(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                OF g:FreeLine                    
+                    SELF.Preview_FreeLine(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                OF g:AxisAdvance
+                    ! Axis of Advance
+                    SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                END                
+            END
+            
+        OF EVENT:MouseDown
+            ! mouse down
+            IF SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
+                SELF.isSelection   = TRUE                                
+            END
+            IF SELF.isPointsCollection = FALSE THEN
+                ! collect points
+                SELF.p1x    = SELF.drwImg.MouseX()
+                SELF.p1y    = SELF.drwImg.MouseY()                
+                SELF.isPointsCollection = TRUE
+            END
+            
+        OF EVENT:Drop
+            ! DROP
+
+END
+            
+        END
+        
+C2IP.TakePoints     PROCEDURE(LONG nGeometry)
+    CODE
+        SELF.geometry           = nGeometry                   
+        
+C2IP.Preview_Line    PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        SELF.drwImg.Display()
+        
+C2IP.Preview_Arrow   PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        dX# = nXPos - SELF.p1x
+        dY# = nYPos - SELF.p1y
+        i#  = SQRT(dX#*dX# + dY#*dY#)
+        SELF.drwImg.Line(nXPos, nYPos, -0.2*i#, -0.2*i#)
+        SELF.drwImg.Line(nXPos, nYPos, 0.2*i#, 0.2*i#)
+        SELF.drwImg.Display()
+        
+C2IP.Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE                
+        IF SELF.PolyPoints = 0 THEN
+            SELF.pp.xPos    = SELF.p1x
+            SELF.pp.yPos    = SELF.p1y
+            ADD(SELF.pp)
+            SELF.PolyPoints +=  1            
+        END        
+        
+        dx# = nXPos - SELF.pp.xPos
+        dy# = nYPos - SELF.pp.yPos
+        SELF.drwImg.Line(SELF.pp.xPos, SELF.pp.yPos, dx#, dy#)
+                
+        SELF.pp.xPos    = nXPos
+        SELF.pp.yPos    = nYPos
+        ADD(SELF.pp)      
+        SELF.PolyPoints +=  1
+        
+        SELF.drwImg.Display()
+        
+C2IP.Draw_AxisAdvance   PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)        
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        END        
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        
+        
+        dx# = nXPos - SELF.p1x
+        dy# = nYPos - SELF.p1y
+        L#  = SQRT(dx#*dx# + dy#*dy#)
+        wdth#  = 20
+        
+        lx# = dy#*wdth#/L#
+        ly# = dx#*wdth#/L#
+        
+        SELF.drwImg.Line(SELF.p1x - lx#, SELF.p1y + ly#, dx#, dy#)
+        SELF.drwImg.Line(SELF.p1x + lx#, SELF.p1y - ly#, dx#, dy#)
+        
+        llx#    = dy#*2*wdth#/L#
+        lly#    = dx#*2*wdth#/L#
+        
+        SELF.drwImg.Line(nXPos, nYPos, -llx#, lly#)
+        SELF.drwImg.Line(nXPos, nYPos, llx#, -lly#)
+        
+        hght#   = 20
+        
+        hx#     = hght#*dx#/L#
+        hy#     = hght#*dy#/L#
+        
+        SELF.drwImg.Line(nXPos, nYPos, hx#, hy#)
+        
+        
+        
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()
+        
+        
+        
+        
