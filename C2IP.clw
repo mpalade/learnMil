@@ -31,8 +31,8 @@ C2IP.Construct      PROCEDURE()
         ! initialize default objects    
     !SELF.ul     &= NEW(UnitsList)
     !SELF.tmpul  &= NEW(UnitsList)
-        SELF.ul     &= NEW(BSOCollection)
-        SELF.tmpul  &= NEW(BSOCollection)
+        SELF.ul     &= NEW(UnitsCollection)
+        SELF.tmpul  &= NEW(UnitsCollection)
     
     ! default C2IP Name
     SELF.Name   = ''
@@ -1206,7 +1206,7 @@ C2IP.TakeEvent      PROCEDURE()
                     ! Axis of Advance
                     SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
                 END                
-            END
+            END            
             
         OF EVENT:MouseDown
             ! mouse down
@@ -1222,10 +1222,8 @@ C2IP.TakeEvent      PROCEDURE()
             
         OF EVENT:Drop
             ! DROP
-
-END
+    END
             
-        END
         
 C2IP.TakePoints     PROCEDURE(LONG nGeometry)
     CODE
@@ -1271,8 +1269,10 @@ C2IP.Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos)
 C2IP.Draw_AxisAdvance   PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)        
     CODE
         SELF.drwImg.Blank(COLOR:White)
-        IF bPreview THEN            
+        IF bPreview = TRUE THEN            
             SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
         END        
         SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
         

@@ -21,18 +21,18 @@ BSO.Construct       PROCEDURE()
 BSO.Destruct        PROCEDURE()
     CODE
         
-BSOCollection.Construct     PROCEDURE()
+UnitsCollection.Construct     PROCEDURE()
     CODE
         SELF.ul     &= NEW(UnitsList)
         SELF.tmpul  &=NEW(UnitsList)
         
-BSOCollection.Destruct      PROCEDURE()
+UnitsCollection.Destruct      PROCEDURE()
     CODE         
         DISPOSE(SELF.tmpul)
         DISPOSE(SELF.ul)   
         
     
-BSOCollection.prepRndName   PROCEDURE
+UnitsCollection.prepRndName   PROCEDURE
 tmpUnitName     STRING(100)
     CODE
         LOOP 10 TIMES
@@ -41,9 +41,9 @@ tmpUnitName     STRING(100)
         
         RETURN tmpUnitName
         
-BSOCollection.insertFirstNode PROCEDURE
+UnitsCollection.insertFirstNode PROCEDURE
     CODE
-        sst.Trace('START:BSOCollection.insertFirstNode')
+        sst.Trace('START:UnitsCollection.insertFirstNode')
         SELF.ul.UnitName        = SELF.prepRndName()
         !SELF.ul.UnitType        = uTpy:notDefined
         SELF.ul.UnitTypeCode    = ''
@@ -66,15 +66,15 @@ BSOCollection.insertFirstNode PROCEDURE
         ELSE
             sst.Trace('ADD(SELF.ul) error')
         END
-        sst.Trace('END:BSOCollection.insertFirstNode')
+        sst.Trace('END:UnitsCollection.insertFirstNode')
         
         
         
         
         
-BSOCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
+UnitsCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
     CODE
-        sst.Trace('START:BSOCollection.prepNewNode')        
+        sst.Trace('START:UnitsCollection.prepNewNode')        
         CLEAR(SELF.urec)
         SELF.urec.TreePos       = SELF.selTreePos
         SELF.urec.UnitName      = SELF.prepRndName()
@@ -86,11 +86,11 @@ BSOCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
         SELF.urec.IsHQ          = SELF.ul.IsHQ
         SELF.urec.xPos          = (SELF.urec.TreePos-1)*50 + 1
         SELF.urec.yPos          = (nNewRecPosition - 1)*30 + 1
-        sst.Trace('END:BSOCollection.prepNewNode')        
+        sst.Trace('END:UnitsCollection.prepNewNode')        
         
-BSOCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
+UnitsCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
     CODE
-        sst.Trace('START:BSOCollection.moveNodesToTmp')        
+        sst.Trace('START:UnitsCollection.moveNodesToTmp')        
         FREE(SELF.tmpul)       
         LOOP i# = nStartPos TO nEndPos
             GET(SELF.ul, i#)
@@ -106,19 +106,19 @@ BSOCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
                 ADD(SELF.tmpul)
             END            
         END
-        sst.Trace('END:BSOCollection.moveNodesToTmp')        
+        sst.Trace('END:UnitsCollection.moveNodesToTmp')        
         
-BSOCollection.addEmptyNode       PROCEDURE
+UnitsCollection.addEmptyNode       PROCEDURE
     CODE
-        sst.Trace('START:BSOCollection.insertEmptyNode')        
+        sst.Trace('START:UnitsCollection.insertEmptyNode')        
         ADD(SELF.ul)
         IF NOT ERRORCODE() THEN
         END        
-        sst.Trace('END:BSOCollection.insertEmptyNode')        
+        sst.Trace('END:UnitsCollection.insertEmptyNode')        
         
-BSOCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
+UnitsCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
     CODE
-        sst.Trace('START:BSOCollection.insertCurrentNode')        
+        sst.Trace('START:UnitsCollection.insertCurrentNode')        
         GET(SELF.ul, nPosition)
         IF NOT ERRORCODE() THEN
             SELF.ul.TreePos     = SELF.urec.TreePos
@@ -133,11 +133,11 @@ BSOCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
             SELF.ul.markForDisbl    = FALSE
             PUT(SELF.ul)
         END
-        sst.Trace('END:BSOCollection.insertCurrentNode')        
+        sst.Trace('END:UnitsCollection.insertCurrentNode')        
         
-BSOCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)        
+UnitsCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)        
     CODE
-        sst.Trace('START:BSOCollection.moveNodesBackFromTmp')        
+        sst.Trace('START:UnitsCollection.moveNodesBackFromTmp')        
         j# = 0
         LOOP i# = nStartPos TO RECORDS(SELF.ul)
             j# = j# + 1
@@ -159,11 +159,11 @@ BSOCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)
                 END                    
             END            
         END        
-        sst.Trace('END:BSOCollection.moveNodesBackFromTmp')        
+        sst.Trace('END:UnitsCollection.moveNodesBackFromTmp')        
         
-BSOCollection.insertLastNode        PROCEDURE()
+UnitsCollection.insertLastNode        PROCEDURE()
     CODE
-        sst.Trace('START:BSOCollection.insertLastNode')        
+        sst.Trace('START:UnitsCollection.insertLastNode')        
         SELF.ul.TreePos         = SELF.urec.TreePos
         SELF.ul.UnitName        = SELF.urec.UnitName
         SELF.ul.UnitType        = SELF.urec.UnitType
@@ -184,15 +184,15 @@ BSOCollection.insertLastNode        PROCEDURE()
         ELSE
             sst.Trace('ADD(SELF.ul) error')
         END        
-        sst.Trace('END:BSOCollection.insertLastNode')        
+        sst.Trace('END:UnitsCollection.insertLastNode')        
         
         
         
-BSOCollection.InsertNode    PROCEDURE
+UnitsCollection.InsertNode    PROCEDURE
 tmpUnitName     STRING(100)
 CODE
     ! insert a new node to the current collection
-    sst.Trace('START:BSOCollection.InsertNode')
+    sst.Trace('START:UnitsCollection.InsertNode')
         
     tmpUnitName    = SELF.prepRndName()
     
@@ -267,10 +267,10 @@ CODE
     sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
     sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
     sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
-    sst.Trace('END:BSOCollection.InsertNode')
+    sst.Trace('END:UnitsCollection.InsertNode')
     
     
-BSOCollection.InsertNode    PROCEDURE(*UnitBasicRecord pURec)
+UnitsCollection.InsertNode    PROCEDURE(*UnitBasicRecord pURec)
 tmpUnitName         STRING(100)
 CODE
     ! do something
@@ -417,7 +417,7 @@ CODE
     
     RETURN TRUE        
     
-BSOCOllection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
+UnitsCollection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
     CODE
         SELF.ul.UnitName        = pUrec.UnitName
         SELF.ul.UnitType        = pURec.UnitType
@@ -436,7 +436,7 @@ BSOCOllection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
         SELF.selQueuePos    = POINTER(SELF.ul)
         RETURN TRUE
         
-BSOCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
+UnitsCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
     CODE
         ! get current node
     
@@ -456,7 +456,7 @@ BSOCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
             RETURN FALSE
         END    
         
-BSOCollection.GetNode       PROCEDURE()
+UnitsCollection.GetNode       PROCEDURE()
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -467,7 +467,7 @@ BSOCollection.GetNode       PROCEDURE()
         
         
         
-BSOCollection.DeleteNode     PROCEDURE
+UnitsCollection.DeleteNode     PROCEDURE
 CODE
     ! do something
     
@@ -516,7 +516,7 @@ CODE
         
     END                
     
-BSOCollection.DisableNode    PROCEDURE
+UnitsCollection.DisableNode    PROCEDURE
 CODE
     ! do something
     
@@ -527,7 +527,7 @@ CODE
         PUT(SELF.ul)
     END   
     
-BSOCollection.SelUp     PROCEDURE
+UnitsCollection.SelUp     PROCEDURE
 CODE
     ! do something
     
@@ -539,7 +539,7 @@ CODE
     END
     
     
-BSOCollection.SelDown     PROCEDURE
+UnitsCollection.SelDown     PROCEDURE
 CODE
     ! do something
     
@@ -551,60 +551,60 @@ CODE
     END
     
     
-BSOCollection.SelLeft     PROCEDURE
+UnitsCollection.SelLeft     PROCEDURE
 CODE
     ! do something
     RETURN TRUE
         
     
-BSOCollection.SelRight     PROCEDURE
+UnitsCollection.SelRight     PROCEDURE
 CODE
     ! do something    
     RETURN TRUE
                    
-BSOCollection.Records       PROCEDURE()        
+UnitsCollection.Records       PROCEDURE()        
     CODE
-        sst.Trace('BEGIN:BSOCollection.Records')
+        sst.Trace('BEGIN:UnitsCollection.Records')
         sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
-        sst.Trace('END:BSOCollection.Records')
+        sst.Trace('END:UnitsCollection.Records')
         RETURN RECORDS(SELF.ul)
         
-BSOCollection.Pointer       PROCEDURE()
+UnitsCollection.Pointer       PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.Pointer')
+        sst.Trace('BEGIN:UnitsCollection.Pointer')
         sst.Trace('POINTER(SELF.ul) = ' & POINTER(SELF.ul))
-        sst.Trace('END:BSOCollection.Pointer')
+        sst.Trace('END:UnitsCollection.Pointer')
         RETURN POINTER(SELF.ul)
         
-BSOCollection.GetCurrentSelPos      PROCEDURE()
+UnitsCollection.GetCurrentSelPos      PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.GetCurrentSelPos')
+        sst.Trace('BEGIN:UnitsCollection.GetCurrentSelPos')
         sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
-        sst.Trace('END:BSOCollection.GetCurrentSelPos')
+        sst.Trace('END:UnitsCollection.GetCurrentSelPos')
         RETURN SELF.selQueuePos
         
                                 
 
-BSOCollection.Get        PROCEDURE()
+UnitsCollection.Get        PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.Get()')
+        sst.Trace('BEGIN:UnitsCollection.Get()')
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
             succes# = TRUE
         ELSE
             success# = FALSE
         END
-        sst.Trace('END:BSOCollection.Get')
+        sst.Trace('END:UnitsCollection.Get')
         RETURN success#
 
-BSOCollection.UnitTypeCode  PROCEDURE()
+UnitsCollection.UnitTypeCode  PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.UnitTypeCode')
+        sst.Trace('BEGIN:UnitsCollection.UnitTypeCode')
         sst.Trace('SELF.ul.UnitTypeCode = ' & SELF.ul.UnitTypeCode)
-        sst.Trace('END:BSOCollection.UnitTypeCode')
+        sst.Trace('END:UnitsCollection.UnitTypeCode')
         RETURN SELF.ul.UnitTypeCode
         
-BSOCOllection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
+UnitsCollection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN       
@@ -619,14 +619,14 @@ BSOCOllection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
             RETURN FALSE
         END    
         
-BSOCollection.Echelon      PROCEDURE()        
+UnitsCollection.Echelon      PROCEDURE()        
     CODE
-        sst.Trace('BEGIN:BSOCollection.Echelon')
+        sst.Trace('BEGIN:UnitsCollection.Echelon')
         sst.Trace('SELF.ul.Echelon = ' & SELF.ul.Echelon)
-        sst.Trace('END:BSOCollection.Echelon')
+        sst.Trace('END:UnitsCollection.Echelon')
         RETURN SELF.ul.Echelon                
 
-BSOCollection.SetEchelon    PROCEDURE(LONG nEchelon)
+UnitsCollection.SetEchelon    PROCEDURE(LONG nEchelon)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -642,23 +642,23 @@ BSOCollection.SetEchelon    PROCEDURE(LONG nEchelon)
             RETURN FALSE
         END    
         
-BSOCollection.xPos  PROCEDURE()
+UnitsCollection.xPos  PROCEDURE()
     CODE
         RETURN SELF.ul.xPos
                                 
         
-BSOCollection.yPos  PROCEDURE()
+UnitsCollection.yPos  PROCEDURE()
     CODE
         RETURN SELF.ul.yPos
         
-BSOCollection.Hostility     PROCEDURE()
+UnitsCollection.Hostility     PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.Hostility')
+        sst.Trace('BEGIN:UnitsCollection.Hostility')
         sst.Trace('SELF.ul.Hostility = ' & SELF.ul.Hostility)
-        sst.Trace('END:BSOCollection.Hostility')
+        sst.Trace('END:UnitsCollection.Hostility')
         RETURN SELF.ul.Hostility
         
-BSOCollection.SetHostility  PROCEDURE(LONG nHostility)
+UnitsCollection.SetHostility  PROCEDURE(LONG nHostility)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -675,16 +675,16 @@ BSOCollection.SetHostility  PROCEDURE(LONG nHostility)
         END    
                                
         
-BSOCollection.markForDisbl  PROCEDURE()
+UnitsCollection.markForDisbl  PROCEDURE()
     CODE
         RETURN SELF.ul.markForDel
         
-BSOCollection.IsHQ  PROCEDURE()
+UnitsCollection.IsHQ  PROCEDURE()
     CODE
         ! do something
         RETURN SELF.ul.IsHQ
 
-BSOCollection.SetHQ PROCEDURE(BOOL bIsHQ)
+UnitsCollection.SetHQ PROCEDURE(BOOL bIsHQ)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -700,11 +700,11 @@ BSOCollection.SetHQ PROCEDURE(BOOL bIsHQ)
             RETURN FALSE
         END    
         
-BSOCollection.UnitName      PROCEDURE
+UnitsCollection.UnitName      PROCEDURE
     CODE
         RETURN SELF.ul.UnitName
         
-BSOCollection.SetUnitName   PROCEDURE(STRING sUnitName)
+UnitsCollection.SetUnitName   PROCEDURE(STRING sUnitName)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -720,12 +720,12 @@ BSOCollection.SetUnitName   PROCEDURE(STRING sUnitName)
         END
                
                 
-BSOCollection.TreePos       PROCEDURE
+UnitsCollection.TreePos       PROCEDURE
     CODE
         RETURN SELF.ul.TreePos
         
         
-BSOCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)        
+UnitsCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)        
     CODE
         LOOP i# = 1 TO RECORDS(SELF.ul)
             GET(SELF.ul, i#)
@@ -744,7 +744,7 @@ BSOCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)
         RETURN 0
         
         
-BSOCollection.ChangeNodePos PROCEDURE(LONG nXPos, LONG nYPos)
+UnitsCollection.ChangeNodePos PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN

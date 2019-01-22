@@ -191,6 +191,16 @@ markForDel              BOOL
 markForDisbl            BOOL
                     END
 
+! Actions Queue Structure
+ActionsList         QUEUE, TYPE
+ActionName              STRING(100)
+ActionType              LONG
+ActionTypeCode          STRING(10)
+xPos                    LONG
+yPos                    LONG
+                    END
+
+
 PosRecord           GROUP, TYPE
 xPos                        LONG
 yPos                        LONG
@@ -232,7 +242,7 @@ Destruct                PROCEDURE()
 
                     END
 
-BSOCollection       CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+UnitsCollection       CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 ul                      &UnitsList
 tmpul                   &UnitsList, PRIVATE
 urec                    GROUP(UnitBasicRecord)
@@ -289,13 +299,21 @@ TreePos                 PROCEDURE(), LONG
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
+
+ActionsCollection     CLASS, MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
+al                          &ActionsList
+
+Construct                   PROCEDURE()
+Destruct                    PROCEDURE()
+                    END
+
     
 
 ! Generic C2IP structure
 C2IP                CLASS, MODULE('C2IP.clw'), LINK('C2IP.clw'), TYPE
 Name                    STRING(100)
-ul                      &BSOCollection
-tmpul                   &BSOCollection
+ul                      &UnitsCollection
+tmpul                   &UnitsCollection
 tmpUnitName             STRING(100), PRIVATE
 
 ! Draw representation
