@@ -31,11 +31,11 @@
     <AspNetConfiguration>$(Configuration)</AspNetConfiguration>
   </PropertyGroup>
   <PropertyGroup>
-    <SolutionDir>D:\WORK\inception\pers\CW10\learnMil\</SolutionDir>
+    <SolutionDir>C:\WORK\DEV\learnMil\github\learnMil\</SolutionDir>
     <SolutionExt>.sln</SolutionExt>
     <SolutionFileName>learnMil.sln</SolutionFileName>
     <SolutionName>learnMil</SolutionName>
-    <SolutionPath>D:\WORK\inception\pers\CW10\learnMil\learnMil.sln</SolutionPath>
+    <SolutionPath>C:\WORK\DEV\learnMil\github\learnMil\learnMil.sln</SolutionPath>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and '$(MSBuildToolsVersion)' == '2.0'">v2.0</TargetFrameworkVersion>

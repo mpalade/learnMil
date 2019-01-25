@@ -1,6 +1,6 @@
 
 
-  MEMBER
+  MEMBER('learnMil')
 
 OMIT('***')
  * Created with Clarion 10.0
@@ -26,7 +26,25 @@ collection          &JSONClass
 ! string theory objects
 sst                 stringtheory
 
-ActionsCollection.Construct()
+ActionsCollection.Construct   PROCEDURE
+    CODE
+        SELF.al &= NEW(ActionsQueue)
+        
+ActionsCollection.Destruct   PROCEDURE
+    CODE
+        DISPOSE(SELF.al)
+        
+ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
+    CODE
+        SELF.al.ActionName      = pARec.ActionName
+        SELF.al.ActionType      = pARec.ActionType
+        SELF.al.ActionTypeCode  = pARec.ActionTypeCode
+        SELF.al.xPos            = pARec.xPos
+        SELF.al.yPos            = pARec.yPos
+        ADD(SELF.al)   
+        MESSAGE('action added to the queue')
+        
+        
 
 
 

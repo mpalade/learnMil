@@ -176,6 +176,20 @@ g:Line              EQUATE(1002)
 g:FreeLine          EQUATE(1003)
 g:AxisAdvance       EQUATE(1010)
 
+! Action Type Equates
+aTpy:notDefined     EQUATE('')
+
+aTpy:AxisOfAdvance                              EQUATE('151400')    ! Axis Of Advance
+aTpy:AxisOfAdvance_FriendlyAirborne_Aviation        EQUATE('151401')    ! Axis Of Advance / Friendly Airborne/Aviation
+aTpy:AxisOfAdvance_AttackHelicopter                 EQUATE('151402')    ! Axis Of Advance / Attack Helicopte
+aTpy:AxisOfAdvance_MainAttack                       EQUATE('151403')    ! Axis Of Advance / Main Attack
+aTpy:AxisOfAdvance_SupportingAttack                 EQUATE('151404')    ! Axis Of Advance / Supporting Attack
+aTpy:AxisOfAdvance_SupportingAttackPlanned          EQUATE('151405')    ! Axis Of Advance / Supporting Attack Planned or On Order
+aTpy:AxisOfAdvance_Feint                            EQUATE('151406')    ! Axis Of Advance / Feint
+aTpy:AxisOfAdvance_EnemyConfirmed                   EQUATE('151407')    ! Axis Of Advance / Enemy Confirmed
+aTpy:AxisOfAdvance_EnemyTemplated_Suspected         EQUATE('151408')    ! Axis Of Advance / Enemy Templated or Suspected
+
+
 ! Units Queue Structure
 UnitsList           QUEUE, TYPE
 UnitName                STRING(100)
@@ -192,7 +206,7 @@ markForDisbl            BOOL
                     END
 
 ! Actions Queue Structure
-ActionsList         QUEUE, TYPE
+ActionsQueue         QUEUE, TYPE
 ActionName              STRING(100)
 ActionType              LONG
 ActionTypeCode          STRING(10)
@@ -225,6 +239,16 @@ xPos                        LONG
 yPos                        LONG
 TreePos                     LONG
                     END
+
+!Action Basic Record Structure
+ActionBasicRecord   GROUP, TYPE
+ActionName              STRING(100)
+ActionType              LONG
+ActionTypeCode          STRING(10)
+xPos                    LONG
+yPos                    LONG
+                    END
+
 
 ! Reference C2IPs Queue Structure
 C2IPsList           QUEUE, TYPE
@@ -301,10 +325,12 @@ ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
 ActionsCollection     CLASS, MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
-al                          &ActionsList
+al                          &ActionsQueue
 
 Construct                   PROCEDURE()
 Destruct                    PROCEDURE()
+
+InsertAction                PROCEDURE(ActionBasicRecord parec)
                     END
 
     
@@ -318,21 +344,12 @@ tmpUnitName             STRING(100), PRIVATE
 
 ! Draw representation
 drwImg                  &Draw
-TakeEvent               PROCEDURE()
+TakeEvent               PROCEDURE(), VIRTUAL
 geometry                LONG        ! geometry equates
-isPointsCollection      BOOL, PROTECTED
 isSelection             BOOL, PROTECTED
-Preview_Line            PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
-Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
-Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
-Draw_AxisAdvance        PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
+isMouseDown             BOOL, PROTECTED
+isPointsCollection      BOOL, PROTECTED
 
-p1x                     LONG, PRIVATE
-p1y                     LONG, PRIVATE
-PolyPoints              LONG, PRIVATE
-pp                      &PosList, PRIVATE
-
-TakePoints              PROCEDURE(LONG nGeometry)
 
 ! referenced C2IPs list
 refC2IPs                &C2IPsList
@@ -433,6 +450,8 @@ OrgChartC2IP        CLASS(C2IP), MODULE('OrgChartC2IP.clw'), LINK('OrgChartC2IP.
 urec                    GROUP(UnitBasicRecord)
                         END
 
+TakeEvent               PROCEDURE(), VIRTUAL
+
 selTreePos              LONG, PRIVATE
 maxTreePos              LONG, PRIVATE
 selQueuePos             LONG, PRIVATE
@@ -485,6 +504,22 @@ HostilityMenuOptions    PROCEDURE(), STRING, PRIVATE
 ! Overlay structure
 OverlayC2IP         CLASS(C2IP), MODULE('OverlayC2IP.clw'), LINK('OverlayC2IP.clw'), TYPE
 map                     STRING(100)
+al                      &ActionsCollection
+
+TakeEvent               PROCEDURE(), VIRTUAL
+
+Preview_Line            PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+Draw_AxisAdvance        PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
+
+p1x                     LONG, PROTECTED
+p1y                     LONG, PROTECTED
+PolyPoints              LONG, PROTECTED
+pp                      &PosList, PROTECTED
+
+TakePoints              PROCEDURE(LONG nGeometry)
+
 
 Construct               PROCEDURE
 Destruct                PROCEDURE
@@ -505,6 +540,10 @@ NodeActionsMenuOptions  PROCEDURE(), STRING
 
 DA_SupportingAttack     PROCEDURE(PosRecord startPos,PosRecord endPos)
 TakePoints              PROCEDURE(PosRecord startPos, PosRecord endPos)    
+
+InsertAction            PROCEDURE()
+
+DrawAction                      PROCEDURE()
                     END
 
 

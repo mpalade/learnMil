@@ -476,3 +476,10 @@ CODE
     SELF.DisplaySelection()        
 
 
+OrgChartC2IP.TakeEvent     PROCEDURE()
+    CODE
+        PARENT.TakeEvent()
+        
+          
+        
+        
