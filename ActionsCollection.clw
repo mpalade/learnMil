@@ -42,7 +42,7 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         SELF.al.xPos            = pARec.xPos
         SELF.al.yPos            = pARec.yPos
         ADD(SELF.al)   
-        MESSAGE('action added to the queue')
+        !MESSAGE('action added to the queue')
         
         
 

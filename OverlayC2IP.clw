@@ -90,7 +90,9 @@ OverlayC2IP.Destruct        PROCEDURE()
         
 OverlayC2IP.Redraw  PROCEDURE()
     CODE
-        SELF.drwImg.Blank(COLOR:White)
+        
+        PARENT.Redraw()
+                
         SELF.drwImg.Setpencolor(COLOR:Black)
         SELF.drwImg.SetPenWidth(1)
         
@@ -103,7 +105,7 @@ OverlayC2IP.Redraw  PROCEDURE()
         
         
         ! draw Units
-        MESSAGE('units = ' & RECORDS(SELF.ul.ul))
+        !MESSAGE('units = ' & RECORDS(SELF.ul.ul))
         LOOP i# = 1 TO RECORDS(SELF.ul.ul)
             GET(SELF.ul.ul, i#)
             IF NOT ERRORCODE() THEN
@@ -117,7 +119,7 @@ OverlayC2IP.Redraw  PROCEDURE()
         END
         
         ! draw actions
-        MESSAGE('actions = ' & RECORDS(SELF.al.al))
+        !MESSAGE('actions = ' & RECORDS(SELF.al.al))
         LOOP i# = 1 TO RECORDS(SELF.al.al)
             GET(SELF.al.al, i#)
             IF NOT ERRORCODE() THEN
@@ -129,6 +131,8 @@ OverlayC2IP.Redraw  PROCEDURE()
         
  
         SELF.drwImg.Display()
+        
+        !MESSAGE('Finish Overlay Redraw')
 
         
         
@@ -227,7 +231,73 @@ OverlayC2IP.DA_SupportingAttack     PROCEDURE(PosRecord startPos, PosRecord endP
         SELF.drwImg.Line(startPos.xPos, startPos.yPos, dX#, dY#)
         SELF.drwImg.Line(endPos.xPos, endPos.yPos, -(0.15*i#), -(0.15*i#))
         SELF.drwImg.Line(endPos.xPos, endPos.yPos, -(0.15*i#), +(0.15*i#))
-        SELF.drwImg.Display()
+        !SELF.drwImg.Display()
+        !MESSAGE('DA_SupportingAttack')
+        
+OverlayC2IP.DA_AxisOfAdvance        PROCEDURE(PosRecord startPos, PosRecord endPos)
+    CODE
+        SELF.drwImg.Line(startPos.xPos, startPos.yPos, endPos.xPos - startPos.xPos, endPos.yPos - startPos.yPos)
+                
+        dx# = endPos.xPos - startPos.xPos
+        dy# = endPos.yPos - startPos.yPos
+        L#  = SQRT(dx#*dx# + dy#*dy#)
+        wdth#  = 20
+        
+        lx# = dy#*wdth#/L#
+        ly# = dx#*wdth#/L#
+        
+        SELF.drwImg.Line(startPos.xPos - lx#, startPos.yPos + ly#, dx#, dy#)
+        SELF.drwImg.Line(startPos.xPos + lx#, startPos.yPos - ly#, dx#, dy#)
+        
+        llx#    = dy#*2*wdth#/L#
+        lly#    = dx#*2*wdth#/L#
+        
+        SELF.drwImg.Line(endPos.xPos, endPos.yPos, -llx#, lly#)
+        SELF.drwImg.Line(endPos.xPos, endPos.yPos, llx#, -lly#)
+        
+        hght#   = 20
+        
+        hx#     = hght#*dx#/L#
+        hy#     = hght#*dy#/L#
+        
+        SELF.drwImg.Line(endPos.xPos, endPos.yPos, hx#, hy#)
+                        
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()             
+        
+        
+!OverlayC2IP.DA_AxisOfAdvance        PROCEDURE(PosRecord startPos, PostRecord endPos)
+!    CODE        
+!        SELF.drwImg.Line(startPos.xPos, startPos.yPos, endPos.xPos - startPos.xPos, endPos.yPos - startPos.yPos)
+!        
+!        
+!        dx# = endPos.xPos - startPos.xPos
+!        dy# = endPos.yPos - startPos.yPos
+!        L#  = SQRT(dx#*dx# + dy#*dy#)
+!        wdth#  = 20
+!        
+!        lx# = dy#*wdth#/L#
+!        ly# = dx#*wdth#/L#
+!        
+!        SELF.drwImg.Line(startPos.xPos - lx#, startPos.yPos + ly#, dx#, dy#)
+!        SELF.drwImg.Line(startPos.xPos + lx#, startPos.yPos - ly#, dx#, dy#)
+!        
+!        llx#    = dy#*2*wdth#/L#
+!        lly#    = dx#*2*wdth#/L#
+!        
+!        SELF.drwImg.Line(endPos.xPos, endPos.yPos, -llx#, lly#)
+!        SELF.drwImg.Line(endPos.xPos, endPos.yPos, llx#, -lly#)
+!        
+!        hght#   = 20
+!        
+!        hx#     = hght#*dx#/L#
+!        hy#     = hght#*dy#/L#
+!        
+!        SELF.drwImg.Line(endPos.xPos, endPos.yPos, hx#, hy#)
+!                        
+!        SELF.drwImg.SetPenStyle(PEN:solid)
+!        SELF.drwImg.Display()     
+        
     
 OverlayC2IP.TakePoints      PROCEDURE(PosRecord startPos, PosRecord endPos)    
     CODE
@@ -251,10 +321,13 @@ actionRec                       GROUP(ActionBasicRecord)
         OF g:AxisAdvance
             actionRec.ActionName    = 'bla bla bla'
             actionRec.ActionType    = 0
-            actionRec.ActionTypeCode    = aTpy:AxisOfAdvance_SupportingAttack
-            actionRec.xPos          = SELF.drwImg.MouseX()
-            actionRec.yPos          = SELF.drwImg.MouseY()
-            MESSAGE('inainte de call')
+            actionRec.ActionTypeCode        = aTpy:AxisOfAdvance_SupportingAttack
+            actionRec.ActionPointsNumber    = 2
+            actionRec.xPos[1]               = SELF.p1x
+            actionRec.yPos[1]               = SELF.p1y
+            actionRec.xPos[2]               = SELF.drwImg.MouseX()
+            actionRec.yPos[2]               = SELF.drwImg.MouseY()
+            !MESSAGE('inainte de call')
             SELF.al.InsertAction(actionRec)
         END        
         SELF.Redraw()
@@ -421,7 +494,9 @@ OverlayC2IP.Draw_AxisAdvance   PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
         
         
         SELF.drwImg.SetPenStyle(PEN:solid)
-        SELF.drwImg.Display()        
+        SELF.drwImg.Display()     
+        !MESSAGE('am desenat Draw_AxisAdvance')
+        
         
 OverlayC2IP.DrawAction      PROCEDURE()
 startPos                        GROUP(PosRecord)
@@ -433,12 +508,14 @@ endPos                          GROUP(PosRecord)
         CASE CLIP(SELF.al.al.ActionTypeCode)
         OF '151404'
             ! Axis Of Advance / Supporting Attack
+            !MESSAGE('Axis Of Advance / Supporting Attack')
             !SELF.DrawAction_SupportingAttack()
-            startPos.xPos   = SELF.al.al.xPos
-            startPos.yPos   = SELF.al.al.yPos
-            endPos.xPos     = SELF.al.al.xPos
-            endPos.yPos     = SELF.al.al.yPos            
-            SELF.DA_SupportingAttack(startPos, endPos)
+            startPos.xPos   = SELF.al.al.xPos[1]
+            startPos.yPos   = SELF.al.al.yPos[1]
+            endPos.xPos     = SELF.al.al.xPos[2]
+            endPos.yPos     = SELF.al.al.yPos[2]
+            !SELF.DA_SupportingAttack(startPos, endPos)
+            SELF.DA_AxisOfAdvance(startPos, endPos)
         END
         
         

@@ -1170,7 +1170,8 @@ C2IP.DrawNode_MainSymbol    PROCEDURE
         
 C2IP.Redraw         PROCEDURE()
     CODE
-        ! nothing to redraw at this class level    
+        ! nothing to redraw at this class level   
+        SELF.drwImg.Blank(COLOR:White)
         
 C2IP.TakeEvent      PROCEDURE()
     CODE

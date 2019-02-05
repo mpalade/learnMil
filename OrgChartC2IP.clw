@@ -37,7 +37,8 @@ CODE
     ! redraw OrgChar C2IP content
     sst.Trace('BEGIN:OrgChartC2IP.Redraw')
    
-    SELF.drwImg.Blank(COLOR:White)
+    PARENT.Redraw()
+    
     SELF.drwImg.Setpencolor(COLOR:Black)
     SELF.drwImg.SetPenWidth(1)
     

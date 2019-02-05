@@ -210,8 +210,9 @@ ActionsQueue         QUEUE, TYPE
 ActionName              STRING(100)
 ActionType              LONG
 ActionTypeCode          STRING(10)
-xPos                    LONG
-yPos                    LONG
+ActionPointsNumber      LONG
+xPos                    LONG, DIM(100)
+yPos                    LONG, DIM(100)
                     END
 
 
@@ -245,8 +246,9 @@ ActionBasicRecord   GROUP, TYPE
 ActionName              STRING(100)
 ActionType              LONG
 ActionTypeCode          STRING(10)
-xPos                    LONG
-yPos                    LONG
+ActionPointsNumber      LONG
+xPos                    LONG, DIM(100)
+yPos                    LONG, DIM(100)
                     END
 
 
@@ -538,7 +540,8 @@ MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 TakeNodeAction          PROCEDURE(LONG nOption), LONG
 NodeActionsMenuOptions  PROCEDURE(), STRING
 
-DA_SupportingAttack     PROCEDURE(PosRecord startPos,PosRecord endPos)
+DA_SupportingAttack     PROCEDURE(PosRecord startPos, PosRecord endPos)
+DA_AxisOfAdvance        PROCEDURE(PosRecord startPos, PosRecord endPos)
 TakePoints              PROCEDURE(PosRecord startPos, PosRecord endPos)    
 
 InsertAction            PROCEDURE()
