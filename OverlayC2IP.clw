@@ -464,6 +464,8 @@ OverlayC2IP.Draw_AxisAdvance   PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
         ELSE
             SELF.drwImg.SetPenStyle(PEN:solid)            
         END        
+        
+        ! median line
         SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
         
         
@@ -475,12 +477,14 @@ OverlayC2IP.Draw_AxisAdvance   PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
         lx# = dy#*wdth#/L#
         ly# = dx#*wdth#/L#
         
+        ! corridor lines
         SELF.drwImg.Line(SELF.p1x - lx#, SELF.p1y + ly#, dx#, dy#)
         SELF.drwImg.Line(SELF.p1x + lx#, SELF.p1y - ly#, dx#, dy#)
         
         llx#    = dy#*2*wdth#/L#
         lly#    = dx#*2*wdth#/L#
         
+        ! small arrow lateral lines
         SELF.drwImg.Line(nXPos, nYPos, -llx#, lly#)
         SELF.drwImg.Line(nXPos, nYPos, llx#, -lly#)
         
@@ -489,7 +493,13 @@ OverlayC2IP.Draw_AxisAdvance   PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
         hx#     = hght#*dx#/L#
         hy#     = hght#*dy#/L#
         
+        ! arrow line
         SELF.drwImg.Line(nXPos, nYPos, hx#, hy#)
+        
+        ! arrow lines
+        !SELF.drwImg.Line(SELF.p1x - lx# + dx#, SELF.p1y + ly# + dy#, ABS(llx# + hx#), ABS(lly# - hy#))
+        SELF.drwImg.Line(nXPos - llx#, nYPos - lly#, llx# + hx#, lly# - hy#)
+        SELF.drwImg.Line(nXPos + llx#, nYPos + lly#, ABS(hx# - llx#), ABS(hy# - lly#)) 
         
         
         
