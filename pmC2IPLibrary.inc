@@ -179,7 +179,7 @@ g:AxisAdvance       EQUATE(1010)
 ! Action Type Equates
 aTpy:notDefined     EQUATE('')
 
-aTpy:AxisOfAdvance                              EQUATE('151400')    ! Axis Of Advance
+aTpy:AxisOfAdvance                                  EQUATE('151400')    ! Axis Of Advance
 aTpy:AxisOfAdvance_FriendlyAirborne_Aviation        EQUATE('151401')    ! Axis Of Advance / Friendly Airborne/Aviation
 aTpy:AxisOfAdvance_AttackHelicopter                 EQUATE('151402')    ! Axis Of Advance / Attack Helicopte
 aTpy:AxisOfAdvance_MainAttack                       EQUATE('151403')    ! Axis Of Advance / Main Attack

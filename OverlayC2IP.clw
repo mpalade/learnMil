@@ -217,10 +217,63 @@ CODE
     
     
     
-OverlayC2IP.NodeActionsMenuOptions   PROCEDURE()
+OverlayC2IP.NodeActionsMenuOptions  PROCEDURE()
+actMenuOpt          STRING(1000)
 CODE
-    ! do something    
-    RETURN 'Supporting Attack'        
+    ! do something  
+    actMenuOpt  = 'Advance To Contact'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Ambush'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Arrest'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Attack'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Attack By Fire'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Block'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Breach'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Bypass'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Canalize'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Capture'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Clear'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Contain'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Control'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Counterattack'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Counterattack By Fire'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Cover'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Conduct Deception'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Delay'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Demonstrate'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Deny'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Disengage'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Disrupt'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Envelop'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Escort'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Exfiltrate'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Conduct Exploitation'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Feint'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Fix'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Follow and Assume'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Follow and Support'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Guard'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Infiltrate'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Interdict'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Isolate'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Locate'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Neutralize'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Occupy'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Penetrate'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Pursue'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Recover'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Relief In Place'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Retain'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Retire'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Screen'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Secure'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Seize'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Support By Fire'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Suppress'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Turn'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Withdraw'
+    actMenuOpt  = CLIP(actMenuOpt) & '| ' & 'Withdraw Under Pressure'
+                
+    RETURN actMenuOpt
     
 OverlayC2IP.DA_SupportingAttack     PROCEDURE(PosRecord startPos, PosRecord endPos)
     CODE
