@@ -551,8 +551,8 @@ OverlayC2IP.Draw_AxisAdvance   PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
         
         ! arrow lines
         !SELF.drwImg.Line(SELF.p1x - lx# + dx#, SELF.p1y + ly# + dy#, ABS(llx# + hx#), ABS(lly# - hy#))
-        SELF.drwImg.Line(nXPos - llx#, nYPos - lly#, llx# + hx#, lly# - hy#)
-        SELF.drwImg.Line(nXPos + llx#, nYPos + lly#, ABS(hx# - llx#), ABS(hy# - lly#)) 
+        SELF.drwImg.Line(nXPos - ABS(llx#), nYPos - ABS(lly#), ABS(llx#) + ABS(hx#), ABS(ABS(lly#) - ABS(hy#)))
+        !SELF.drwImg.Line(nXPos + llx#, nYPos + lly#, -ABS(llx# - hx#), -ABS(lly# - hy#)) 
         
         
         
