@@ -172,7 +172,10 @@ CODE
     !json.Add('C2IPName', SELF.Name)
     collection &= json.CreateCollection('TaskOrg')
     collection.Append('C2IPName', SELF.Name, json:String)
-    collection.Append(SELF.ul, 'Units')
+    
+    ! changed from queue to class
+    !collection.Append(SELF.ul, 'Units')
+    collection.Append(SELF.ul.ul, 'Units')
     
     ! referenced C2IPs
     collection.Append(SELF.refC2IPs, 'refC2IPs')    
@@ -197,7 +200,10 @@ CODE
     !json.Add('C2IPName', SELF.Name)
     collection &= json.CreateCollection('TaskOrg')
     collection.Append('C2IPName', SELF.Name, json:String)
-    collection.Append(SELF.ul, 'Units')
+    
+    ! changed from queue to class
+    !collection.Append(SELF.ul, 'Units')
+    collection.Append(SELF.ul.ul, 'Units')
     
     ! referenced C2IPs
     collection.Append(SELF.refC2IPs, 'refC2IPs')    
