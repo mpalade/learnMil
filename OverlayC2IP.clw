@@ -198,24 +198,115 @@ CODE
     
     CASE nOption
     OF 1
-        ! Supporting Attack
+        ! Advance to contact
+        SELF.geometry           = g:AxisAdvance
+        SELF.isPointsCollection = TRUE
+        SELF.isMouseDown        = FALSE        
+    OF 2
+        ! Abush
         SELF.geometry           = g:AxisAdvance
         SELF.isPointsCollection = TRUE
         SELF.isMouseDown        = FALSE
-        
-        !SELF.TakePoints(startPos, endPos)       
-        !startPos.xPos   = SELF.ul.xPos()
-        !startPos.yPos   = SELF.ul.yPos()
-        !endPos.xPos     = SELF.drwImg.MouseY()
-        !endPos.yPos     = SELF.drwImg.MouseY()       
-        !SELF.DA_SupportingAttack(startPos, endPos)        
-        !SELF.TakePoints(g:AxisAdvance)
+    OF 3
+        ! Arrest
+    OF 4
+        ! Attack By Fire
+    OF 5
+        ! Block
+    OF 6
+        ! Breach
+    OF 7
+        ! Bypass
+    OF 8
+        ! Canalize
+    OF 9
+        ! Capture
+    OF 10
+        ! Clear
+    OF 11
+        ! Contain
+    OF 12
+        ! Control
+    OF 13
+        ! Counterattack
+    OF 14
+        ! Counterattack By Fire
+    OF 15
+        ! Cover
+    OF 16
+        ! Conduct Deception
+    OF 17
+        ! Delay
+    OF 18
+        ! Demonstrate
+    OF 19
+        ! Deny
+    OF 20
+        ! Disengage
+    OF 21
+        ! Disrupt
+    OF 22
+        ! Envelop
+    OF 23
+        ! Escort
+    OF 24
+        ! Exfiltrate
+    OF 25
+        ! Conduct Exploitation
+    OF 26
+        ! Feint
+    OF 27
+        ! Fix
+    OF 28
+        ! Follow and Assume
+    OF 29
+        ! Follow and Support
+    OF 30
+        ! Guard
+    OF 31
+        ! Infiltrate
+    OF 32
+        ! Interdict
+    OF 33
+        ! Isolate
+    OF 34
+        ! Locate
+    OF 35
+        ! Neutralize
+    OF 36
+        ! Occupy
+    OF 37
+        ! Penetrate
+    OF 38
+        ! Pursue
+    OF 39
+        ! Recover
+    OF 40
+        ! Relief In Place
+    OF 41
+        ! Retain
+    OF 42
+        ! Retire
+    OF 43
+        ! Screen
+    OF 44
+        ! Secure
+    OF 45
+        ! Seize
+    OF 46
+        ! Support By Fire
+    OF 47
+        ! Suppress
+    OF 48
+        ! Turn
+    OF 49
+        ! Withdraw
+    OF 50
+        ! Withdraw Under Pressure
+                        
     END
     
-    RETURN TRUE    
-    
-    
-    
+    RETURN TRUE        
     
 OverlayC2IP.NodeActionsMenuOptions  PROCEDURE()
 actMenuOpt          STRING(1000)
@@ -581,4 +672,70 @@ endPos                          GROUP(PosRecord)
             SELF.DA_AxisOfAdvance(startPos, endPos)
         END
         
+OverlayC2IP.Save     PROCEDURE(STRING sFileName)
+CODE
+    ! do something
+    json.Start()
+    collection &= json.CreateCollection('Overlay')
+    
+    ! C2IP Name
+    collection.Append('C2IPName', SELF.Name, json:String)
+    
+    ! Units
+    collection.Append(SELF.ul.ul, 'Units')
+    
+    ! Actions
+    collection.Append(SELF.al.al, 'Actions')
+    
+    ! referenced C2IPs
+    collection.Append(SELF.refC2IPs, 'refC2IPs')    
+    
+    json.SaveFile(sFileName, TRUE)
+    
+    RETURN TRUE        
+    
+    
+OverlayC2IP.Load   PROCEDURE(STRING sFileName)
+jsonItem  &JSONClass
+CODE
+    ! do something
+    
+    json.LoadFile(sFileName)
+    
+    i# = json.Records()
+    !MESSAGE('found = ' & i#)
+    
+    ! C2IP Name
+    jsonItem &= json.GetByName('C2IPName')
+    IF NOT jsonItem &= Null THEN
+        SELF.Name   = json.GetValueByName('C2IPName')
+    END
+    
+    ! Units
+    jsonItem &= json.GetByName('Units')
+    IF NOT jsonItem &= NULL THEN
+        !IF SELF.ul.Free() = TRUE THEN
+        !END
         
+        FREE(SELF.ul.ul)
+        jsonItem.Load(SELF.ul.ul)
+    END  
+    
+    ! Actions
+    jsonItem &= json.GetByName('Actions')
+    IF NOT jsonItem &= NULL THEN
+        FREE(SELF.al.al)
+        jsonItem.Load(SELF.al.al)
+    END  
+    
+    ! refrenced C2IPs
+    jsonItem &= json.GetByName('refC2IPs')
+    IF NOT jsonItem &= NULL THEN
+        FREE(SELF.refC2IPs)
+        jsonItem.Load(SELF.refC2IPs)
+    END
+    
+    
+    SELF.Redraw()
+    
+    RETURN TRUE    

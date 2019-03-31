@@ -935,7 +935,7 @@ CODE
 C2IP.SetHostility     PROCEDURE(LONG nHostility)
 CODE
     ! do something
-    IF SELF.SetHostility(nHostility) = TRUE THEN
+    IF SELF.ul.SetHostility(nHostility) = TRUE THEN
         SELF.Redraw()
         SELF.DisplaySelection()
         RETURN TRUE

@@ -57,9 +57,9 @@
 			{
 				"UNITNAME" : "mhvwepmfzo",
 				"UNITTYPE" : 0,
-				"UNITTYPECODE" : "",
+				"UNITTYPECODE" : "121101",
 				"ECHELON" : 1100,
-				"HOSTILITY" : 0,
+				"HOSTILITY" : 1503,
 				"ISHQ" : 0,
 				"XPOS" : 101,
 				"YPOS" : 121,

@@ -1287,9 +1287,9 @@ Mark                   BYTE                           !Entry's marked status
 ViewPosition           STRING(1024)                   !Entry's view position
                      END
 History::C2IPExp:Record LIKE(C2IPExp:RECORD),THREAD
-QuickWindow          WINDOW('Form C2IPExplorer'),AT(,,417,84),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
+QuickWindow          WINDOW('Form C2IPExplorer'),AT(,,417,270),FONT('Microsoft Sans Serif',8,,FONT:regular,CHARSET:DEFAULT), |
   RESIZE,CENTER,GRAY,IMM,MDI,HLP('U_C2IPExplorer'),SYSTEM
-                       SHEET,AT(4,4,411,58),USE(?CurrentTab)
+                       SHEET,AT(4,4,411,247),USE(?CurrentTab)
                          TAB('&1) General'),USE(?Tab:1)
                            PROMPT('ID:'),AT(8,20),USE(?C2IPExp:ID:Prompt),TRN
                            ENTRY(@n-10.0),AT(61,20,48,10),USE(C2IPExp:ID),DECIMAL(12)
@@ -1303,11 +1303,11 @@ QuickWindow          WINDOW('Form C2IPExplorer'),AT(,,417,84),FONT('Microsoft Sa
   's100@40L(2)|M~C2IP Type~C(0)@s20@'),FROM(Queue:FileDropCombo:1),IMM
                          END
                        END
-                       BUTTON('&OK'),AT(260,68,49,14),USE(?OK),LEFT,ICON('WAOK.ICO'),DEFAULT,FLAT,MSG('Accept dat' & |
+                       BUTTON('&OK'),AT(260,254,49,14),USE(?OK),LEFT,ICON('WAOK.ICO'),DEFAULT,FLAT,MSG('Accept dat' & |
   'a and close the window'),TIP('Accept data and close the window')
-                       BUTTON('&Cancel'),AT(313,68,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel operation'), |
+                       BUTTON('&Cancel'),AT(313,254,49,14),USE(?Cancel),LEFT,ICON('WACANCEL.ICO'),FLAT,MSG('Cancel operation'), |
   TIP('Cancel operation')
-                       BUTTON('&Help'),AT(366,68,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
+                       BUTTON('&Help'),AT(366,254,49,14),USE(?Help),LEFT,ICON('WAHELP.ICO'),FLAT,MSG('See Help Window'), |
   STD(STD:Help),TIP('See Help Window')
                      END
 

@@ -1,0 +1,99 @@
+{
+	"TaskOrg" : {
+		"C2IPName" : "Bucharest1",
+		"Units" : [
+			{
+				"UNITNAME" : "Division1",
+				"UNITTYPE" : 0,
+				"UNITTYPECODE" : "121100",
+				"ECHELON" : 1109,
+				"HOSTILITY" : 1503,
+				"ISHQ" : 0,
+				"XPOS" : 1,
+				"YPOS" : 1,
+				"TREEPOS" : 1,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "Brigade1_1",
+				"UNITTYPE" : 0,
+				"UNITTYPECODE" : "121100",
+				"ECHELON" : 1108,
+				"HOSTILITY" : 1503,
+				"ISHQ" : 0,
+				"XPOS" : 51,
+				"YPOS" : 31,
+				"TREEPOS" : 2,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "Battalion11_1",
+				"UNITTYPE" : 0,
+				"UNITTYPECODE" : "121101",
+				"ECHELON" : 1106,
+				"HOSTILITY" : 1503,
+				"ISHQ" : 0,
+				"XPOS" : 101,
+				"YPOS" : 61,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "Battaltion11_2",
+				"UNITTYPE" : 0,
+				"UNITTYPECODE" : "121100",
+				"ECHELON" : 1106,
+				"HOSTILITY" : 1503,
+				"ISHQ" : 0,
+				"XPOS" : 101,
+				"YPOS" : 91,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "Company112_A",
+				"UNITTYPE" : 0,
+				"UNITTYPECODE" : "121100",
+				"ECHELON" : 1105,
+				"HOSTILITY" : 1503,
+				"ISHQ" : 0,
+				"XPOS" : 151,
+				"YPOS" : 121,
+				"TREEPOS" : 4,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "Company112_B",
+				"UNITTYPE" : 0,
+				"UNITTYPECODE" : "121100",
+				"ECHELON" : 1105,
+				"HOSTILITY" : 1503,
+				"ISHQ" : 0,
+				"XPOS" : 151,
+				"YPOS" : 151,
+				"TREEPOS" : 4,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			},
+			{
+				"UNITNAME" : "Battaltion11_3",
+				"UNITTYPE" : 0,
+				"UNITTYPECODE" : "121100",
+				"ECHELON" : 1109,
+				"HOSTILITY" : 1504,
+				"ISHQ" : 0,
+				"XPOS" : 101,
+				"YPOS" : 181,
+				"TREEPOS" : 3,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			}
+		],
+		"refC2IPs" : null
+	}
+}

@@ -213,7 +213,13 @@ ActionTypeCode          STRING(10)
 ActionPointsNumber      LONG
 xPos                    LONG, DIM(100)
 yPos                    LONG, DIM(100)
-                    END
+                        END
+
+! Actions Resources Structure
+ActionResourcesQueue        QUEUE(ActionsQueue), TYPE
+
+                            END
+
 
 
 PosRecord           GROUP, TYPE
@@ -546,7 +552,13 @@ TakePoints              PROCEDURE(PosRecord startPos, PosRecord endPos)
 
 InsertAction            PROCEDURE()
 
-DrawAction                      PROCEDURE()
+DrawAction              PROCEDURE()
+
+
+! persistence layer
+!Save                    PROCEDURE(), LONG
+Save                    PROCEDURE(STRING sFileName), LONG
+Load                    PROCEDURE(STRING sFileName), LONG
                     END
 
 

@@ -590,7 +590,7 @@ UnitsCollection.Get        PROCEDURE()
         sst.Trace('BEGIN:UnitsCollection.Get()')
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
-            succes# = TRUE
+            success# = TRUE
         ELSE
             success# = FALSE
         END
@@ -706,6 +706,7 @@ UnitsCollection.UnitName      PROCEDURE
         
 UnitsCollection.SetUnitName   PROCEDURE(STRING sUnitName)
     CODE
+        !MESSAGE('selQPos = ' & SELF.selQueuePos)
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
             SELF.ul.UnitName    = sUnitName
@@ -713,9 +714,11 @@ UnitsCollection.SetUnitName   PROCEDURE(STRING sUnitName)
             IF NOT ERRORCODE() THEN
                 RETURN TRUE
             ELSE
+                MESSAGE('error PUT')
                 RETURN FALSE                
             END
         ELSE
+            !MESSAGE('error GET')
             RETURN FALSE
         END
                
