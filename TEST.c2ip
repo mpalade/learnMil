@@ -1,0 +1,37 @@
+{
+	"Overlay" : {
+		"C2IPName" : "dzpxnqkdvr",
+		"Units" : [
+			{
+				"UNITNAME" : "Battaltion11_3",
+				"UNITTYPE" : 0,
+				"UNITTYPECODE" : "121100",
+				"ECHELON" : 1109,
+				"HOSTILITY" : 1504,
+				"ISHQ" : 0,
+				"XPOS" : 255,
+				"YPOS" : 489,
+				"TREEPOS" : 0,
+				"MARKFORDEL" : 0,
+				"MARKFORDISBL" : 0
+			}
+		],
+		"Actions" : [
+			{
+				"ACTIONNAME" : "bla bla bla",
+				"ACTIONTYPE" : 0,
+				"ACTIONTYPECODE" : "151404",
+				"ACTIONPOINTSNUMBER" : 0,
+				"XPOS" : [309,471,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				"YPOS" : [482,393,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				"RESOURCES" : "àwý\u0000"
+			}
+		],
+		"refC2IPs" : [
+			{
+				"C2IPPATH" : "D:\\WORK\\inception\\pers\\CW10\\learnMil\\Bucharest1.c2ip",
+				"C2IPNAME" : "Bucharest1"
+			}
+		]
+	}
+}

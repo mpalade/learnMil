@@ -213,11 +213,12 @@ ActionTypeCode          STRING(10)
 ActionPointsNumber      LONG
 xPos                    LONG, DIM(100)
 yPos                    LONG, DIM(100)
+Resources               &UnitsList
                         END
 
 ! Actions Resources Structure
 ActionResourcesQueue        QUEUE(ActionsQueue), TYPE
-
+UnitsResources              &UnitsList
                             END
 
 

@@ -20,11 +20,30 @@ OMIT('***')
 ! Local objects
 
 ! JSON objects
-json                JSONClass
+json                CLASS(JSONClass)
+reference           &UnitsList
+!AddByReference          PROCEDURE (StringTheory pName,JSONClass pJson),VIRTUAL
+AddByReference          PROCEDURE (StringTheory pName,JSONClass pJson)
+
+Construct               PROCEDURE()
+Destruct                PROCEDURE(), VIRTUAL
+                    END
+        
 collection          &JSONClass
 
 ! string theory objects
 sst                 stringtheory
+
+json.Construct      PROCEDURE
+    CODE
+        PARENT.Construct
+        self.reference  &= NEW(UnitsList)
+        
+        
+json.Destruct       PROCEDURE
+    CODE
+        DISPOSE(self.reference)
+        PARENT.Destruct()
 
 OverlayC2IP.SelectByMouse   PROCEDURE(LONG nXPos, LONG nYPos)    
     CODE
@@ -59,18 +78,6 @@ OverlayC2IP.MoveTo  PROCEDURE(LONG nXPos, LONG nYPos)
         PARENT.MoveTo(nXPos, nYPos)
         SELF.Redraw()
         RETURN TRUE
-    
-       
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
 
 
 OverlayC2IP.Construct       PROCEDURE()
@@ -686,6 +693,8 @@ CODE
     
     ! Actions
     collection.Append(SELF.al.al, 'Actions')
+    json.reference  = SELF.al.al.Resources
+    !json.SetColumnType('Resources',jf:Reference)
     
     ! referenced C2IPs
     collection.Append(SELF.refC2IPs, 'refC2IPs')    
@@ -693,6 +702,14 @@ CODE
     json.SaveFile(sFileName, TRUE)
     
     RETURN TRUE        
+    
+json.AddByReference PROCEDURE (StringTheory pName,JSONClass pJson)
+  CODE
+  case pName.GetValue()
+  of 'Resources'
+    pJson.Add(self.reference)
+  end
+  !PARENT.AddByReference (pName,pJson)    
     
     
 OverlayC2IP.Load   PROCEDURE(STRING sFileName)
