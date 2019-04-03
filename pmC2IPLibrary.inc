@@ -216,10 +216,10 @@ yPos                    LONG, DIM(100)
 Resources               &UnitsList
                         END
 
-! Actions Resources Structure
-ActionResourcesQueue        QUEUE(ActionsQueue), TYPE
-UnitsResources              &UnitsList
-                            END
+!! Actions Resources Structure
+!ActionResourcesQueue        QUEUE(ActionsQueue), TYPE
+!UnitsResources              &UnitsList
+!                            END
 
 
 

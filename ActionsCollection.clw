@@ -50,15 +50,30 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         SELF.al.yPos            = pARec.yPos
         
         SELF.al.Resources       &= NEW(UnitsList)
+        ! Resource1
         SELF.al.Resources.Echelon   = 1
         SELF.al.Resources.Hostility = 1
         SELF.al.Resources.IsHQ      = 1
         SELF.al.Resources.markForDel    = 0
         SELF.al.Resources.markForDisbl  = 0
         SELF.al.Resources.TreePos       = 1
-        SELF.al.Resources.UnitName      = 'TEST'
+        SELF.al.Resources.UnitName      = 'TEST1'
         SELF.al.Resources.UnitType      = 1
-        SELF.al.Resources.UnitTypeCode  = 'TEST'
+        SELF.al.Resources.UnitTypeCode  = 'TEST1'
+        SELF.al.Resources.xPos          = 100
+        SELF.al.Resources.yPos          = 100
+        ADD(SELF.al.Resources)
+        
+        ! Resource2
+        SELF.al.Resources.Echelon   = 2
+        SELF.al.Resources.Hostility = 2
+        SELF.al.Resources.IsHQ      = 2
+        SELF.al.Resources.markForDel    = 0
+        SELF.al.Resources.markForDisbl  = 0
+        SELF.al.Resources.TreePos       = 1
+        SELF.al.Resources.UnitName      = 'TEST2'
+        SELF.al.Resources.UnitType      = 1
+        SELF.al.Resources.UnitTypeCode  = 'TEST2'
         SELF.al.Resources.xPos          = 100
         SELF.al.Resources.yPos          = 100
         ADD(SELF.al.Resources)

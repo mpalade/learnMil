@@ -30,6 +30,7 @@ Destruct                PROCEDURE(), VIRTUAL
                     END
         
 collection          &JSONClass
+subItem             &JSONClass
 
 ! string theory objects
 sst                 stringtheory
@@ -693,8 +694,11 @@ CODE
     
     ! Actions
     collection.Append(SELF.al.al, 'Actions')
-    json.reference  = SELF.al.al.Resources
+    !json.reference  = SELF.al.al.Resources
     !json.SetColumnType('Resources',jf:Reference)
+    
+    subItem &= collection.Append('Resources')
+    subItem.Append(SELF.al.al.Resources)
     
     ! referenced C2IPs
     collection.Append(SELF.refC2IPs, 'refC2IPs')    
