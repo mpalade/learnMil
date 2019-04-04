@@ -32,8 +32,14 @@ Destruct                PROCEDURE(), VIRTUAL
 collection          &JSONClass
 subItem             &JSONClass
 
+ActionsJSON             CLASS(JSONClass)
+!AssignValue     PROCEDURE (JSONClass pJson,StringTheory pName,|
+!                            *Group pGroup,*Long pIndex,Long pColumnOffset),VIRTUAL
+                        END
+
 ! string theory objects
 sst                 stringtheory
+
 
 json.Construct      PROCEDURE
     CODE
@@ -44,7 +50,8 @@ json.Construct      PROCEDURE
 json.Destruct       PROCEDURE
     CODE
         DISPOSE(self.reference)
-        PARENT.Destruct()
+        PARENT.Destruct()               
+                                
 
 OverlayC2IP.SelectByMouse   PROCEDURE(LONG nXPos, LONG nYPos)    
     CODE
@@ -680,7 +687,10 @@ endPos                          GROUP(PosRecord)
             SELF.DA_AxisOfAdvance(startPos, endPos)
         END
         
-OverlayC2IP.Save     PROCEDURE(STRING sFileName)
+OverlayC2IP.Save    PROCEDURE(STRING sFileName)
+arec                    GROUP(ActionBasicRecord)
+                        END
+
 CODE
     ! do something
     json.Start()
