@@ -218,105 +218,116 @@ CODE
         SELF.isPointsCollection = TRUE
         SELF.isMouseDown        = FALSE        
     OF 2
-        ! Abush
-        SELF.geometry           = g:AxisAdvance
+        ! Ambush
+        SELF.geometry           = g:Ambush
         SELF.isPointsCollection = TRUE
         SELF.isMouseDown        = FALSE
     OF 3
         ! Arrest
+        SELF.geometry           = g:Circle
+        SELF.isPointsCollection = TRUE
+        SELF.isMouseDown        = FALSE
     OF 4
+        ! Attack
+        SELF.geometry           = g:AxisAdvance
+        SELF.isPointsCollection = TRUE
+        SELF.isMouseDown        = FALSE
+    OF 5        
         ! Attack By Fire
-    OF 5
-        ! Block
+        SELF.geometry           = g:LineWithBase
+        SELF.isPointsCollection = TRUE
+        SELF.isMouseDown        = FALSE
     OF 6
-        ! Breach
+        ! Block
     OF 7
-        ! Bypass
+        ! Breach
     OF 8
-        ! Canalize
+        ! Bypass
     OF 9
-        ! Capture
+        ! Canalize
     OF 10
-        ! Clear
+        ! Capture
     OF 11
-        ! Contain
+        ! Clear
     OF 12
-        ! Control
+        ! Contain
     OF 13
-        ! Counterattack
+        ! Control
     OF 14
-        ! Counterattack By Fire
+        ! Counterattack
     OF 15
-        ! Cover
+        ! Counterattack By Fire
     OF 16
-        ! Conduct Deception
+        ! Cover
     OF 17
-        ! Delay
+        ! Conduct Deception
     OF 18
-        ! Demonstrate
+        ! Delay
     OF 19
-        ! Deny
+        ! Demonstrate
     OF 20
-        ! Disengage
+        ! Deny
     OF 21
-        ! Disrupt
+        ! Disengage
     OF 22
-        ! Envelop
+        ! Disrupt
     OF 23
-        ! Escort
+        ! Envelop
     OF 24
-        ! Exfiltrate
+        ! Escort
     OF 25
-        ! Conduct Exploitation
+        ! Exfiltrate
     OF 26
-        ! Feint
+        ! Conduct Exploitation
     OF 27
-        ! Fix
+        ! Feint
     OF 28
-        ! Follow and Assume
+        ! Fix
     OF 29
-        ! Follow and Support
+        ! Follow and Assume
     OF 30
-        ! Guard
+        ! Follow and Support
     OF 31
-        ! Infiltrate
+        ! Guard
     OF 32
-        ! Interdict
+        ! Infiltrate
     OF 33
-        ! Isolate
+        ! Interdict
     OF 34
-        ! Locate
+        ! Isolate
     OF 35
-        ! Neutralize
+        ! Locate
     OF 36
-        ! Occupy
+        ! Neutralize
     OF 37
-        ! Penetrate
+        ! Occupy
     OF 38
-        ! Pursue
+        ! Penetrate
     OF 39
-        ! Recover
+        ! Pursue
     OF 40
-        ! Relief In Place
+        ! Recover
     OF 41
-        ! Retain
+        ! Relief In Place
     OF 42
-        ! Retire
+        ! Retain
     OF 43
-        ! Screen
+        ! Retire
     OF 44
-        ! Secure
+        ! Screen
     OF 45
-        ! Seize
+        ! Secure
     OF 46
-        ! Support By Fire
+        ! Seize
     OF 47
-        ! Suppress
+        ! Support By Fire
     OF 48
-        ! Turn
+        ! Suppress
     OF 49
-        ! Withdraw
+        ! Turn
     OF 50
+        ! Withdraw
+    OF 51
         ! Withdraw Under Pressure
                         
     END
@@ -537,6 +548,15 @@ OverlayC2IP.TakeEvent       PROCEDURE()
                     OF g:AxisAdvance
                         ! Axis of Advance
                         SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                    
+                    OF g:Ambush
+                        ! Ambush style
+                        SELF.Draw_Ambush(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                    OF g:Circle
+                        ! Circle style
+                        SELF.Draw_Circle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                        
+                    OF g:LineWithBase
+                        ! Line With Base style
+                        SELF.Draw_LineWithBase(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
                     END
                 ELSE
                     ! nothing
@@ -561,6 +581,15 @@ OverlayC2IP.TakeEvent       PROCEDURE()
                         ! Axis of Advance
                         SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
                         SELF.InsertAction()
+                    OF g:Ambush
+                        ! Ambush style
+                        SELF.Draw_Ambush(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
+                    OF g:Circle
+                        ! Circle style
+                        SELF.Draw_Circle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)     
+                    OF g:LineWithBase
+                        ! Line With Base style
+                        SELF.Draw_LineWithBase(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
                     END
                     SELF.isPointsCollection = FALSE                
                 ELSE
@@ -666,6 +695,71 @@ OverlayC2IP.Draw_AxisAdvance   PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
         SELF.drwImg.Display()     
         !MESSAGE('am desenat Draw_AxisAdvance')
         
+OverlayC2IP.Draw_Ambush     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)        
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview = TRUE THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
+        END        
+        
+        ! median line
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        
+        ! arrow cup
+        
+        ! base arc
+        SELF.drwImg.Arc(SELF.p1x - 10, SELF.p1y - 10, 10, 10, 0, 90)
+        SELF.drwImg.Arc(SELF.p1x, SELF.p1y, 10, 10, 0, 90)
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+    SELF.drwImg.Display()     
+
+
+OverlayC2IP.Draw_Circle     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)        
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview = TRUE THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
+        END      
+        
+        dx# = nXPos - SELF.p1x
+        dy# = nYPos - SELF.p1y
+        
+        ! circle
+        SELF.drwImg.Arc(SELF.p1x -dx#/2, SELF.p1y -dy#/2, dx#, dy#, 0, 3599)
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()     
+        
+OverlayC2IP.Draw_LineWithBase     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)        
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview = TRUE THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
+        END      
+        
+        dx# = nXPos - SELF.p1x
+        dy# = nYPos - SELF.p1y
+        L#  = SQRT(dx#*dx# + dy#*dy#)
+        wdth#  = 20
+        
+        lx# = dy#*wdth#/L#
+        ly# = dx#*wdth#/L#
+        
+        ! circle
+        SELF.drwImg.Line(SELF.p1x - lx#, SELF.p1y - ly#, 2*lx#, 2*ly#)
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()             
         
 OverlayC2IP.DrawAction      PROCEDURE()
 startPos                        GROUP(PosRecord)
