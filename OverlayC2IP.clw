@@ -214,33 +214,47 @@ CODE
     CASE nOption
     OF 1
         ! Advance to contact
+        SELF.actionTypeCode     = aTpy:AdvanceToContact
+             
         SELF.geometry           = g:AxisAdvance
         SELF.isPointsCollection = TRUE
         SELF.isMouseDown        = FALSE        
     OF 2
         ! Ambush
+        SELF.actionTypeCode     = aTpy:Ambush
         SELF.geometry           = g:Ambush
         SELF.isPointsCollection = TRUE
         SELF.isMouseDown        = FALSE
     OF 3
         ! Arrest
+        SELF.actionTypeCode     = aTpy:CAI_Arrest
         SELF.geometry           = g:Circle
         SELF.isPointsCollection = TRUE
         SELF.isMouseDown        = FALSE
     OF 4
         ! Attack
+        SELF.actionTypeCode     = aTpy:AxisOfAdvance_SupportingAttack
         SELF.geometry           = g:AxisAdvance
         SELF.isPointsCollection = TRUE
         SELF.isMouseDown        = FALSE
     OF 5        
         ! Attack By Fire
+        SELF.actionTypeCode     = aTpy:AttackByFirePosition
         SELF.geometry           = g:LineWithBase
         SELF.isPointsCollection = TRUE
         SELF.isMouseDown        = FALSE
     OF 6
         ! Block
+        SELF.actionTypeCode     = aTpy:Block
+        SELF.geometry           = g:LineWithHeader
+        SELF.isPointsCollection = TRUE
+        SELF.isMouseDown        = FALSE
     OF 7
         ! Breach
+        SELF.actionTypeCode     = aTpy:Breach
+        SELF.geometry           = g:Breach
+        SELF.isPointsCollection = TRUE
+        SELF.isMouseDown        = FALSE
     OF 8
         ! Bypass
     OF 9
@@ -467,6 +481,46 @@ OverlayC2IP.DA_AxisOfAdvance        PROCEDURE(PosRecord startPos, PosRecord endP
 !                        
 !        SELF.drwImg.SetPenStyle(PEN:solid)
 !        SELF.drwImg.Display()     
+
+OverlayC2IP.DA_Block        PROCEDURE(PosRecord startPos, PosRecord endPos)        
+    CODE
+        dx# = endPos.xPos - startPos.xPos
+        dy# = endPos.yPos - startPos.yPos
+        L#  = SQRT(dx#*dx# + dy#*dy#)
+        wdth#  = 20
+        
+        lx# = dy#*wdth#/L#
+        ly# = dx#*wdth#/L#
+        
+        ! median line
+        SELF.drwImg.Line(startPos.xPos, startPos.yPos, dx#, dy#)
+        
+        ! small header line
+        SELF.drwImg.Line(endPos.xPos, endPos.yPos, -lx#, -ly#)
+        SELF.drwImg.Line(endPos.xPos, endPos.yPos, lx#, ly#)      
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()
+        
+OverlayC2IP.DA_Breach   PROCEDURE(PosRecord startPos, PosRecord endPos)
+    CODE        
+        dx# = endPos.xPos - startPos.xPos
+        dy# = endPos.yPos - startPos.yPos
+        L#  = SQRT(dx#*dx# + dy#*dy#)
+        wdth#  = 20
+        
+        lx# = dy#*wdth#/L#
+        ly# = dx#*wdth#/L#        
+        
+        ! main symbol
+        ! corridor lines
+        SELF.drwImg.Line(startPos.xPos - lx#, startPos.yPos + ly#, dx#, dy#)
+        SELF.drwImg.Line(startPos.xPos + lx#, startPos.yPos - ly#, dx#, dy#)    
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()
         
     
 OverlayC2IP.TakePoints      PROCEDURE(PosRecord startPos, PosRecord endPos)    
@@ -482,26 +536,58 @@ OverlayC2IP.InsertAction    PROCEDURE()
 actionRec                       GROUP(ActionBasicRecord)
                                 END
 
-    CODE
-        !actionRec   &= NEW(ActionBasicRecord)
-        CASE SELF.geometry
-        OF g:Point
-        OF g:Line
-        OF g:FreeLine
-        OF g:AxisAdvance
-            actionRec.ActionName    = 'bla bla bla'
-            actionRec.ActionType    = 0
-            actionRec.ActionTypeCode        = aTpy:AxisOfAdvance_SupportingAttack
-            actionRec.ActionPointsNumber    = 2
-            actionRec.xPos[1]               = SELF.p1x
-            actionRec.yPos[1]               = SELF.p1y
-            actionRec.xPos[2]               = SELF.drwImg.MouseX()
-            actionRec.yPos[2]               = SELF.drwImg.MouseY()
-            !MESSAGE('inainte de call')
-            SELF.al.InsertAction(actionRec)
-        END        
+    CODE        
+        CASE CLIP(SELF.actionTypeCode)
+            OF aTpy:AdvanceToContact
+                ! Advance to contact
+                
+            OF aTpy:Ambush
+                ! Ambush
+                
+            OF aTpy:CAI_Arrest
+                ! Arrest
+                
+            OF aTpy:AxisOfAdvance_SupportingAttack
+                ! Attack
+                actionRec.ActionName    = 'aTpy:AxisOfAdvance_SupportingAttack'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:AxisOfAdvance_SupportingAttack
+                actionRec.ActionPointsNumber    = 2
+                actionRec.xPos[1]               = SELF.p1x
+                actionRec.yPos[1]               = SELF.p1y
+                actionRec.xPos[2]               = SELF.drwImg.MouseX()
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                SELF.al.InsertAction(actionRec)
+
+            OF aTpy:AttackByFirePosition        
+                ! Attack By Fire
+                
+            OF aTpy:Block
+                ! Block
+                actionRec.ActionName    = 'aTpy:Block'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:Block
+                actionRec.ActionPointsNumber    = 2
+                actionRec.xPos[1]               = SELF.p1x
+                actionRec.yPos[1]               = SELF.p1y
+                actionRec.xPos[2]               = SELF.drwImg.MouseX()
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                SELF.al.InsertAction(actionRec)
+                
+            OF aTpy:Breach
+                ! Breach
+                actionRec.ActionName    = 'aTpy:Breach'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:Breach
+                actionRec.ActionPointsNumber    = 2
+                actionRec.xPos[1]               = SELF.p1x
+                actionRec.yPos[1]               = SELF.p1y
+                actionRec.xPos[2]               = SELF.drwImg.MouseX()
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                SELF.al.InsertAction(actionRec)
+        END                
+        
         SELF.Redraw()
-        !DISPOSE(actionRec)
         
 OverlayC2IP.TakeEvent       PROCEDURE()
     CODE
@@ -557,6 +643,12 @@ OverlayC2IP.TakeEvent       PROCEDURE()
                     OF g:LineWithBase
                         ! Line With Base style
                         SELF.Draw_LineWithBase(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                    OF g:LineWithHeader
+                        ! Line With Header style
+                        SELF.Draw_LineWithHeader(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                            
+                    OF g:Breach
+                        ! Breach style
+                        SELF.Draw_Breach(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
                     END
                 ELSE
                     ! nothing
@@ -579,8 +671,7 @@ OverlayC2IP.TakeEvent       PROCEDURE()
                         ! final dree line
                     OF g:AxisAdvance
                         ! Axis of Advance
-                        SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
-                        SELF.InsertAction()
+                        SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
                     OF g:Ambush
                         ! Ambush style
                         SELF.Draw_Ambush(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
@@ -590,7 +681,14 @@ OverlayC2IP.TakeEvent       PROCEDURE()
                     OF g:LineWithBase
                         ! Line With Base style
                         SELF.Draw_LineWithBase(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
+                    OF g:LineWithHeader
+                        ! Line With Header style
+                        SELF.Draw_LineWithHeader(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)    
+                    OF g:Breach
+                        ! Breach style
+                        SELF.Draw_Breach(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
                     END
+                    SELF.InsertAction()
                     SELF.isPointsCollection = FALSE                
                 ELSE
                     ! noting
@@ -754,12 +852,75 @@ OverlayC2IP.Draw_LineWithBase     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPrevie
         lx# = dy#*wdth#/L#
         ly# = dx#*wdth#/L#
         
-        ! circle
-        SELF.drwImg.Line(SELF.p1x - lx#, SELF.p1y - ly#, 2*lx#, 2*ly#)
+        ! median line
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, dx#, dy#)
+        
+        ! small base line
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, -lx#, -ly#)
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, lx#, ly#)
+        
+        ! small lateral wings
+        SELF.drwImg.Line(SELF.p1x - lx#, SELF.p1y - ly#, -wdth#, -wdth#/2)
+        SELF.drwImg.Line(SELF.p1x + lx#, SELF.p1y + ly#, wdth#, wdth#/2)
         
         ! display preview
         SELF.drwImg.SetPenStyle(PEN:solid)
         SELF.drwImg.Display()             
+        
+        
+OverlayC2IP.Draw_LineWithHeader     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)        
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview = TRUE THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
+        END      
+        
+        dx# = nXPos - SELF.p1x
+        dy# = nYPos - SELF.p1y
+        L#  = SQRT(dx#*dx# + dy#*dy#)
+        wdth#  = 20
+        
+        lx# = dy#*wdth#/L#
+        ly# = dx#*wdth#/L#
+        
+        ! median line
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, dx#, dy#)
+        
+        ! small header line
+        SELF.drwImg.Line(nXPos, nYPos, -lx#, -ly#)
+        SELF.drwImg.Line(nXPos, nYPos, lx#, ly#)       
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()                     
+        
+OverlayC2IP.Draw_Breach     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)        
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview = TRUE THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
+        END      
+        
+        dx# = nXPos - SELF.p1x
+        dy# = nYPos - SELF.p1y
+        L#  = SQRT(dx#*dx# + dy#*dy#)
+        wdth#  = 20
+        
+        lx# = dy#*wdth#/L#
+        ly# = dx#*wdth#/L#
+        
+        ! main symbol
+        ! corridor lines
+        SELF.drwImg.Line(SELF.p1x - lx#, SELF.p1y + ly#, dx#, dy#)
+        SELF.drwImg.Line(SELF.p1x + lx#, SELF.p1y - ly#, dx#, dy#)
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()                             
         
 OverlayC2IP.DrawAction      PROCEDURE()
 startPos                        GROUP(PosRecord)
@@ -768,8 +929,11 @@ endPos                          GROUP(PosRecord)
                                 END
 
     CODE
+        
+        OMIT('_noCompile')
         CASE CLIP(SELF.al.al.ActionTypeCode)
-        OF '151404'
+        !OF '151404'
+        OF aTpy:AxisOfAdvance_SupportingAttack
             ! Axis Of Advance / Supporting Attack
             !MESSAGE('Axis Of Advance / Supporting Attack')
             !SELF.DrawAction_SupportingAttack()
@@ -779,7 +943,142 @@ endPos                          GROUP(PosRecord)
             endPos.yPos     = SELF.al.al.yPos[2]
             !SELF.DA_SupportingAttack(startPos, endPos)
             SELF.DA_AxisOfAdvance(startPos, endPos)
-        END
+        END    
+        _noCompile        
+        
+    CASE CLIP(SELF.al.al.ActionTypeCode)
+    OF aTpy:AdvanceToContact
+        ! Advance to contact
+        
+    OF aTpy:Ambush
+        ! Ambush
+        
+    OF aTpy:CAI_Arrest
+        ! Arrest
+        
+    OF aTpy:AxisOfAdvance_SupportingAttack
+        ! Attack
+        startPos.xPos   = SELF.al.al.xPos[1]
+        startPos.yPos   = SELF.al.al.yPos[1]
+        endPos.xPos     = SELF.al.al.xPos[2]
+        endPos.yPos     = SELF.al.al.yPos[2]       
+        SELF.DA_AxisOfAdvance(startPos, endPos)
+
+    OF aTpy:AttackByFirePosition        
+        ! Attack By Fire
+        
+    OF aTpy:Block
+        ! Block
+        startPos.xPos   = SELF.al.al.xPos[1]
+        startPos.yPos   = SELF.al.al.yPos[1]
+        endPos.xPos     = SELF.al.al.xPos[2]
+        endPos.yPos     = SELF.al.al.yPos[2]       
+        SELF.DA_Block(startPos, endPos)
+        
+    OF aTpy:Breach
+    !OF '340200'
+        ! Breach
+        startPos.xPos   = SELF.al.al.xPos[1]
+        startPos.yPos   = SELF.al.al.yPos[1]
+        endPos.xPos     = SELF.al.al.xPos[2]
+        endPos.yPos     = SELF.al.al.yPos[2]       
+        SELF.DA_Breach(startPos, endPos)
+        
+        
+        OMIT('_noCompile')
+    OF 8
+        ! Bypass
+    OF 9
+        ! Canalize
+    OF 10
+        ! Capture
+    OF 11
+        ! Clear
+    OF 12
+        ! Contain
+    OF 13
+        ! Control
+    OF 14
+        ! Counterattack
+    OF 15
+        ! Counterattack By Fire
+    OF 16
+        ! Cover
+    OF 17
+        ! Conduct Deception
+    OF 18
+        ! Delay
+    OF 19
+        ! Demonstrate
+    OF 20
+        ! Deny
+    OF 21
+        ! Disengage
+    OF 22
+        ! Disrupt
+    OF 23
+        ! Envelop
+    OF 24
+        ! Escort
+    OF 25
+        ! Exfiltrate
+    OF 26
+        ! Conduct Exploitation
+    OF 27
+        ! Feint
+    OF 28
+        ! Fix
+    OF 29
+        ! Follow and Assume
+    OF 30
+        ! Follow and Support
+    OF 31
+        ! Guard
+    OF 32
+        ! Infiltrate
+    OF 33
+        ! Interdict
+    OF 34
+        ! Isolate
+    OF 35
+        ! Locate
+    OF 36
+        ! Neutralize
+    OF 37
+        ! Occupy
+    OF 38
+        ! Penetrate
+    OF 39
+        ! Pursue
+    OF 40
+        ! Recover
+    OF 41
+        ! Relief In Place
+    OF 42
+        ! Retain
+    OF 43
+        ! Retire
+    OF 44
+        ! Screen
+    OF 45
+        ! Secure
+    OF 46
+        ! Seize
+    OF 47
+        ! Support By Fire
+    OF 48
+        ! Suppress
+    OF 49
+        ! Turn
+    OF 50
+        ! Withdraw
+    OF 51
+        ! Withdraw Under Pressure
+        
+        _noCompile
+                        
+    END
+
         
 OverlayC2IP.Save    PROCEDURE(STRING sFileName)
 arec                    GROUP(ActionBasicRecord)

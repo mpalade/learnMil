@@ -179,8 +179,77 @@ g:Ambush            EQUATE(1011)
 g:Circle            EQUATE(1012)
 g:LineWithBase      EQUATE(1013)
 
+g:LineWithHeader    EQUATE(1014)
+g:Block             EQUATE(1014)
+
+g:Breach            EQUATE(1015)
+
 ! Action Type Equates
 aTpy:notDefined     EQUATE('')
+
+aTpy:AdvanceToContact       EQUATE('900000')    ! Advance To Contact
+
+aTpy:Incident                       EQUATE('110000') ! Incident
+aTpy:CriminalActivityIncident       EQUATE('110100') ! Criminal Activity Incident
+aTpy:CAI_Arrest                     EQUATE('110101') ! Criminal Activity Incident / Arrest
+
+aTpy:Block          EQUATE('340100')    ! Block
+aTpy:Breach         EQUATE('340200')    ! Breach
+aTpy:Bypass         EQUATE('340300')    ! Bypass
+aTpy:Canalize       EQUATE('340400')    ! Canalize
+aTpy:Clear          EQUATE('340500')    ! Clear
+aTpy:Counterattack  EQUATE('340600')    ! Counterattack
+aTpy:CounterattackByFire    EQUATE('340700') ! Counterattack by Fire
+aTpy:Delay          EQUATE('340800')    ! Delay
+aTpy:Destroy        EQUATE('340900')    ! Destroy
+aTpy:Disrupt        EQUATE('341000')    ! Disrupt
+aTpy:Fix            EQUATE('341100')    ! Fix
+aTpy:FollowAndAssume        EQUATE('341200')    ! Follow and Assume
+aTpy:FollowAndSupport       EQUATE('341300')    ! Follow and Support
+aTpy:Interdict      EQUATE('341400')    ! Interdict
+aTpy:Isolate        EQUATE('341500')    ! Isolate
+aTpy:Neutralize     EQUATE('341600')    ! Neutralize
+aTpy:Occupy         EQUATE('341700')    ! Occupy
+aTpy:Penetrate      EQUATE('341800')    ! Penetrate
+aTpy:ReliefInPlace  EQUATE('341900')    ! Relief in Place (RIP)
+aTpy:Retire         EQUATE('342000')    ! Retire
+aTpy:Secure         EQUATE('342100')    ! Secure
+aTpy:Security       EQUATE('342200')    ! Security
+aTpy:Security_Cover     EQUATE('342201')    ! Security / Cover
+aTpy:Security_Guard     EQUATE('342202')    ! Security / Guard
+aTpy:Security_Screen    EQUATE('342203')    ! Security / Screen
+aTpy:Seize          EQUATE('342300')    ! Seize
+aTpy:Withdraw       EQUATE('342400')    ! Withdraw
+aTpy:WithdrawUnderPressure  EQUATE('342500')    ! Withdraw Under Pressure
+
+    ! no representation
+!aTpy:LineOfContact  EQUATE('140200')        ! Line Of Contact
+    
+aTpy:PhaseLine      EQUATE('140300')        ! Phase Line
+aTpy:ForwardEdge    EQUATE('140400')        ! Forward Edge of the Battle Area
+aTpy:ForwardEdge_Proposed   EQUATE('140401')        ! Forward Edge of the Battle Area / Proposed or On Order
+aTpy:PrincipleDirectionOfFire       EQUATE('140500')    ! Principle Direction of Fire
+
+aTpy:DirectionOfAttack                      EQUATE('140600')    ! Direction of Attack
+aTpy:DirectionOfAttack_FriendlyAviation     EQUATE('140601')    ! Direction of Attack / Friendly Aviation
+aTpy:DirectionOfAttack_FriendlyDirectionOfMainAttack                    EQUATE('140602')    ! Direction of Attack / Friendly Direction of Main Attack
+aTpy:DirectionOfAttack_FriendlyDirectionOfSupportingAttack              EQUATE('140603')    ! Direction of Attack / 	Friendly Direction of Supporting Attack
+aTpy:DirectionOfAttack_Feint                        EQUATE('140605')    ! Direction of Attack / Feint
+aTpy:DirectionOfAttack_EnemyConfirmed               EQUATE('140606')    ! Direction of Attack / Enemy Confirmed
+aTpy:DirectionOfAttack_EnemyTemplated               EQUATE('140607')    ! Direction of Attack / Enemy Templated or Suspected
+
+aTpy:FinalCoordinationLine  EQUATE('140700')          ! Final Coordination Line
+aTpy:InfiltrationLane       EQUATE('140800')          ! Infiltration Lane
+aTpy:LimitOfAdvance         EQUATE('140900')          ! Limit of Advance
+aTpy:LineofDeparture        EQUATE('141000')          ! Line of Departure
+aTpy:LineofContact          EQUATE('141100')          ! Line of Departure/Line of Contact
+aTpy:ProbableLineofDeployment       EQUATE('141200')        ! Probable Line of Deployment
+aTpy:AirheadLine                    EQUATE('141300')        ! Airhead Line
+aTpy:BridgeheadLine EQUATE('141400')        ! Bridgehead Line
+aTpy:HoldingLine    EQUATE('141500')        ! Holding Line
+aTpy:ReleaseLine    EQUATE('141600')        ! Release Line
+aTpy:Ambush         EQUATE('141700')        ! Ambush
+
 
 aTpy:AxisOfAdvance                                  EQUATE('151400')    ! Axis Of Advance
 aTpy:AxisOfAdvance_FriendlyAirborne_Aviation        EQUATE('151401')    ! Axis Of Advance / Friendly Airborne/Aviation
@@ -191,6 +260,16 @@ aTpy:AxisOfAdvance_SupportingAttackPlanned          EQUATE('151405')    ! Axis O
 aTpy:AxisOfAdvance_Feint                            EQUATE('151406')    ! Axis Of Advance / Feint
 aTpy:AxisOfAdvance_EnemyConfirmed                   EQUATE('151407')    ! Axis Of Advance / Enemy Confirmed
 aTpy:AxisOfAdvance_EnemyTemplated_Suspected         EQUATE('151408')    ! Axis Of Advance / Enemy Templated or Suspected
+aTpy:AssaultPosition                                EQUATE('151500')    ! Assault Position
+aTpy:AttackPosition                                 EQUATE('151600')    ! Attack Position
+aTpy:Objective      EQUATE('151700')    ! Objective
+aTpy:Encirclement   EQUATE('151800')    ! Encirclement
+aTpy:Encirclement_Friendly  EQUATE('151801')    ! Encirclement / Friendly
+aTpy:Encirclement_Enemy     EQUATE('151802')    ! Encirclement / Enemy
+aTpy:PenetratioBox          EQUATE('151900')    ! Penetration Box
+aTpy:AttackByFirePosition   EQUATE('152000')    ! Attack By Fire Position
+aTpy:SupportByFire  EQUATE('152100')    ! Support By Fire
+aTpy:SearchArea     EQUATE('152200')    ! Search Are / Reconnaissance Area
 
 
 ! Units Queue Structure
@@ -513,6 +592,7 @@ al                      &ActionsCollection
 
 TakeEvent               PROCEDURE(), VIRTUAL
 
+    ! draw actions preview (during visual construction)
 Preview_Line            PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
 Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
 Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
@@ -520,7 +600,12 @@ Draw_AxisAdvance        PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE)
 Draw_Ambush             PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
 Draw_Circle             PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
 Draw_LineWithBase       PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
+Draw_LineWithHeader     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
 
+Draw_Breach             PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
+
+!actionType              LONG, PROTECTED
+actionTypeCode          STRING(10), PROTECTED
 p1x                     LONG, PROTECTED
 p1y                     LONG, PROTECTED
 PolyPoints              LONG, PROTECTED
@@ -546,8 +631,12 @@ MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 TakeNodeAction          PROCEDURE(LONG nOption), LONG
 NodeActionsMenuOptions  PROCEDURE(), STRING
 
+    ! Draw final actions representations
 DA_SupportingAttack     PROCEDURE(PosRecord startPos, PosRecord endPos)
 DA_AxisOfAdvance        PROCEDURE(PosRecord startPos, PosRecord endPos)
+DA_Block                PROCEDURE(PosRecord startPos, PosRecord endPos)
+DA_Breach               PROCEDURE(PosRecord startPos, PosRecord endPos)
+
 TakePoints              PROCEDURE(PosRecord startPos, PosRecord endPos)    
 
 InsertAction            PROCEDURE()
