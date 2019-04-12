@@ -482,6 +482,39 @@ OverlayC2IP.DA_AxisOfAdvance        PROCEDURE(PosRecord startPos, PosRecord endP
 !        SELF.drwImg.SetPenStyle(PEN:solid)
 !        SELF.drwImg.Display()     
 
+
+OverlayC2IP.DA_Ambush       PROCEDURE(PosRecord startPos, PosRecord endPos)        
+    CODE
+        dx# = endPos.xPos - startPos.xPos
+        dy# = endPos.yPos - startPos.yPos
+        
+        ! median line
+        SELF.drwImg.Line(startPos.xPos, startPos.yPos, dx#, dy#)
+        
+        ! arrow cup
+        
+        ! base arc
+        SELF.drwImg.Arc(startPos.xPos - 10, startPos.yPos - 10, 10, 10, 0, 90)
+        SELF.drwImg.Arc(startPos.xPos, startPos.yPos, 10, 10, 0, 90)
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()     
+
+OverlayC2IP.DA_Arrest       PROCEDURE(PosRecord startPos, PosRecord endPos)        
+    CODE        
+        dx# = endPos.xPos - startPos.xPos
+        dy# = endPos.yPos - startPos.yPos
+        
+        ! circle
+        SELF.drwImg.Arc(startPos.xPos -dx#/2, startPos.yPos -dy#/2, dx#, dy#, 0, 3599)
+        
+        ! display preview
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()     
+        
+                                
+
 OverlayC2IP.DA_Block        PROCEDURE(PosRecord startPos, PosRecord endPos)        
     CODE
         dx# = endPos.xPos - startPos.xPos
@@ -543,9 +576,27 @@ actionRec                       GROUP(ActionBasicRecord)
                 
             OF aTpy:Ambush
                 ! Ambush
+                actionRec.ActionName    = 'aTpy:Ambush'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:Ambush
+                actionRec.ActionPointsNumber    = 2
+                actionRec.xPos[1]               = SELF.p1x
+                actionRec.yPos[1]               = SELF.p1y
+                actionRec.xPos[2]               = SELF.drwImg.MouseX()
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                SELF.al.InsertAction(actionRec)
                 
             OF aTpy:CAI_Arrest
                 ! Arrest
+                actionRec.ActionName    = 'aTpy:CAI_Arrest'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:CAI_Arrest
+                actionRec.ActionPointsNumber    = 2
+                actionRec.xPos[1]               = SELF.p1x
+                actionRec.yPos[1]               = SELF.p1y
+                actionRec.xPos[2]               = SELF.drwImg.MouseX()
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                SELF.al.InsertAction(actionRec)
                 
             OF aTpy:AxisOfAdvance_SupportingAttack
                 ! Attack
@@ -813,7 +864,7 @@ OverlayC2IP.Draw_Ambush     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
         
         ! display preview
         SELF.drwImg.SetPenStyle(PEN:solid)
-    SELF.drwImg.Display()     
+        SELF.drwImg.Display()     
 
 
 OverlayC2IP.Draw_Circle     PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)        
@@ -952,9 +1003,19 @@ endPos                          GROUP(PosRecord)
         
     OF aTpy:Ambush
         ! Ambush
+        startPos.xPos   = SELF.al.al.xPos[1]
+        startPos.yPos   = SELF.al.al.yPos[1]
+        endPos.xPos     = SELF.al.al.xPos[2]
+        endPos.yPos     = SELF.al.al.yPos[2]       
+        SELF.DA_Ambush(startPos, endPos)
         
     OF aTpy:CAI_Arrest
         ! Arrest
+        startPos.xPos   = SELF.al.al.xPos[1]
+        startPos.yPos   = SELF.al.al.yPos[1]
+        endPos.xPos     = SELF.al.al.xPos[2]
+        endPos.yPos     = SELF.al.al.yPos[2]       
+        SELF.DA_Arrest(startPos, endPos)
         
     OF aTpy:AxisOfAdvance_SupportingAttack
         ! Attack

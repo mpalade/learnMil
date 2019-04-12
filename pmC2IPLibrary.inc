@@ -1,4 +1,4 @@
-! Unit Types Equates
+start! Unit Types Equates
 uTpy:notDefined     EQUATE('')
 !uTpy:infantry       EQUATE(1001)
 
@@ -634,6 +634,8 @@ NodeActionsMenuOptions  PROCEDURE(), STRING
     ! Draw final actions representations
 DA_SupportingAttack     PROCEDURE(PosRecord startPos, PosRecord endPos)
 DA_AxisOfAdvance        PROCEDURE(PosRecord startPos, PosRecord endPos)
+DA_Ambush               PROCEDURE(PosRecord startPos, PosRecord endPos)
+DA_Arrest               PROCEDURE(PosRecord startPos, PosRecord endPos)
 DA_Block                PROCEDURE(PosRecord startPos, PosRecord endPos)
 DA_Breach               PROCEDURE(PosRecord startPos, PosRecord endPos)
 
