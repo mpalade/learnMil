@@ -464,6 +464,30 @@ UnitsCollection.GetNode       PROCEDURE()
         ELSE
             RETURN FALSE
         END
+
+        
+Action.Construct    PROCEDURE()
+    CODE
+        
+Action.Init    PROCEDURE(*ActionBasicRecord pARec)
+    CODE
+        SELF.arec.ActionName            = pArec.ActionName
+        SELF.arec.ActionPointsNumber    = pArec.ActionPointsNumber
+        SELF.arec.ActionType            = pArec.ActionType
+        SELF.arec.ActionTypeCode        = pArec.ActionTypeCode
+        SELF.arec.xPos                  = pArec.xPos
+        SELF.arec.yPos                  = pArec.yPos
+        
+        RETURN TRUE
+        
+Action.Destruct     PROCEDURE()
+    CODE
+        
+Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        
+        RETURN TRUE
+                              
         
         
         

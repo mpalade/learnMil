@@ -350,6 +350,18 @@ Destruct                PROCEDURE()
 
                     END
 
+Action              CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
+arec                    GROUP(ActionBasicRecord)
+                        END
+
+Construct               PROCEDURE()
+Init                    PROCEDURE(*ActionBasicRecord pArec), LONG
+Destruct                PROCEDURE()
+
+CheckLineByMouse        PROCEDURE(LONG nXPos, LONG nYPos), LONG
+                    END
+
+
 UnitsCollection       CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 ul                      &UnitsList
 tmpul                   &UnitsList, PRIVATE
@@ -417,6 +429,9 @@ Destruct                    PROCEDURE()
 
 InsertAction                PROCEDURE(ActionBasicRecord parec)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec)
+GetAction                   PROCEDURE(LONG nPointer, *ActionBasicRecord pARec), LONG
+SelectByMouse               PROCEDURE(LONG nXPos, LONG nYPos), LONG
+CheckLineByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
     

@@ -59,8 +59,10 @@ OverlayC2IP.SelectByMouse   PROCEDURE(LONG nXPos, LONG nYPos)
         curXPos#    = SELF.ul.xPos()
         curYPos#    = SELF.ul.yPos()
             
+        ! verify the BSOs
         nodeFoundPos#   = PARENT.SelectByMouse(nXPos, nYPos)
         IF nodeFoundPos# > 0 THEN
+            ! BSO found
             sst.Trace('node found')
             sst.Trace('curSel# = ' & curSel#)
             sst.Trace('curXPos# = ' & curXPos#)
@@ -72,6 +74,8 @@ OverlayC2IP.SelectByMouse   PROCEDURE(LONG nXPos, LONG nYPos)
             SELF.DisplaySelection()
         ELSE
             SELF.DisplaySelection()
+            
+            ! verify the Actions
         END
                     
         IF nodeFoundPos# > 0 THEN
