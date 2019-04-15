@@ -1,4 +1,4 @@
-start! Unit Types Equates
+! Unit Types Equates
 uTpy:notDefined     EQUATE('')
 !uTpy:infantry       EQUATE(1001)
 
@@ -185,7 +185,7 @@ g:Block             EQUATE(1014)
 g:Breach            EQUATE(1015)
 
 ! Action Type Equates
-aTpy:notDefined     EQUATE('')
+aTpy:notDefined     EQUATE('notDefined')
 
 aTpy:AdvanceToContact       EQUATE('900000')    ! Advance To Contact
 
@@ -405,6 +405,7 @@ SetHQ                   PROCEDURE(BOOL bIsHQ), BOOL
 TreePos                 PROCEDURE(), LONG
 
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG
+CheckByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG    
 ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
@@ -415,6 +416,7 @@ Construct                   PROCEDURE()
 Destruct                    PROCEDURE()
 
 InsertAction                PROCEDURE(ActionBasicRecord parec)
+InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec)
                     END
 
     
@@ -508,6 +510,7 @@ DrawNode_Engineer_Recon           PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTE
 DrawNode_Echelon        PROCEDURE(BOOL bAutoDisplay=TRUE), LONG, PROTECTED
 
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+CheckByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 Unselect                PROCEDURE(), LONG
 MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 
@@ -593,7 +596,9 @@ al                      &ActionsCollection
 TakeEvent               PROCEDURE(), VIRTUAL
 
     ! draw actions preview (during visual construction)
-Preview_Line            PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
+Draw_Line               PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
+Draw_Line               PROCEDURE(PosRecord startPos, PosRecord endPos)
+
 Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
 Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
 Draw_AxisAdvance        PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
@@ -626,8 +631,12 @@ AttachC2IP              PROCEDURE(STRING sFileName), LONG
 AttachMap               PROCEDURE(STRING sFileName), LONG
 
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+CheckByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 
+SetGeometry             PROCEDURE(LONG nGeometry), LONG
+SetActionTypeCode       PROCEDURE(STRING sActionTypeCode), LONG
+SetAction               PROCEDURE(STRING sActionTypeCode, LONG nGeometry), LONG
 TakeNodeAction          PROCEDURE(LONG nOption), LONG
 NodeActionsMenuOptions  PROCEDURE(), STRING
 

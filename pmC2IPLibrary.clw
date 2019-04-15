@@ -746,6 +746,25 @@ UnitsCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)
         
         RETURN 0
         
+UnitsCollection.CheckByMouse        PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        currentSelTreePos# = SELF.selTreePos
+        currentSelQueuePos# = SELF.selQueuePos
+                
+        LOOP i# = 1 TO RECORDS(SELF.ul)
+            GET(SELF.ul, i#)
+            IF NOT ERRORCODE() THEN
+                IF (SELF.ul.xPos < nXPos) AND (nXPos < SELF.ul.xPos + 50) THEN
+                    IF (SELF.ul.yPos < nYPos) AND (nYPos < SELF.ul.yPos + 30) THEN
+                        ! found Unit selection
+                        RETURN i#
+                    END                
+                END            
+            END
+        END
+        
+        RETURN 0
+        
         
 UnitsCollection.ChangeNodePos PROCEDURE(LONG nXPos, LONG nYPos)
     CODE

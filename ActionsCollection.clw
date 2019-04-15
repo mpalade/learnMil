@@ -47,7 +47,7 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
         SELF.al.xPos            = pARec.xPos
-        SELF.al.yPos            = pARec.yPos
+        SELF.al.yPos            = pARec.yPos       
         
         SELF.al.Resources       &= NEW(UnitsList)
         ! Resource1
@@ -82,6 +82,31 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         !MESSAGE('action added to the queue')
         
         
-
+ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasicRecord  pURec)
+    CODE
+        SELF.al.ActionName      = pARec.ActionName
+        SELF.al.ActionType      = pARec.ActionType
+        SELF.al.ActionTypeCode  = pARec.ActionTypeCode
+        SELF.al.xPos            = pARec.xPos
+        SELF.al.yPos            = pARec.yPos
+        
+        SELF.al.Resources       &= NEW(UnitsList)
+        
+        SELF.al.Resources.Echelon   = purec.Echelon
+        SELF.al.Resources.Hostility = purec.Hostility
+        SELF.al.Resources.IsHQ      = purec.IsHQ
+        SELF.al.Resources.markForDel    = 0
+        SELF.al.Resources.markForDisbl  = 0
+        SELF.al.Resources.TreePos       = purec.TreePos
+        SELF.al.Resources.UnitName      = purec.UnitName
+        SELF.al.Resources.UnitType      = purec.UnitType
+        SELF.al.Resources.UnitTypeCode  = purec.UnitTypeCode
+        SELF.al.Resources.xPos          = purec.xPos
+        SELF.al.Resources.yPos          = purec.yPos
+        
+        ADD(SELF.al.Resources)
+        
+        ADD(SELF.al)   
+        
 
 

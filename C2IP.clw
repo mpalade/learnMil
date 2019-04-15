@@ -853,6 +853,10 @@ C2IP.SelectByMouse  PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
         RETURN SELF.ul.SelectByMouse(nXPos, nYPos)
         
+C2IP.CheckByMouse  PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        RETURN SELF.ul.CheckByMouse(nXPos, nYPos)        
+        
 C2IP.MoveTo         PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
         RETURN SELF.ul.ChangeNodePos(nXPos, nYPos)    
