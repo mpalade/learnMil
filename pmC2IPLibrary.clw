@@ -485,8 +485,17 @@ Action.Destruct     PROCEDURE()
         
 Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
+        currentSlope$   = (SELF.arec.xPos[1] - SELF.arec.xPos[2]) / (SELF.arec.yPos[1] - SELF.arec.yPos[2])
+        computedSlope$  = (SELF.arec.xPos[1] - nXPos) / (SELF.arec.yPos[1] - nYPos)        
         
-        RETURN TRUE
+        !MESSAGE('slopes ' & currentSlope$ & ' vs. ' & computedSlope$)
+        IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
+            RETURN TRUE
+        ELSE
+            RETURN FALSE
+        END
+        
+                       
                               
         
         

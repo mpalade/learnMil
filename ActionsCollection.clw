@@ -127,6 +127,7 @@ foundAction                             Action
                         foundAction.Init(aRec)
                         IF foundAction.CheckLineByMouse(nXPos, nYPos) THEN
                             ! found Line
+                            RETURN i#
                         END
                         
                     END
@@ -153,6 +154,40 @@ foundAction                             Action
         END
         _noCompile
         
+        RETURN 0
+        
+ActionsCollection.CheckByMouse     PROCEDURE(LONG nXPos, LONG nYPos)     
+aRec                                    GROUP(ActionBasicRecord)
+                                        END
+foundAction                             Action
+    CODE
+        sst.Trace('START ActionsCollection.CheckByMouse')
+        
+        sst.Trace('Actions# = ' & RECORDS(SELF.al))
+        LOOP i# = 1 TO RECORDS(SELF.al)
+            GET(SELF.al, i#)
+            IF NOT ERRORCODE() THEN
+                ! found Action
+                sst.Trace('Action' & i# & 'code =' & CLIP(SELF.al.ActionTypeCode))                
+                CASE CLIP(SELF.al.ActionTypeCode)
+                OF aTpy:notDefined
+                    ! not defined                    
+                    sst.Trace('verify aTpy:notDefined')
+                    
+                    ! verify Line                   
+                    SELF.GetAction(i#, aRec)
+                    foundAction.Init(aRec)
+                    IF foundAction.CheckLineByMouse(nXPos, nYPos) THEN
+                        ! found Line
+                        RETURN i#
+                    END                        
+                    
+                END
+            END
+            
+        END
+        
+        sst.Trace('END ActionsCollection.CheckByMouse')
         RETURN 0
 
 ActionsCollection.CheckLineByMouse  PROCEDURE(LONG nXPos, LONG nYPos)                

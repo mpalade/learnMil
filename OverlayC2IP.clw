@@ -75,7 +75,16 @@ OverlayC2IP.SelectByMouse   PROCEDURE(LONG nXPos, LONG nYPos)
         ELSE
             SELF.DisplaySelection()
             
+            !MESSAGE('verify the Actions')
+            
             ! verify the Actions
+            actionFoundPos# = SELF.al.CheckByMouse(nXPos, nYPos)
+            !MESSAGE('actionFoundPos# = ' & actionFoundPos#)
+            IF actionFoundPos# > 0 THEN
+                !MESSAGE('found Action = ' & actionFoundPos#)
+                SELF.DisplaySelection(actionFoundPos#)
+            END
+            
         END
                     
         IF nodeFoundPos# > 0 THEN
@@ -696,19 +705,22 @@ OverlayC2IP.TakeEvent       PROCEDURE()
         
         CASE EVENT()
         OF EVENT:MouseDown
-            ! mouse down
-            
-            ! check if it is a new selection on the Overlay                
-            IF SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
-                SELF.isSelection    = TRUE
-            ELSE
-                SELF.isSelection    = FALSE
-                ! check if is a generic drawing
-                IF SELF.geometry <> g:NotDefined THEN
-                    SELF.isPointsCollection    = TRUE
+            ! mouse down            
+            IF SELF.isSelection = FALSE THEN
+                ! check if it is a new selection on the Overlay                
+                IF SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
+                    SELF.isSelection    = TRUE
+                ELSE
+                    SELF.isSelection    = FALSE
+                    ! check if is a generic drawing
+                    IF SELF.geometry <> g:NotDefined THEN
+                        SELF.isPointsCollection    = TRUE
+                    END
+                    
                 END
-                
             END
+            
+            
             
             ! check if it is about to collect points for Action drawing / generic drawing
             IF SELF.isPointsCollection = TRUE THEN
@@ -1320,3 +1332,27 @@ CODE
     SELF.Redraw()
     
     RETURN TRUE    
+    
+OverlayC2IP.DisplaySelection        PROCEDURE(LONG nAPointer)    
+aRec                                    GROUP(ActionBasicRecord)
+                                        END
+selAction   Action
+    CODE
+        SELF.al.GetAction(nAPointer, aRec)
+        selAction.Init(aRec)
+        dx# = aRec.xPos[2] - aRec.xPos[1]
+        dy# = aRec.yPos[2] - aRec.yPos[1]
+        
+        SELF.drwImg.Setpencolor(COLOR:Red)
+        SELF.drwImg.SetPenWidth(3)
+        
+        ! display line
+        SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+        ! display anchors
+        SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
+        SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+        
+        SELF.drwImg.SetPenWidth(1)
+        SELF.drwImg.Setpencolor(COLOR:Black)
+        SELF.drwImg.Display()
+        

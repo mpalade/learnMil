@@ -431,6 +431,7 @@ InsertAction                PROCEDURE(ActionBasicRecord parec)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec)
 GetAction                   PROCEDURE(LONG nPointer, *ActionBasicRecord pARec), LONG
 SelectByMouse               PROCEDURE(LONG nXPos, LONG nYPos), LONG
+CheckByMouse                PROCEDURE(LONG nXPos, LONG nYPos), LONG
 CheckLineByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
@@ -668,6 +669,8 @@ TakePoints              PROCEDURE(PosRecord startPos, PosRecord endPos)
 InsertAction            PROCEDURE()
 
 DrawAction              PROCEDURE()
+
+DisplaySelection        PROCEDURE(LONG nAPointer)
 
 
 ! persistence layer
