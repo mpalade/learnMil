@@ -45,7 +45,7 @@ C2IP.Construct      PROCEDURE()
         
         SELF.isSelection        = FALSE        
         SELF.isPointsCollection = FALSE                
-        SELF.isMouseDown    = FALSE
+        SELF.isMouseDown        = FALSE
     
         
 C2IP.Destruct       PROCEDURE()
@@ -850,8 +850,28 @@ C2IP.DisplayUnselection     PROCEDURE(LONG nXPos, LONG nYPos)
     
     
 C2IP.SelectByMouse  PROCEDURE(LONG nXPos, LONG nYPos)
-    CODE
-        RETURN SELF.ul.SelectByMouse(nXPos, nYPos)
+    CODE        
+        curSel#     = SELF.ul.Pointer()
+        curXPos#    = SELF.ul.xPos()
+        curYPos#    = SELF.ul.yPos()
+            
+        ! verify the BSOs
+        nodeFoundPos#   = SELF.ul.SelectByMouse(nXPos, nYPos)
+        IF nodeFoundPos# > 0 THEN
+            ! BSO found
+            sst.Trace('node found')
+            sst.Trace('curSel# = ' & curSel#)
+            sst.Trace('curXPos# = ' & curXPos#)
+            sst.Trace('curYPos# = ' & curYPos#)
+            SELF.DisplayUnselection(curXPos#, curYPos#)
+            
+            !SELF.selTreePos     = SELF.ul.TreePos()
+            !SELF.selQueuePos    = SELF.ul.Pointer()
+            SELF.DisplaySelection()
+        ELSE
+            SELF.DisplaySelection()
+        END
+
         
 C2IP.CheckByMouse  PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
@@ -1181,6 +1201,16 @@ C2IP.TakeEvent      PROCEDURE()
     CODE
         IF SELF.isSelection = FALSE
             CASE EVENT()
+            OF EVENT:MouseDown
+                ! mouse down
+                ! Check the status of BSO selection
+                IF SELF.isSelection = FALSE THEN
+                    ! check if it is a new BSO selection on the Overlay                
+                    IF SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
+                        SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                        SELF.isSelection    = TRUE
+                    END
+                END                
             OF EVENT:MouseMove
                 ! Mouse Move
                 CASE DRAGID()

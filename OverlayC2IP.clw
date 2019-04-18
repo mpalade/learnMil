@@ -55,47 +55,44 @@ json.Destruct       PROCEDURE
 
 OverlayC2IP.SelectByMouse   PROCEDURE(LONG nXPos, LONG nYPos)    
     CODE
-        curSel#     = SELF.ul.Pointer()
-        curXPos#    = SELF.ul.xPos()
-        curYPos#    = SELF.ul.yPos()
-            
-        ! verify the BSOs
-        nodeFoundPos#   = PARENT.SelectByMouse(nXPos, nYPos)
-        IF nodeFoundPos# > 0 THEN
+        IF PARENT.SelectByMouse(nXPos, nYPos) = TRUE THEN
             ! BSO found
-            sst.Trace('node found')
-            sst.Trace('curSel# = ' & curSel#)
-            sst.Trace('curXPos# = ' & curXPos#)
-            sst.Trace('curYPos# = ' & curYPos#)
-            SELF.DisplayUnselection(curXPos#, curYPos#)
+        END
+        
             
-            !SELF.selTreePos     = SELF.ul.TreePos()
-            !SELF.selQueuePos    = SELF.ul.Pointer()
-            SELF.DisplaySelection()
-        ELSE
-            SELF.DisplaySelection()
-            
-            !MESSAGE('verify the Actions')
-            
-            ! verify the Actions
-            actionFoundPos# = SELF.al.CheckByMouse(nXPos, nYPos)
-            !MESSAGE('actionFoundPos# = ' & actionFoundPos#)
-            IF actionFoundPos# > 0 THEN
-                !MESSAGE('found Action = ' & actionFoundPos#)
-                SELF.DisplaySelection(actionFoundPos#)
-            END
-            
+        !MESSAGE('verify the Actions')
+        
+        ! verify the Actions
+        actionFoundPos# = SELF.al.CheckByMouse(nXPos, nYPos)
+        !MESSAGE('actionFoundPos# = ' & actionFoundPos#)
+        IF actionFoundPos# > 0 THEN
+            !MESSAGE('found Action = ' & actionFoundPos#)
+            SELF.DisplaySelection(actionFoundPos#)
         END
                     
-        IF nodeFoundPos# > 0 THEN
+        IF actionFoundPos# > 0 THEN
             RETURN TRUE
         ELSE
             RETURN FALSE
         END            
+
+OverlayC2IP.SelectDrawingByMouse    PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        actionFoundPos# = SELF.al.CheckByMouse(nXPos, nYPos)
+        !MESSAGE('actionFoundPos# = ' & actionFoundPos#)
+        IF actionFoundPos# > 0 THEN
+            !MESSAGE('found Action = ' & actionFoundPos#)
+            SELF.DisplaySelection(actionFoundPos#)
+        END
+        
         
 OverlayC2IP.CheckByMouse   PROCEDURE(LONG nXPos, LONG nYPos)    
     CODE        
         RETURN PARENT.CheckByMouse(nXPos, nYPos)
+        
+OverlayC2IP.CheckDrawingByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        RETURN SELF.al.CheckByMouse(nXPos, nYPos)
         
     
 OverlayC2IP.MoveTo  PROCEDURE(LONG nXPos, LONG nYPos)            
@@ -111,6 +108,8 @@ OverlayC2IP.Construct       PROCEDURE()
         SELF.PolyPoints = 0    
         SELF.pp     &= NEW(PosList)
         SELF.al &= NEW(ActionsCollection)
+        
+        SELF.isDrawingSelection = FALSE
                    
         
 OverlayC2IP.Destruct        PROCEDURE()
@@ -235,6 +234,10 @@ OverlayC2IP.SetAction       PROCEDURE(STRING sActionTypeCode, LONG nGeometry)
         SELF.actionTypeCode = CLIP(sActionTypeCode)
         SELF.geometry       = nGeometry
         
+        SELF.isDrawingSelection = TRUE
+        SELF.isPointsCollection = TRUE
+        SELF.isMouseDown        = FALSE
+        
     RETURN TRUE
 
                                         
@@ -248,6 +251,8 @@ endPos                              GROUP(PosRecord)
                                     END
 CODE
     ! do something
+    
+    SELF.isDrawingSelection     = FALSE
     
     CASE nOption
     OF 1
@@ -385,6 +390,7 @@ CODE
     END
     
     RETURN TRUE        
+        
     
 OverlayC2IP.NodeActionsMenuOptions  PROCEDURE()
 actMenuOpt          STRING(1000)
@@ -701,27 +707,33 @@ selBSO                                  GROUP(UnitBasicRecord)
         
 OverlayC2IP.TakeEvent       PROCEDURE()
     CODE
-        !PARENT.TakeEvent()
+        PARENT.TakeEvent()
         
         CASE EVENT()
-        OF EVENT:MouseDown
-            ! mouse down            
-            IF SELF.isSelection = FALSE THEN
-                ! check if it is a new selection on the Overlay                
-                IF SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
-                    SELF.isSelection    = TRUE
+        OF EVENT:MouseDown            
+            ! mouse down                        
+            
+            ! Check the status of Generic Drawings selection
+            IF SELF.isDrawingSelection = FALSE THEN
+                IF SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
+                    SELF.SelectDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                    SELF.isDrawingSelection = TRUE
                 ELSE
-                    SELF.isSelection    = FALSE
                     ! check if is a generic drawing
                     IF SELF.geometry <> g:NotDefined THEN
-                        SELF.isPointsCollection    = TRUE
+                        SELF.isPointsCollection     = TRUE
+                    ELSE
                     END
-                    
                 END
-            END
+                
+            END       
             
+            sst.Trace('isBSOSelection = ' & SELF.isSelection)
+            sst.Trace('isDrawingSelection = ' & SELF.isDrawingSelection)
+         
             
-            
+            ! Check the status of Actions selection
+                                    
             ! check if it is about to collect points for Action drawing / generic drawing
             IF SELF.isPointsCollection = TRUE THEN
                 IF SELF.isMouseDown = FALSE THEN
@@ -772,7 +784,7 @@ OverlayC2IP.TakeEvent       PROCEDURE()
                     END
                 ELSE
                     ! nothing
-                END                                                
+                END                                                                
             ELSE
                 ! nothing
             END                                                                                    
@@ -826,7 +838,10 @@ OverlayC2IP.TakeEvent       PROCEDURE()
                 END
             ELSE
                 ! nothing
-            END                    
+            END   
+            SELF.isSelection        = FALSE
+            SELF.isDrawingSelection = FALSE
+            SELF.isPointsCollection = FALSE
             
         OF EVENT:Drop
             ! DROP

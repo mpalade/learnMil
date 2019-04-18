@@ -631,6 +631,7 @@ p1x                     LONG, PROTECTED
 p1y                     LONG, PROTECTED
 PolyPoints              LONG, PROTECTED
 pp                      &PosList, PROTECTED
+isDrawingSelection      BOOL, PROTECTED
 
 TakePoints              PROCEDURE(LONG nGeometry)
 
@@ -647,7 +648,9 @@ AttachC2IP              PROCEDURE(STRING sFileName), LONG
 AttachMap               PROCEDURE(STRING sFileName), LONG
 
 SelectByMouse           PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+SelectDrawingByMouse    PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 CheckByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+CheckDrawingByMouse     PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 
 SetGeometry             PROCEDURE(LONG nGeometry), LONG
