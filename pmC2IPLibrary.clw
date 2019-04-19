@@ -434,6 +434,7 @@ UnitsCollection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
         ADD(SELF.ul)
         
         SELF.selQueuePos    = POINTER(SELF.ul)
+        !MESSAGE('Units = ' & RECORDS(SELF.ul))
         RETURN TRUE
         
 UnitsCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)

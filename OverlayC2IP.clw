@@ -704,148 +704,172 @@ selBSO                                  GROUP(UnitBasicRecord)
         
         SELF.Redraw()
                 
-        
-OverlayC2IP.TakeEvent       PROCEDURE()
-    CODE
-        PARENT.TakeEvent()
-        
-        CASE EVENT()
-        OF EVENT:MouseDown            
-            ! mouse down                        
-            
-            ! Check the status of Generic Drawings selection
-            IF SELF.isDrawingSelection = FALSE THEN
-                IF SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
-                    SELF.SelectDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
-                    SELF.isDrawingSelection = TRUE
-                ELSE
-                    ! check if is a generic drawing
-                    IF SELF.geometry <> g:NotDefined THEN
-                        SELF.isPointsCollection     = TRUE
-                    ELSE
-                    END
-                END
-                
-            END       
-            
-            sst.Trace('isBSOSelection = ' & SELF.isSelection)
-            sst.Trace('isDrawingSelection = ' & SELF.isDrawingSelection)
-         
-            
-            ! Check the status of Actions selection
-                                    
-            ! check if it is about to collect points for Action drawing / generic drawing
-            IF SELF.isPointsCollection = TRUE THEN
-                IF SELF.isMouseDown = FALSE THEN
-                    ! collect points
-                    SELF.p1x    = SELF.drwImg.MouseX()
-                    SELF.p1y    = SELF.drwImg.MouseY()            
-                    
-                    SELF.isMouseDown    = TRUE
-                ELSE
-                    ! nothing
-                END
-                
-                
-            END                                                
 
-        OF EVENT:MouseMove
-            ! mouse move
-            IF SELF.isPointsCollection = TRUE THEN
-                IF SELF.isMouseDown = TRUE THEN
-                    ! previewing = TRUE
-                    CASE SELF.geometry
-                    OF g:Point
-                        ! Point                    
-                    OF g:Line
-                        ! Line
-                        SELF.Draw_Line(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
-                        !SELF.PreviewArrow(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
-                    OF g:FreeLine                    
-                        SELF.Preview_FreeLine(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
-                    OF g:AxisAdvance
-                        ! Axis of Advance
-                        SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                    
-                    OF g:Ambush
-                        ! Ambush style
-                        SELF.Draw_Ambush(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
-                    OF g:Circle
-                        ! Circle style
-                        SELF.Draw_Circle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                        
-                    OF g:LineWithBase
-                        ! Line With Base style
-                        SELF.Draw_LineWithBase(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
-                    OF g:LineWithHeader
-                        ! Line With Header style
-                        SELF.Draw_LineWithHeader(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                            
-                    OF g:Breach
-                        ! Breach style
-                        SELF.Draw_Breach(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
-                    END
+OverlayC2IP.TakeMouseDown   PROCEDURE()
+    CODE
+        ! Check the status of BSO selection
+        IF SELF.isSelection = FALSE THEN
+            ! check if it is a new BSO selection on the Overlay                
+            IF SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
+                SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                SELF.isSelection    = TRUE
+            END
+        END
+        
+        ! Check the status of Generic Drawings selection
+        IF SELF.isDrawingSelection = FALSE THEN
+            IF SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
+                SELF.SelectDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                SELF.isDrawingSelection = TRUE
+            ELSE
+                ! check if is a generic drawing
+                IF SELF.geometry <> g:NotDefined THEN
+                    SELF.isPointsCollection     = TRUE
                 ELSE
-                    ! nothing
-                END                                                                
+                END
+            END
+            
+        END       
+        
+        sst.Trace('isBSOSelection = ' & SELF.isSelection)
+        sst.Trace('isDrawingSelection = ' & SELF.isDrawingSelection)
+     
+        
+        ! Check the status of Actions selection
+                                
+        ! check if it is about to collect points for Action drawing / generic drawing
+        IF SELF.isPointsCollection = TRUE THEN
+            IF SELF.isMouseDown = FALSE THEN
+                ! collect points
+                SELF.p1x    = SELF.drwImg.MouseX()
+                SELF.p1y    = SELF.drwImg.MouseY()            
+                
+                SELF.isMouseDown    = TRUE
             ELSE
                 ! nothing
-            END                                                                                    
-        OF EVENT:MouseUp
-            ! mouse up     
-            IF SELF.isPointsCollection = TRUE THEN
-                IF SELF.isMouseDown = TRUE THEN                    
-                    ! points collected
-                    ! draw final version; previewing = FALSE
-                    CASE SELF.geometry
-                    OF g:Point
-                        ! finalize point
-                    OF g:Line
-                        ! final line
-                        SELF.Draw_Line(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
-                    OF g:FreeLine                    
-                        ! final dree line
-                    OF g:AxisAdvance
-                        ! Axis of Advance
-                        SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
-                    OF g:Ambush
-                        ! Ambush style
-                        SELF.Draw_Ambush(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
-                    OF g:Circle
-                        ! Circle style
-                        SELF.Draw_Circle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)     
-                    OF g:LineWithBase
-                        ! Line With Base style
-                        SELF.Draw_LineWithBase(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
-                    OF g:LineWithHeader
-                        ! Line With Header style
-                        SELF.Draw_LineWithHeader(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)    
-                    OF g:Breach
-                        ! Breach style
-                        SELF.Draw_Breach(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
-                    END
-                    
-                    ! check if another BSO is targeted
+            END                        
+        END                                                    
+        
+OverlayC2IP.TakeMouseMove   PROCEDURE()
+    CODE
+        IF SELF.isPointsCollection = TRUE THEN
+            IF SELF.isMouseDown = TRUE THEN
+                ! previewing = TRUE
+                CASE SELF.geometry
+                OF g:Point
+                    ! Point                    
+                OF g:Line
+                    ! Line
+                    SELF.Draw_Line(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                    !SELF.PreviewArrow(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                OF g:FreeLine                    
+                    SELF.Preview_FreeLine(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                OF g:AxisAdvance
+                    ! Axis of Advance
+                    SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                    
+                OF g:Ambush
+                    ! Ambush style
+                    SELF.Draw_Ambush(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                OF g:Circle
+                    ! Circle style
+                    SELF.Draw_Circle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                        
+                OF g:LineWithBase
+                    ! Line With Base style
+                    SELF.Draw_LineWithBase(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                OF g:LineWithHeader
+                    ! Line With Header style
+                    SELF.Draw_LineWithHeader(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                            
+                OF g:Breach
+                    ! Breach style
+                    SELF.Draw_Breach(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                END
+            ELSE
+                ! nothing
+            END                                                                
+            ELSE
+                ! nothing
+        END                                                                                    
+        
+OverlayC2IP.TakeMouseUp     PROCEDURE
+    CODE
+        IF SELF.isPointsCollection = TRUE THEN
+            IF SELF.isMouseDown = TRUE THEN                    
+                ! points collected
+                ! draw final version; previewing = FALSE
+                CASE SELF.geometry
+                OF g:Point
+                    ! finalize point
+                OF g:Line
+                    ! final line
+                    SELF.Draw_Line(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
+                OF g:FreeLine                    
+                    ! final dree line
+                OF g:AxisAdvance
+                    ! Axis of Advance
+                    SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
+                OF g:Ambush
+                    ! Ambush style
+                    SELF.Draw_Ambush(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
+                OF g:Circle
+                    ! Circle style
+                    SELF.Draw_Circle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)     
+                OF g:LineWithBase
+                    ! Line With Base style
+                    SELF.Draw_LineWithBase(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
+                OF g:LineWithHeader
+                    ! Line With Header style
+                    SELF.Draw_LineWithHeader(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)    
+                OF g:Breach
+                    ! Breach style
+                    SELF.Draw_Breach(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
+                END
+                
+                ! check if another BSO is targeted
+                ! only if there is the Action mode
+                IF SELF.isDrawingSelection = TRUE THEN
                     foundTarget#    = SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
                     IF foundTarget# > 0 THEN
                         MESSAGE('found a target pos#' & foundTarget#)
                     END
-                    
-                    
-                    SELF.InsertAction()
-                    SELF.isPointsCollection = FALSE      
-                    SELF.geometry           = g:NotDefined
-                    SELF.isMouseDown        = FALSE
-                ELSE
-                    ! noting
-                END
+                END                                                           
+                
+                SELF.InsertAction()
+                SELF.isPointsCollection = FALSE      
+                SELF.geometry           = g:NotDefined
+                SELF.isMouseDown        = FALSE
             ELSE
-                ! nothing
-            END   
-            SELF.isSelection        = FALSE
-            SELF.isDrawingSelection = FALSE
-            SELF.isPointsCollection = FALSE
+                ! noting
+            END
+        ELSE
+            ! nothing
+        END   
+        
+        SELF.isSelection        = FALSE
+        SELF.isDrawingSelection = FALSE
+        SELF.isPointsCollection = FALSE
+        
+        
+OverlayC2IP.TakeEvent       PROCEDURE()
+    CODE
+        !! check BSO 
+        !PARENT.TakeEvent()
+                
+        CASE EVENT()            
+        OF EVENT:MouseDown            
+            ! mouse down                
+            SELF.TakeMouseDown()
+                            
+        OF EVENT:MouseMove
+            ! mouse move
+            SELF.TakeMouseMove()                
+            
+        OF EVENT:MouseUp
+            ! mouse up     
+            SELF.TakeMouseUp()                        
             
         OF EVENT:Drop
             ! DROP
-        END
+        END        
         
 OverlayC2IP.TakePoints     PROCEDURE(LONG nGeometry)
     CODE

@@ -864,12 +864,12 @@ C2IP.SelectByMouse  PROCEDURE(LONG nXPos, LONG nYPos)
             sst.Trace('curXPos# = ' & curXPos#)
             sst.Trace('curYPos# = ' & curYPos#)
             SELF.DisplayUnselection(curXPos#, curYPos#)
-            
+                        
             !SELF.selTreePos     = SELF.ul.TreePos()
             !SELF.selQueuePos    = SELF.ul.Pointer()
-            SELF.DisplaySelection()
+            SELF.DisplaySelection(curXPos#, curYPos#)
         ELSE
-            SELF.DisplaySelection()
+            SELF.DisplaySelection(curXPos#, curYPos#)
         END
 
         
@@ -1199,7 +1199,7 @@ C2IP.Redraw         PROCEDURE()
         
 C2IP.TakeEvent      PROCEDURE()
     CODE
-        IF SELF.isSelection = FALSE
+        !IF SELF.isSelection = FALSE
             CASE EVENT()
             OF EVENT:MouseDown
                 ! mouse down
@@ -1234,7 +1234,7 @@ C2IP.TakeEvent      PROCEDURE()
                     !SETCURSOR(CURSOR:Arrow)
                 END
             END
-        END
+        !END
                 
         
             

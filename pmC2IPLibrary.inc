@@ -610,6 +610,9 @@ map                     STRING(100)
 al                      &ActionsCollection
 
 TakeEvent               PROCEDURE(), VIRTUAL
+TakeMouseDown           PROCEDURE(), PRIVATE
+TakeMouseMove           PROCEDURE(), PRIVATE
+TakeMouseUp             PROCEDURE(), PRIVATE
 
     ! draw actions preview (during visual construction)
 Draw_Line               PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
