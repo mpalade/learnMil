@@ -108,30 +108,104 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         
         ADD(SELF.al)   
         
+ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasicRecord  pURec, UnitBasicRecord pTarget_urec)        
+    CODE
+        SELF.al.ActionName      = pARec.ActionName
+        SELF.al.ActionType      = pARec.ActionType
+        SELF.al.ActionTypeCode  = pARec.ActionTypeCode
+        SELF.al.xPos            = pARec.xPos
+        SELF.al.yPos            = pARec.yPos
+        
+        SELF.al.Resources       &= NEW(UnitsList)
+        
+        SELF.al.Resources.Echelon   = purec.Echelon
+        SELF.al.Resources.Hostility = purec.Hostility
+        SELF.al.Resources.IsHQ      = purec.IsHQ
+        SELF.al.Resources.markForDel    = 0
+        SELF.al.Resources.markForDisbl  = 0
+        SELF.al.Resources.TreePos       = purec.TreePos
+        SELF.al.Resources.UnitName      = purec.UnitName
+        SELF.al.Resources.UnitType      = purec.UnitType
+        SELF.al.Resources.UnitTypeCode  = purec.UnitTypeCode
+        SELF.al.Resources.xPos          = purec.xPos
+        SELF.al.Resources.yPos          = purec.yPos
+        
+        ADD(SELF.al.Resources)
+        
+        ADD(SELF.al)
+
+ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasicRecord  pURec, ActionBasicRecord pTarget_arec)                
+    CODE
+        SELF.al.ActionName      = pARec.ActionName
+        SELF.al.ActionType      = pARec.ActionType
+        SELF.al.ActionTypeCode  = pARec.ActionTypeCode
+        SELF.al.xPos            = pARec.xPos
+        SELF.al.yPos            = pARec.yPos
+        
+        SELF.al.Resources       &= NEW(UnitsList)
+        
+        SELF.al.Resources.Echelon   = purec.Echelon
+        SELF.al.Resources.Hostility = purec.Hostility
+        SELF.al.Resources.IsHQ      = purec.IsHQ
+        SELF.al.Resources.markForDel    = 0
+        SELF.al.Resources.markForDisbl  = 0
+        SELF.al.Resources.TreePos       = purec.TreePos
+        SELF.al.Resources.UnitName      = purec.UnitName
+        SELF.al.Resources.UnitType      = purec.UnitType
+        SELF.al.Resources.UnitTypeCode  = purec.UnitTypeCode
+        SELF.al.Resources.xPos          = purec.xPos
+        SELF.al.Resources.yPos          = purec.yPos
+        
+        ADD(SELF.al.Resources)
+        
+        ADD(SELF.al)
+        
 
 ActionsCollection.SelectByMouse     PROCEDURE(LONG nXPos, LONG nYPos)     
 aRec                                    GROUP(ActionBasicRecord)
                                         END
 foundAction                             Action
-    CODE
-        
+    CODE                
+        sst.Trace('ActionsCollection.CheckByMouse Actions# = ' & RECORDS(SELF.al))
         LOOP i# = 1 TO RECORDS(SELF.al)
             GET(SELF.al, i#)
             IF NOT ERRORCODE() THEN
+                ! found Action
+                sst.Trace('Action' & i# & 'code =' & CLIP(SELF.al.ActionTypeCode))                
                 CASE CLIP(SELF.al.ActionTypeCode)
-                OF g:NotDefined
-                    ! not defined
-                    IF SELF.CheckLineByMouse(nXPos, nYPos) THEN
-                        ! found Action
-                        SELF.GetAction(i#, aRec)
-                        foundAction.Init(aRec)
-                        IF foundAction.CheckLineByMouse(nXPos, nYPos) THEN
-                            ! found Line
-                            RETURN i#
-                        END
-                        
-                    END
+                OF aTpy:notDefined
+                    ! not defined                    
+                    sst.Trace('verify aTpy:notDefined')
                     
+                    ! verify Line                   
+                    SELF.GetAction(i#, aRec)
+                    foundAction.Init(aRec)
+                    IF foundAction.CheckLineByMouse(nXPos, nYPos) THEN
+                        ! found Line
+                        RETURN TRUE
+                    END                        
+                OF aTpy:notDef_Line
+                    ! generic Line
+                    sst.Trace('verify aTpy:notDef_Line')
+                    
+                    ! verify Line                   
+                    SELF.GetAction(i#, aRec)
+                    foundAction.Init(aRec)
+                    IF foundAction.CheckLineByMouse(nXPos, nYPos) THEN
+                        ! found Line
+                        RETURN TRUE
+                    END                   
+                OF aTpy:notDef_Rectangle
+                    ! generic Rectangle
+                    sst.Trace('verify aTpy:notDef_Rectangle')
+                    
+                    ! verify Rectangle                   
+                    SELF.GetAction(i#, aRec)
+                    foundAction.Init(aRec)
+                    IF foundAction.CheckRectangleByMouse(nXPos, nYPos) THEN
+                        ! found Line
+                        RETURN TRUE
+                    END                   
                 END
             END
             
@@ -154,41 +228,67 @@ foundAction                             Action
         END
         _noCompile
         
-        RETURN 0
+        RETURN FALSE
         
 ActionsCollection.CheckByMouse     PROCEDURE(LONG nXPos, LONG nYPos)     
 aRec                                    GROUP(ActionBasicRecord)
                                         END
 foundAction                             Action
     CODE
-        sst.Trace('START ActionsCollection.CheckByMouse')
+        sst.Trace('ActionsCollection.CheckByMouse BEGIN')
         
-        sst.Trace('Actions# = ' & RECORDS(SELF.al))
+        sst.Trace('     ActionsCollection.CheckByMouse : Actions# = ' & RECORDS(SELF.al))
+        ret#    = 0
         LOOP i# = 1 TO RECORDS(SELF.al)
             GET(SELF.al, i#)
             IF NOT ERRORCODE() THEN
                 ! found Action
-                sst.Trace('Action' & i# & 'code =' & CLIP(SELF.al.ActionTypeCode))                
+                sst.Trace('     ActionsCollection.CheckByMouse : Action' & i# & ' code =' & CLIP(SELF.al.ActionTypeCode))                
                 CASE CLIP(SELF.al.ActionTypeCode)
                 OF aTpy:notDefined
                     ! not defined                    
-                    sst.Trace('verify aTpy:notDefined')
+                    sst.Trace('     ActionsCollection.CheckByMouse : verify aTpy:notDefined')
                     
                     ! verify Line                   
                     SELF.GetAction(i#, aRec)
                     foundAction.Init(aRec)
                     IF foundAction.CheckLineByMouse(nXPos, nYPos) THEN
                         ! found Line
-                        RETURN i#
+                        ret#    = i#                        
+                        BREAK
                     END                        
+                OF aTpy:notDef_Line
+                    ! generic Line
+                    sst.Trace('     ActionsCollection.CheckByMouse : verify aTpy:notDef_Line')
                     
+                    ! verify Line                   
+                    SELF.GetAction(i#, aRec)
+                    foundAction.Init(aRec)
+                    IF foundAction.CheckLineByMouse(nXPos, nYPos) THEN
+                        ! found Line
+                        ret#    = i#
+                        BREAK
+                    END                   
+                OF aTpy:notDef_Rectangle
+                    ! generic Rectangle
+                    sst.Trace('     ActionsCollection.CheckByMouse : verify aTpy:notDef_Rectangle')
+                    
+                    ! verify Rectangle                   
+                    SELF.GetAction(i#, aRec)
+                    foundAction.Init(aRec)
+                    IF foundAction.CheckRectangleByMouse(nXPos, nYPos) THEN
+                        ! found Line
+                        ret#    = i#
+                        BREAK
+                    END                   
                 END
             END
             
         END
         
-        sst.Trace('END ActionsCollection.CheckByMouse')
-        RETURN 0
+        sst.Trace('     ActionsCollection.CheckByMouse : ret# = ' & ret#)
+        sst.Trace('ActionsCollection.CheckByMouse END')
+        RETURN ret#
 
 ActionsCollection.CheckLineByMouse  PROCEDURE(LONG nXPos, LONG nYPos)                
     CODE
@@ -205,8 +305,10 @@ ActionsCollection.GetAction PROCEDURE(LONG nPointer, *ActionBasicRecord pARec)
             pARec.ActionPointsNumber    = SELF.al.ActionPointsNumber
             pARec.ActionType            = SELF.al.ActionType
             pARec.ActionTypeCode        = SELF.al.ActionTypeCode
-            pARec.xPos                  = SELF.al.xPos
-            pARec.yPos                  = SELF.al.yPos
+            LOOP i# = 1 TO MAXIMUM(SELF.al.xPos, 1)
+                pARec.xPos[i#]  = SELF.al.xPos[i#]
+                pARec.yPos[i#]  = SELF.al.yPos[i#]
+            END
             
             RETURN TRUE
         ELSE

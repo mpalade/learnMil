@@ -55,26 +55,35 @@ json.Destruct       PROCEDURE
 
 OverlayC2IP.SelectByMouse   PROCEDURE(LONG nXPos, LONG nYPos)    
     CODE
+        sst.Trace('OverlayC2IP.SelectByMouse BEGIN')
         IF PARENT.SelectByMouse(nXPos, nYPos) = TRUE THEN
             ! BSO found
-        END
-        
-            
-        !MESSAGE('verify the Actions')
-        
-        ! verify the Actions
-        actionFoundPos# = SELF.al.CheckByMouse(nXPos, nYPos)
-        !MESSAGE('actionFoundPos# = ' & actionFoundPos#)
-        IF actionFoundPos# > 0 THEN
-            !MESSAGE('found Action = ' & actionFoundPos#)
-            SELF.DisplaySelection(actionFoundPos#)
-        END
-                    
-        IF actionFoundPos# > 0 THEN
-            RETURN TRUE
+            sst.Trace('     OverlayC2IP.SelectByMouse : BSO found')
+            sst.Trace('     OverlayC2IP.SelectByMouse = ' & TRUE)
+            ret#    = TRUE
         ELSE
-            RETURN FALSE
-        END            
+           ! verify the Actions
+            sst.Trace('     OverlayC2IP.SelectByMouse : verify for Action')
+            actionFoundPos# = SELF.al.CheckByMouse(nXPos, nYPos)
+            MESSAGE('actionFoundPos# = ' & actionFoundPos#)
+            IF actionFoundPos# > 0 THEN
+                MESSAGE('found Action = ' & actionFoundPos#)
+                IF SELF.prevActionSelection <> 0 THEN
+                    SELF.DisplayUnselection(SELF.prevActionSelection)
+                END                
+                SELF.DisplaySelection(actionFoundPos#)
+                SELF.prevActionSelection    = actionFoundPos#
+            END 
+            IF actionFoundPos# > 0 THEN
+                ret#    = TRUE
+            ELSE
+                ret#    = FALSE
+            END            
+        END                
+        
+        sst.Trace('     OverlayC2IP.SelectByMouse : actionFoundPos# = ' & actionFoundPos#)
+        sst.Trace('OverlayC2IP.SelectByMouse BEGIN')
+        RETURN ret#
 
 OverlayC2IP.SelectDrawingByMouse    PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
@@ -82,13 +91,23 @@ OverlayC2IP.SelectDrawingByMouse    PROCEDURE(LONG nXPos, LONG nYPos)
         !MESSAGE('actionFoundPos# = ' & actionFoundPos#)
         IF actionFoundPos# > 0 THEN
             !MESSAGE('found Action = ' & actionFoundPos#)
+            IF SELF.prevActionSelection <> 0 THEN            
+                SELF.DisplayUnselection(SELF.prevActionSelection)
+            END            
             SELF.DisplaySelection(actionFoundPos#)
+            SELF.prevActionSelection    = actionFoundPos#
+            RETURN TRUE
         END
+        RETURN FALSE
         
         
 OverlayC2IP.CheckByMouse   PROCEDURE(LONG nXPos, LONG nYPos)    
     CODE        
-        RETURN PARENT.CheckByMouse(nXPos, nYPos)
+        sst.Trace('OverlayC2IP.CheckByMouse BEGIN')
+        ret#    = PARENT.CheckByMouse(nXPos, nYPos)
+        sst.Trace('     OverlayC2IP.CheckByMouse : parent.CheckByMouse = ' & ret#)
+        sst.Trace('OverlayC2IP.CheckByMouse END')
+        RETURN ret#
         
 OverlayC2IP.CheckDrawingByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
@@ -110,6 +129,8 @@ OverlayC2IP.Construct       PROCEDURE()
         SELF.al &= NEW(ActionsCollection)
         
         SELF.isDrawingSelection = FALSE
+        
+        SELF.prevActionSelection    = 0
                    
         
 OverlayC2IP.Destruct        PROCEDURE()
@@ -169,8 +190,8 @@ OverlayC2IP.Redraw  PROCEDURE()
         
 OverlayC2IP.DeployBSO       PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG nYPos)
     CODE
-        sst.Trace('BEGIN:OverlayC2IP.DeployBSO')
-        sst.Trace('nXPos = ' & nXPos & ', nYPos = ' & nYPos)
+        !sst.Trace('BEGIN:OverlayC2IP.DeployBSO')
+        !sst.Trace('nXPos = ' & nXPos & ', nYPos = ' & nYPos)
         pUrec.xPos  = nXPos
         pUrec.yPos  = nYPos
         
@@ -180,7 +201,7 @@ OverlayC2IP.DeployBSO       PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG n
             SELF.DisplaySelection()
         END
         
-        sst.Trace('END:OverlayC2IP.DeployBSO')
+        !sst.Trace('END:OverlayC2IP.DeployBSO')
         RETURN TRUE
         
 OverlayC2IP.AttachC2IP      PROCEDURE(STRING sFileName)
@@ -617,11 +638,15 @@ actionRec                       GROUP(ActionBasicRecord)
 
 selBSO                                  GROUP(UnitBasicRecord)
                                         END
+targetBSO                               GROUP(UnitBasicRecord)
+                                        END
+targetAction                    GROUP(ActionBasicRecord)
+                                END
 
     CODE   
+        sst.Trace('OverlayC2IP.InsertAction BEGIN')
         ASSERT(SELF.ul.GetNode(selBSO), 'UnitsCollection.GetNode() error')
-        !MESSAGE('Unit Name = ' & selBSO.UnitName)
-        
+
         CASE CLIP(SELF.actionTypeCode)
             OF aTpy:notDefined
                 ! not Defined
@@ -633,6 +658,27 @@ selBSO                                  GROUP(UnitBasicRecord)
                 actionRec.yPos[1]               = SELF.p1y
                 actionRec.xPos[2]               = SELF.drwImg.MouseX()
                 actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+            OF aTpy:notDef_Line
+                ! a generic Line
+                actionRec.ActionName    = 'aTpy:notDef_Line'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:notDef_Line
+                actionRec.ActionPointsNumber    = 2
+                actionRec.xPos[1]               = SELF.p1x
+                actionRec.yPos[1]               = SELF.p1y
+                actionRec.xPos[2]               = SELF.drwImg.MouseX()
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()
+            
+            OF aTpy:notDef_Rectangle
+                ! a generic Rectangle
+                actionRec.ActionName    = 'aTpy:notDef_Rectangle'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:notDef_Rectangle
+                actionRec.ActionPointsNumber    = 2
+                actionRec.xPos[1]               = SELF.p1x
+                actionRec.yPos[1]               = SELF.p1y
+                actionRec.xPos[2]               = SELF.drwImg.MouseX()
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()
             
             OF aTpy:AdvanceToContact
                 ! Advance to contact
@@ -647,7 +693,6 @@ selBSO                                  GROUP(UnitBasicRecord)
                 actionRec.yPos[1]               = SELF.p1y
                 actionRec.xPos[2]               = SELF.drwImg.MouseX()
                 actionRec.yPos[2]               = SELF.drwImg.MouseY()           
-                !SELF.al.InsertAction(actionRec)
                 
             OF aTpy:CAI_Arrest
                 ! Arrest
@@ -659,7 +704,6 @@ selBSO                                  GROUP(UnitBasicRecord)
                 actionRec.yPos[1]               = SELF.p1y
                 actionRec.xPos[2]               = SELF.drwImg.MouseX()
                 actionRec.yPos[2]               = SELF.drwImg.MouseY()           
-                !SELF.al.InsertAction(actionRec)
                 
             OF aTpy:AxisOfAdvance_SupportingAttack
                 ! Attack
@@ -670,8 +714,7 @@ selBSO                                  GROUP(UnitBasicRecord)
                 actionRec.xPos[1]               = SELF.p1x
                 actionRec.yPos[1]               = SELF.p1y
                 actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
-                !SELF.al.InsertAction(actionRec)
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()                           
 
             OF aTpy:AttackByFirePosition        
                 ! Attack By Fire
@@ -685,9 +728,8 @@ selBSO                                  GROUP(UnitBasicRecord)
                 actionRec.xPos[1]               = SELF.p1x
                 actionRec.yPos[1]               = SELF.p1y
                 actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
-                !SELF.al.InsertAction(actionRec)
-                
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()                           
+            
             OF aTpy:Breach
                 ! Breach
                 actionRec.ActionName    = 'aTpy:Breach'
@@ -698,27 +740,57 @@ selBSO                                  GROUP(UnitBasicRecord)
                 actionRec.yPos[1]               = SELF.p1y
                 actionRec.xPos[2]               = SELF.drwImg.MouseX()
                 actionRec.yPos[2]               = SELF.drwImg.MouseY()           
-                !SELF.al.InsertAction(actionRec)
         END     
-        SELF.al.InsertAction(actionRec, selBSO)
         
-        SELF.Redraw()
-                
 
+        ! check for Unit Target
+        foundUnitTarget#    = SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+        sst.Trace('     OverlayC2IP.InsertAction : foundUnitTarget# = ' & foundUnitTarget#)
+        IF foundUnitTarget# > 0 THEN
+            ! Unit Target found
+            ASSERT(SELF.ul.GetNode(foundUnitTarget#, targetBSO), 'UnitsCollection.GetNode() error')
+            sst.Trace('     OverlayC2IP.InsertAction : InsertAction(action, resource, target-Unit)')
+            SELF.al.InsertAction(actionRec, selBSO, targetBSO)
+        ELSE
+            ! check for Action Target
+            foundActionTarget#  = SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+            sst.Trace('     OverlayC2IP.InsertAction : foundActionTarget# = ' & foundActionTarget#)
+            IF foundActionTarget# > 0 THEN
+                ! Action Target found
+                ASSERT(SELF.al.GetAction(foundActionTarget#, targetAction), 'ActionCollection.GetAction() error')
+                sst.Trace('     OverlayC2IP.InsertAction : InsertAction(action, resource, target-Action)')
+                SELF.al.InsertAction(actionRec, selBSO, targetAction)
+            ELSE
+                ! no target found
+                sst.Trace('     OverlayC2IP.InsertAction : InsertAction(action, resource)')
+                SELF.al.InsertAction(actionRec, selBSO)
+            END                                       
+        END
+                
+        SELF.Redraw()
+        sst.Trace('OverlayC2IP.InsertAction END')
+                
+        
 OverlayC2IP.TakeMouseDown   PROCEDURE()
     CODE
         ! Check the status of BSO selection
-        IF SELF.isSelection = FALSE THEN
+        sst.Trace('OverlayC2IP.TakeMouseDown BEGIN')
+        sst.Trace('     OverlayC2IP.TakeMouseDown : check BSO selection')
+        IF (SELF.isSelection = FALSE) AND (SELF.isPointsCollection = FALSE) THEN
             ! check if it is a new BSO selection on the Overlay                
-            IF SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
+            IF SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) > 0 THEN
                 SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
                 SELF.isSelection    = TRUE
+            ELSE
+                SELF.isSelection    = FALSE
             END
         END
+        sst.Trace('     OverlayC2IP.TakeMouseDown : isBSOSelection = ' & SELF.isSelection)
         
         ! Check the status of Generic Drawings selection
-        IF SELF.isDrawingSelection = FALSE THEN
-            IF SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) = TRUE THEN
+        sst.Trace('     OverlayC2IP.TakeMouseDown : check generic drawing selection')
+        !IF SELF.isDrawingSelection = FALSE THEN
+            IF SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) > 0 THEN
                 SELF.SelectDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
                 SELF.isDrawingSelection = TRUE
             ELSE
@@ -727,12 +799,9 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
                     SELF.isPointsCollection     = TRUE
                 ELSE
                 END
-            END
-            
-        END       
-        
-        sst.Trace('isBSOSelection = ' & SELF.isSelection)
-        sst.Trace('isDrawingSelection = ' & SELF.isDrawingSelection)
+            END            
+        !END                       
+        sst.Trace('     OverlayC2IP.TakeMouseDown : isDrawingSelection = ' & SELF.isDrawingSelection)
      
         
         ! Check the status of Actions selection
@@ -748,7 +817,9 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
             ELSE
                 ! nothing
             END                        
-        END                                                    
+        END                                         
+        
+        sst.Trace('OverlayC2IP.TakeMouseDown END')
         
 OverlayC2IP.TakeMouseMove   PROCEDURE()
     CODE
@@ -764,6 +835,8 @@ OverlayC2IP.TakeMouseMove   PROCEDURE()
                     !SELF.PreviewArrow(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
                 OF g:FreeLine                    
                     SELF.Preview_FreeLine(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+                OF g:Rectangle
+                    SELF.Draw_Rectangle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
                 OF g:AxisAdvance
                     ! Axis of Advance
                     SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                    
@@ -791,6 +864,11 @@ OverlayC2IP.TakeMouseMove   PROCEDURE()
         END                                                                                    
         
 OverlayC2IP.TakeMouseUp     PROCEDURE
+newAction                       Action
+resourceObject                  BSO
+targetObject                    BSO
+actionRec                       GROUP(ActionBasicRecord)
+                                END
     CODE
         IF SELF.isPointsCollection = TRUE THEN
             IF SELF.isMouseDown = TRUE THEN                    
@@ -804,6 +882,9 @@ OverlayC2IP.TakeMouseUp     PROCEDURE
                     SELF.Draw_Line(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
                 OF g:FreeLine                    
                     ! final dree line
+                OF g:Rectangle
+                    ! Rectangle
+                    SELF.Draw_Rectangle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
                 OF g:AxisAdvance
                     ! Axis of Advance
                     SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
@@ -823,30 +904,29 @@ OverlayC2IP.TakeMouseUp     PROCEDURE
                     ! Breach style
                     SELF.Draw_Breach(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
                 END
-                
+                                                
                 ! check if another BSO is targeted
-                ! only if there is the Action mode
-                IF SELF.isDrawingSelection = TRUE THEN
-                    foundTarget#    = SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
-                    IF foundTarget# > 0 THEN
-                        MESSAGE('found a target pos#' & foundTarget#)
-                    END
-                END                                                           
+                ! this check is moved in the InsertAction function
                 
                 SELF.InsertAction()
+                
                 SELF.isPointsCollection = FALSE      
                 SELF.geometry           = g:NotDefined
                 SELF.isMouseDown        = FALSE
             ELSE
                 ! noting
             END
+            
+            SELF.isSelection        = FALSE
+            SELF.isDrawingSelection = FALSE
+            SELF.isPointsCollection = FALSE
         ELSE
             ! nothing
-        END   
-        
-        SELF.isSelection        = FALSE
-        SELF.isDrawingSelection = FALSE
-        SELF.isPointsCollection = FALSE
+            
+            SELF.MoveTo(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+            
+            SELF.isSelection        = FALSE            
+        END                   
         
         
 OverlayC2IP.TakeEvent       PROCEDURE()
@@ -899,6 +979,32 @@ OverlayC2IP.Draw_Line       PROCEDURE(PosRecord startPos, PosRecord endPos)
         SELF.drwImg.Line(startPos.xPos, startPos.yPos, dx#, dy#)
 
         SELF.drwImg.Display()
+        
+OverlayC2IP.Draw_Rectangle  PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview = TRUE THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
+        END 
+            
+        ! Draw rectangle
+        SELF.drwImg.Box(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()
+        
+OverlayC2IP.Draw_Rectangle  PROCEDURE(PosRecord startPos, PosRecord endPos)        
+    CODE
+        dx# = endPos.xPos - startPos.xPos
+        dy# = endPos.yPos - startPos.yPos
+        
+        ! Draw line
+        SELF.drwImg.Box(startPos.xPos, startPos.yPos, dx#, dy#)
+
+        SELF.drwImg.Display()
+        
         
         
 OverlayC2IP.Preview_Arrow   PROCEDURE(LONG nXPos, LONG nYPos)
@@ -1145,6 +1251,25 @@ endPos                          GROUP(PosRecord)
             endPos.yPos     = SELF.al.al.yPos[2]       
             SELF.Draw_Line(startPos, endPos)
             
+        OF aTpy:notDef_Line
+            !MESSAGE('generic Line')
+            ! generic Line
+            startPos.xPos   = SELF.al.al.xPos[1]
+            startPos.yPos   = SELF.al.al.yPos[1]
+            endPos.xPos     = SELF.al.al.xPos[2]
+            endPos.yPos     = SELF.al.al.yPos[2]       
+            SELF.Draw_Line(startPos, endPos)            
+            
+        OF aTpy:notDef_Rectangle
+            !MESSAGE('generic Rectangle')
+            ! generic Rectangle
+            startPos.xPos   = SELF.al.al.xPos[1]
+            startPos.yPos   = SELF.al.al.yPos[1]
+            endPos.xPos     = SELF.al.al.xPos[2]
+            endPos.yPos     = SELF.al.al.yPos[2]       
+            SELF.Draw_Rectangle(startPos, endPos)                
+                    
+            
         OF aTpy:AdvanceToContact
             ! Advance to contact
             
@@ -1372,6 +1497,61 @@ CODE
     
     RETURN TRUE    
     
+    
+OverlayC2IP.DisplayUnselection      PROCEDURE(LONG nAPointer)
+aRec                                    GROUP(ActionBasicRecord)
+                                        END
+selAction   Action
+    CODE
+        SELF.al.GetAction(nAPointer, aRec)
+        selAction.Init(aRec)
+        dx# = aRec.xPos[2] - aRec.xPos[1]
+        dy# = aRec.yPos[2] - aRec.yPos[1]
+        
+        SELF.drwImg.Setpencolor(COLOR:White)
+        SELF.drwImg.SetPenWidth(3)
+        
+        CASE CLIP(aRec.ActionTypeCode)
+        OF aTpy:notDefined
+            ! display line
+            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            ! display anchors
+            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+        OF aTpy:notDef_Line
+            ! display line
+            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            ! display anchors
+            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+        OF aTpy:notDef_Rectangle
+            ! display Rectangle
+            SELF.drwImg.Box(aRec.xPos[1], aRec.yPos[1], dx#, dy#)            
+            ! display anchors
+            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[1] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[2] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+            
+        END
+                                
+        SELF.drwImg.SetPenWidth(1)
+        SELF.drwImg.Setpencolor(COLOR:Black)
+        
+        CASE CLIP(aRec.ActionTypeCode)
+        OF aTpy:notDefined
+            ! display line
+            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+        OF aTpy:notDef_Line
+            ! display line
+            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+        OF aTpy:notDef_Rectangle
+            ! display Rectangle
+            SELF.drwImg.Box(aRec.xPos[1], aRec.yPos[1], dx#, dy#)            
+        END
+        
+        SELF.drwImg.Display()
+    
 OverlayC2IP.DisplaySelection        PROCEDURE(LONG nAPointer)    
 aRec                                    GROUP(ActionBasicRecord)
                                         END
@@ -1385,13 +1565,32 @@ selAction   Action
         SELF.drwImg.Setpencolor(COLOR:Red)
         SELF.drwImg.SetPenWidth(3)
         
-        ! display line
-        SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
-        ! display anchors
-        SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
-        SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
-        
+        CASE CLIP(aRec.ActionTypeCode)
+        OF aTpy:notDefined
+            ! display line
+            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            ! display anchors
+            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+        OF aTpy:notDef_Line
+            ! display line
+            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            ! display anchors
+            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+        OF aTpy:notDef_Rectangle
+            ! display Rectangle
+            SELF.drwImg.Box(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            ! display anchors
+            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[1] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[2] - 2, 5, 5)
+            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+            
+        END
+                                
         SELF.drwImg.SetPenWidth(1)
         SELF.drwImg.Setpencolor(COLOR:Black)
         SELF.drwImg.Display()
+        
         
