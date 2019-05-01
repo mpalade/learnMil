@@ -71,67 +71,67 @@ C2IP.DrawNode_HQ    PROCEDURE()
 C2IP.DrawNode_Default       PROCEDURE(BOOL bAutoDisplay)
 nFillColor      LONG
     CODE
-        !sst.Trace('BEGIN:C2IP.DrawNode_Default')
+        sst.Trace('BEGIN:C2IP.DrawNode_Default')
         SELF.drwImg.Setpencolor(COLOR:Black)
         SELF.drwImg.SetPenWidth(1)
         
         ! Fill color depending on Hostility
-        !sst.Trace('SELF.ul.Hostility() = ' & SELF.ul.Hostility())
+        sst.Trace('SELF.ul.Hostility() = ' & SELF.ul.Hostility())
         CASE CLIP(SELF.ul.Hostility())
         OF hTpy:Unknown
             ! yellow
             nFillColor  = COLOR:Unknown
-            !sst.Trace('nFillColor = COLOR:Unknown')
+            sst.Trace('nFillColor = COLOR:Unknown')
         OF hTpy:AssumedFriend
             ! blue
             nFillColor  = COLOR:AssumedFriend
-            !sst.Trace('nFillColor = COLOR:AssumedFriend')
+            sst.Trace('nFillColor = COLOR:AssumedFriend')
         OF hTpy:Friend
             ! blue
             nFillColor  = COLOR:Friend
-            !sst.Trace('nFillColor = COLOR:Friend')
+            sst.Trace('nFillColor = COLOR:Friend')
         OF hTpY:Neutral
             ! green
             nFillColor  = COLOR:Neutral
-            !sst.Trace('nFillColor = COLOR:Neutral')
+            sst.Trace('nFillColor = COLOR:Neutral')
         OF hTpy:Suspect
             ! red
             nFillColor  = COLOR:Suspect
-            !sst.Trace('nFillColor = COLOR:Suspect')
+            sst.Trace('nFillColor = COLOR:Suspect')
         OF hTpy:Hostile
             ! red
             nFillColor  = COLOR:Hostile        
-            !sst.Trace('nFillColor = COLOR:Hostile')
+            sst.Trace('nFillColor = COLOR:Hostile')
         ELSE
             nFillColor  = COLOR:Unknown
-            !sst.Trace('nFillColor = COLOR:Unknown')
+            sst.Trace('nFillColor = COLOR:Unknown')
         END            
         
         ! Fill color depeding on Enable/Disable status for new drag&drop selections
-        !sst.Trace('SELF.ul.markForDisbl() = ' & SELF.ul.markForDisbl())
+        sst.Trace('SELF.ul.markForDisbl() = ' & SELF.ul.markForDisbl())
         IF SELF.ul.markForDisbl() = TRUE THEN
             ! Display as unable for newer selections
             nFillColor  = COLOR:NodeDisabled    
-            !sst.Trace('nFillColor = ' & nFillColor)
+            sst.Trace('nFillColor = ' & nFillColor)
         END    
-        !sst.Trace('nFillColor = ' & nFillColor)
-        !sst.Trace('before BOX')
+        sst.Trace('nFillColor = ' & nFillColor)
+        sst.Trace('before BOX')
         SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
-        !sst.Trace('after BOX')
-        !sst.Trace('before SHOW')
+        sst.Trace('after BOX')
+        sst.Trace('before SHOW')
         SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())   
-        !sst.Trace('after SHOW')
+        sst.Trace('after SHOW')
         
-        !sst.Trace('SELF.ul.IsHQ() = ' & SELF.ul.IsHQ())
+        sst.Trace('SELF.ul.IsHQ() = ' & SELF.ul.IsHQ())
         SELF.DrawNode_HQ()
 
         
-        !sst.Trace('bAutoDisplay = ' & bAutoDisplay)
+        sst.Trace('bAutoDisplay = ' & bAutoDisplay)
         IF bAutoDisplay THEN
             SELF.drwImg.Display()
         END
     
-        !sst.Trace('END:C2IP.DrawNode_Default')
+        sst.Trace('END:C2IP.DrawNode_Default')
         RETURN TRUE      
     
 C2IP.Draw_innerSine PROCEDURE()
@@ -789,7 +789,7 @@ CODE
 C2IP.DisplaySelection     PROCEDURE
 CODE
     ! display SELECTION frame (red) for the current selection
-    !sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection')
+    sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection')
     IF SELF.ul.GetNode() = TRUE THEN
         SELF.drwImg.Setpencolor(COLOR:Red)
         SELF.drwImg.SetPenWidth(3)
@@ -800,11 +800,11 @@ CODE
     
     SELF.drwImg.Setpencolor(COLOR:Black)
     SELF.drwImg.SetPenWidth(1)
-    !sst.Trace('END:OrgChartC2IP.DisplaySelection')
+    sst.Trace('END:OrgChartC2IP.DisplaySelection')
     
 C2IP.DisplaySelection       PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
-        !sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection(' & nXPos & ', ' & nYPos & ')')
+        sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection(' & nXPos & ', ' & nYPos & ')')
         SELF.drwImg.Setpencolor(COLOR:Red)
         SELF.drwImg.SetPenWidth(3)
         SELF.drwImg.Box(nXPos, nYPos,50,30)        
@@ -812,14 +812,14 @@ C2IP.DisplaySelection       PROCEDURE(LONG nXPos, LONG nYPos)
         
         SELF.drwImg.Setpencolor(COLOR:Black)
         SELF.drwImg.SetPenWidth(1)
-        !sst.Trace('END:OrgChartC2IP.DisplaySelection')
+        sst.Trace('END:OrgChartC2IP.DisplaySelection')
         
     
     
 C2IP.DisplayUnselection     PROCEDURE
 CODE
     ! display NORMAL frame (black) for the current selection
-    !sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection')
+    sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection')
     IF SELF.ul.GetNode() = TRUE THEN
         SELF.drwImg.Setpencolor(COLOR:White)
         SELF.drwImg.SetPenWidth(3)
@@ -832,11 +832,11 @@ CODE
     
     SELF.drwImg.Setpencolor(COLOR:Black)
     SELF.drwImg.SetPenWidth(1)
-    !sst.Trace('END:OrgChartC2IP.DisplayUnselection')
+    sst.Trace('END:OrgChartC2IP.DisplayUnselection')
     
 C2IP.DisplayUnselection     PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
-        !sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection (' & nXPos & ', ' & nYPos & ')')
+        sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection (' & nXPos & ', ' & nYPos & ')')
         SELF.drwImg.Setpencolor(COLOR:White)
         SELF.drwImg.SetPenWidth(3)
         SELF.drwImg.Box(nXPos, nYPos,50,30)
@@ -844,51 +844,38 @@ C2IP.DisplayUnselection     PROCEDURE(LONG nXPos, LONG nYPos)
         SELF.drwImg.SetPenWidth(1)
         SELF.drwImg.Box(nXPos, nYPos,50,30)
         SELF.drwImg.Display()
-        sst.Trace('C2IP.DisplayUnselection' & nXPos & ',' & nYPos)
-        !sst.Trace('END:OrgChartC2IP.DisplayUnselection')
+        sst.Trace('END:OrgChartC2IP.DisplayUnselection')
         
    
     
     
 C2IP.SelectByMouse  PROCEDURE(LONG nXPos, LONG nYPos)
     CODE        
-        sst.Trace('C2IP.SelectByMouse BEGIN')
         curSel#     = SELF.ul.Pointer()
         curXPos#    = SELF.ul.xPos()
         curYPos#    = SELF.ul.yPos()
             
         ! verify the BSOs
-        nodeFound#   = SELF.ul.SelectByMouse(nXPos, nYPos)
-        IF nodeFound# = TRUE THEN
+        nodeFoundPos#   = SELF.ul.SelectByMouse(nXPos, nYPos)
+        IF nodeFoundPos# > 0 THEN
             ! BSO found
-            !sst.Trace('node found')
-            !sst.Trace('curSel# = ' & curSel#)
-            !sst.Trace('curXPos# = ' & curXPos#)
-            !sst.Trace('curYPos# = ' & curYPos#)
+            sst.Trace('node found')
+            sst.Trace('curSel# = ' & curSel#)
+            sst.Trace('curXPos# = ' & curXPos#)
+            sst.Trace('curYPos# = ' & curYPos#)
             SELF.DisplayUnselection(curXPos#, curYPos#)
                         
             !SELF.selTreePos     = SELF.ul.TreePos()
             !SELF.selQueuePos    = SELF.ul.Pointer()
-            SELF.DisplaySelection()            
+            SELF.DisplaySelection(curXPos#, curYPos#)
         ELSE
-            !SELF.DisplaySelection(nXPos, nYPos)
+            SELF.DisplaySelection(curXPos#, curYPos#)
         END
-        
-        sst.Trace('     C2IP.SelectByMouse : nodeFound#= ' & nodeFound#)
-        sst.Trace('C2IP.SelectByMouse BEGIN')
-        RETURN nodeFound#
-        
-        
 
         
 C2IP.CheckByMouse  PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
-        sst.Trace('C2IP.CheckByMouse BEGIN')
-        ret#    = SELF.ul.CheckByMouse(nXPos, nYPos)                
-        sst.Trace('     C2IP.CheckByMouse : SELF.ul.CheckByMouse = ' & ret#)
-        sst.Trace('C2IP.CheckByMouse END')
-        RETURN ret#
-        
+        RETURN SELF.ul.CheckByMouse(nXPos, nYPos)        
         
 C2IP.MoveTo         PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
@@ -1002,7 +989,7 @@ C2IP.DrawNode_MainSymbol    PROCEDURE
     CODE
         
         ! Unit Type Code
-            !sst.Trace('! Unit Type Code = ' & CLIP(SELF.ul.UnitTypeCode()) )
+            sst.Trace('! Unit Type Code = ' & CLIP(SELF.ul.UnitTypeCode()) )
             CASE CLIP(SELF.ul.UnitTypeCode())
             OF '120300'
                 ! Amphibious
@@ -1250,9 +1237,7 @@ C2IP.TakeEvent      PROCEDURE()
         !END
                 
         
-C2IP.isABSOSelected PROCEDURE()
-    CODE
-        RETURN SELF.isSelection
+            
         
         
             

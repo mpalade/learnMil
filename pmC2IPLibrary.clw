@@ -43,7 +43,7 @@ tmpUnitName     STRING(100)
         
 UnitsCollection.insertFirstNode PROCEDURE
     CODE
-        !sst.Trace('START:UnitsCollection.insertFirstNode')
+        sst.Trace('START:UnitsCollection.insertFirstNode')
         SELF.ul.UnitName        = SELF.prepRndName()
         !SELF.ul.UnitType        = uTpy:notDefined
         SELF.ul.UnitTypeCode    = ''
@@ -60,13 +60,13 @@ UnitsCollection.insertFirstNode PROCEDURE
             SELF.selTreePos     = 1     
             SELF.maxTreePos     = 1
             SELF.selQueuePos    = POINTER(SELF.ul)
-            !sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
-            !sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
-            !sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+            sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+            sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+            sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
         ELSE
-            !sst.Trace('ADD(SELF.ul) error')
+            sst.Trace('ADD(SELF.ul) error')
         END
-        !sst.Trace('END:UnitsCollection.insertFirstNode')
+        sst.Trace('END:UnitsCollection.insertFirstNode')
         
         
         
@@ -74,7 +74,7 @@ UnitsCollection.insertFirstNode PROCEDURE
         
 UnitsCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
     CODE
-        !sst.Trace('START:UnitsCollection.prepNewNode')        
+        sst.Trace('START:UnitsCollection.prepNewNode')        
         CLEAR(SELF.urec)
         SELF.urec.TreePos       = SELF.selTreePos
         SELF.urec.UnitName      = SELF.prepRndName()
@@ -86,11 +86,11 @@ UnitsCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
         SELF.urec.IsHQ          = SELF.ul.IsHQ
         SELF.urec.xPos          = (SELF.urec.TreePos-1)*50 + 1
         SELF.urec.yPos          = (nNewRecPosition - 1)*30 + 1
-        !sst.Trace('END:UnitsCollection.prepNewNode')        
+        sst.Trace('END:UnitsCollection.prepNewNode')        
         
 UnitsCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
     CODE
-        !sst.Trace('START:UnitsCollection.moveNodesToTmp')        
+        sst.Trace('START:UnitsCollection.moveNodesToTmp')        
         FREE(SELF.tmpul)       
         LOOP i# = nStartPos TO nEndPos
             GET(SELF.ul, i#)
@@ -106,19 +106,19 @@ UnitsCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
                 ADD(SELF.tmpul)
             END            
         END
-        !sst.Trace('END:UnitsCollection.moveNodesToTmp')        
+        sst.Trace('END:UnitsCollection.moveNodesToTmp')        
         
 UnitsCollection.addEmptyNode       PROCEDURE
     CODE
-        !sst.Trace('START:UnitsCollection.insertEmptyNode')        
+        sst.Trace('START:UnitsCollection.insertEmptyNode')        
         ADD(SELF.ul)
         IF NOT ERRORCODE() THEN
         END        
-        !sst.Trace('END:UnitsCollection.insertEmptyNode')        
+        sst.Trace('END:UnitsCollection.insertEmptyNode')        
         
 UnitsCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
     CODE
-        !sst.Trace('START:UnitsCollection.insertCurrentNode')        
+        sst.Trace('START:UnitsCollection.insertCurrentNode')        
         GET(SELF.ul, nPosition)
         IF NOT ERRORCODE() THEN
             SELF.ul.TreePos     = SELF.urec.TreePos
@@ -133,11 +133,11 @@ UnitsCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
             SELF.ul.markForDisbl    = FALSE
             PUT(SELF.ul)
         END
-        !sst.Trace('END:UnitsCollection.insertCurrentNode')        
+        sst.Trace('END:UnitsCollection.insertCurrentNode')        
         
 UnitsCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)        
     CODE
-        !sst.Trace('START:UnitsCollection.moveNodesBackFromTmp')        
+        sst.Trace('START:UnitsCollection.moveNodesBackFromTmp')        
         j# = 0
         LOOP i# = nStartPos TO RECORDS(SELF.ul)
             j# = j# + 1
@@ -159,11 +159,11 @@ UnitsCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)
                 END                    
             END            
         END        
-        !sst.Trace('END:UnitsCollection.moveNodesBackFromTmp')        
+        sst.Trace('END:UnitsCollection.moveNodesBackFromTmp')        
         
 UnitsCollection.insertLastNode        PROCEDURE()
     CODE
-        !sst.Trace('START:UnitsCollection.insertLastNode')        
+        sst.Trace('START:UnitsCollection.insertLastNode')        
         SELF.ul.TreePos         = SELF.urec.TreePos
         SELF.ul.UnitName        = SELF.urec.UnitName
         SELF.ul.UnitType        = SELF.urec.UnitType
@@ -178,13 +178,13 @@ UnitsCollection.insertLastNode        PROCEDURE()
         IF NOT ERRORCODE() THEN
             SELF.selQueuePos    = POINTER(SELF.ul)
             SELF.selTreePos     = SELF.ul.TreePos
-            !sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
-            !sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
-            !sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+            sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+            sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+            sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
         ELSE
-            !sst.Trace('ADD(SELF.ul) error')
+            sst.Trace('ADD(SELF.ul) error')
         END        
-        !sst.Trace('END:UnitsCollection.insertLastNode')        
+        sst.Trace('END:UnitsCollection.insertLastNode')        
         
         
         
@@ -192,66 +192,66 @@ UnitsCollection.InsertNode    PROCEDURE
 tmpUnitName     STRING(100)
 CODE
     ! insert a new node to the current collection
-    !sst.Trace('START:UnitsCollection.InsertNode')
+    sst.Trace('START:UnitsCollection.InsertNode')
         
     tmpUnitName    = SELF.prepRndName()
     
     IF RECORDS(SELF.ul) = 0 THEN
         ! 1st records
-        !sst.Trace('1st queue record')        
-        !sst.Trace('CALL:SELF.insertFirstNode()')
+        sst.Trace('1st queue record')        
+        sst.Trace('CALL:SELF.insertFirstNode()')
         SELF.insertFirstNode()                   
     ELSE
         ! inside the queue
-        !sst.Trace('inside the queue')
+        sst.Trace('inside the queue')
         
         ! increment Tree Position
-        !sst.Trace('increment Tree Position')
+        sst.Trace('increment Tree Position')
         SELF.selTreePos  = SELF.ul.TreePos + 1
         IF SELF.selTreePos > SELF.maxTreePos THEN
             SELF.maxTreePos = SELF.selTreePos
         END
         
         ! preserve current position and all records number
-        !sst.Trace('preserve current position and all records number')
+        sst.Trace('preserve current position and all records number')
         allPos# = RECORDS(SELF.ul)
                 
         ! prepare the new record
-        !sst.Trace('prepare the new record')
-        !sst.Trace('CALL:SELF.prepNewNode()')
+        sst.Trace('prepare the new record')
+        sst.Trace('CALL:SELF.prepNewNode()')
         SELF.prepNewNode(SELF.selQueuePos + 1)               
         
         ! check the position inside the queue
         ! move to the temporary queue
         ! change yPos values
-        !sst.Trace('check the position inside the queue')
+        sst.Trace('check the position inside the queue')
         IF (SELF.selQueuePos + 1) < (allPos# + 1) THEN            
             ! in the middle of queue
-            !sst.Trace('in the middle of queue')           
-            !sst.Trace('CALL:SELF.moveNodesToTmp(SELF.selQueuePos + 1, allPos#)')           
+            sst.Trace('in the middle of queue')           
+            sst.Trace('CALL:SELF.moveNodesToTmp(SELF.selQueuePos + 1, allPos#)')           
             SELF.moveNodesToTmp(SELF.selQueuePos + 1, allPos#)
                                     
             ! add empty record
-            !sst.Trace('add empty record')
-            !sst.Trace('CALL:SELF.addEmptyNode()')           
+            sst.Trace('add empty record')
+            sst.Trace('CALL:SELF.addEmptyNode()')           
             SELF.addEmptyNode()            
             
             
             ! insert current record
-            !sst.Trace('insert current record')
-            !sst.Trace('CALL:SELF.insertCurrentNode(SELF.selQueuePos + 1)')           
+            sst.Trace('insert current record')
+            sst.Trace('CALL:SELF.insertCurrentNode(SELF.selQueuePos + 1)')           
             SELF.insertCurrentPrepNode(SELF.selQueuePos + 1)        
                         
             ! copy back records
-            !sst.Trace('copy back records')
+            sst.Trace('copy back records')
             IF POINTER(SELF.tmpul) > 0 THEN
-                !sst.Trace('CALL:SELF.moveNodesBackFromTmp(SELF.selQueuePos + 2)')                                           
+                sst.Trace('CALL:SELF.moveNodesBackFromTmp(SELF.selQueuePos + 2)')                                           
                 SELF.moveNodesBackFromTmp(SELF.selQueuePos + 2)
                 
             END    
             
             ! get new current Position            
-            !sst.Trace('get new current Position')
+            sst.Trace('get new current Position')
             SELF.selQueuePos    = SELF.selQueuePos + 1
             GET(SELF.ul, SELF.selQueuePos + 1)
             IF NOT ERRORCODE() THEN
@@ -259,15 +259,15 @@ CODE
             END                        
         ELSE
             ! last on queue
-            !sst.Trace('last on queue')
-            !sst.Trace('CALL:SELF.insertLastNode()')             
+            sst.Trace('last on queue')
+            sst.Trace('CALL:SELF.insertLastNode()')             
             SELF.insertLastNode()            
         END                              
     END
-    !sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
-    !sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
-    !sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
-    !sst.Trace('END:UnitsCollection.InsertNode')
+    sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+    sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+    sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+    sst.Trace('END:UnitsCollection.InsertNode')
     
     
 UnitsCollection.InsertNode    PROCEDURE(*UnitBasicRecord pURec)
@@ -457,32 +457,6 @@ UnitsCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
             RETURN FALSE
         END    
         
-UnitsCollection.GetNode       PROCEDURE(LONG nPointer, *UnitBasicRecord pURec)
-    CODE
-        ! get current node
-        
-        currPos# = POINTER(SELF.ul)
-        
-        GET(SELF.ul, nPointer)
-        IF NOT ERRORCODE() THEN
-            pUrec.UnitName          = SELF.ul.UnitName
-            pUrec.UnitType          = SELF.ul.UnitType
-            pUrec.UnitTypeCode      = SELF.ul.UnitTypeCode
-            pUrec.Echelon           = SELF.ul.Echelon
-            pURec.Hostility         = SELF.ul.Hostility
-            pUrec.IsHQ              = SELF.ul.IsHQ
-            pUrec.xPos              = SELF.ul.xPos
-            pUrec.yPos              = SELF.ul.yPos
-            pUrec.TreePos           = SELF.ul.TreePos
-            ret#    = TRUE
-        ELSE
-            ret#    = FALSE
-        END
-        
-        GET(SELF.ul, currPos#)
-        RETURN ret#
-               
-        
 UnitsCollection.GetNode       PROCEDURE()
     CODE
         GET(SELF.ul, SELF.selQueuePos)
@@ -522,17 +496,7 @@ Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
             RETURN FALSE
         END
         
-Action.CheckRectangleByMouse        PROCEDURE(LONG nXPos, LONG nYPos)                       
-    CODE
-        !sst.Trace('Action.CheckRectangleByMouse BEGIN')
-        IF (SELF.arec.xPos[1] <= nXPOs) AND (nXPos <= SELF.arec.xPos[2]) AND |
-            (SELF.arec.yPos[1] <= nYPos) AND (nYPos <= SELF.arec.yPos[2]) THEN
-            RETURN TRUE
-        ELSE
-            RETURN FALSE
-        END
-        !sst.Trace('Action.CheckRectangleByMouse END')
-        
+                       
                               
         
         
@@ -634,44 +598,44 @@ CODE
                    
 UnitsCollection.Records       PROCEDURE()        
     CODE
-        !sst.Trace('BEGIN:UnitsCollection.Records')
-        !sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
-        !sst.Trace('END:UnitsCollection.Records')
+        sst.Trace('BEGIN:UnitsCollection.Records')
+        sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
+        sst.Trace('END:UnitsCollection.Records')
         RETURN RECORDS(SELF.ul)
         
 UnitsCollection.Pointer       PROCEDURE()
     CODE
-        !sst.Trace('BEGIN:UnitsCollection.Pointer')
-        !sst.Trace('POINTER(SELF.ul) = ' & POINTER(SELF.ul))
-        !sst.Trace('END:UnitsCollection.Pointer')
+        sst.Trace('BEGIN:UnitsCollection.Pointer')
+        sst.Trace('POINTER(SELF.ul) = ' & POINTER(SELF.ul))
+        sst.Trace('END:UnitsCollection.Pointer')
         RETURN POINTER(SELF.ul)
         
 UnitsCollection.GetCurrentSelPos      PROCEDURE()
     CODE
-        !sst.Trace('BEGIN:UnitsCollection.GetCurrentSelPos')
-        !sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
-        !sst.Trace('END:UnitsCollection.GetCurrentSelPos')
+        sst.Trace('BEGIN:UnitsCollection.GetCurrentSelPos')
+        sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+        sst.Trace('END:UnitsCollection.GetCurrentSelPos')
         RETURN SELF.selQueuePos
         
                                 
 
 UnitsCollection.Get        PROCEDURE()
     CODE
-        !sst.Trace('BEGIN:UnitsCollection.Get()')
+        sst.Trace('BEGIN:UnitsCollection.Get()')
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
             success# = TRUE
         ELSE
             success# = FALSE
         END
-        !sst.Trace('END:UnitsCollection.Get')
+        sst.Trace('END:UnitsCollection.Get')
         RETURN success#
 
 UnitsCollection.UnitTypeCode  PROCEDURE()
     CODE
-        !sst.Trace('BEGIN:UnitsCollection.UnitTypeCode')
-        !sst.Trace('SELF.ul.UnitTypeCode = ' & SELF.ul.UnitTypeCode)
-        !sst.Trace('END:UnitsCollection.UnitTypeCode')
+        sst.Trace('BEGIN:UnitsCollection.UnitTypeCode')
+        sst.Trace('SELF.ul.UnitTypeCode = ' & SELF.ul.UnitTypeCode)
+        sst.Trace('END:UnitsCollection.UnitTypeCode')
         RETURN SELF.ul.UnitTypeCode
         
 UnitsCollection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
@@ -691,9 +655,9 @@ UnitsCollection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
         
 UnitsCollection.Echelon      PROCEDURE()        
     CODE
-        !sst.Trace('BEGIN:UnitsCollection.Echelon')
-        !sst.Trace('SELF.ul.Echelon = ' & SELF.ul.Echelon)
-        !sst.Trace('END:UnitsCollection.Echelon')
+        sst.Trace('BEGIN:UnitsCollection.Echelon')
+        sst.Trace('SELF.ul.Echelon = ' & SELF.ul.Echelon)
+        sst.Trace('END:UnitsCollection.Echelon')
         RETURN SELF.ul.Echelon                
 
 UnitsCollection.SetEchelon    PROCEDURE(LONG nEchelon)
@@ -723,9 +687,9 @@ UnitsCollection.yPos  PROCEDURE()
         
 UnitsCollection.Hostility     PROCEDURE()
     CODE
-        !sst.Trace('BEGIN:UnitsCollection.Hostility')
-        !sst.Trace('SELF.ul.Hostility = ' & SELF.ul.Hostility)
-        !sst.Trace('END:UnitsCollection.Hostility')
+        sst.Trace('BEGIN:UnitsCollection.Hostility')
+        sst.Trace('SELF.ul.Hostility = ' & SELF.ul.Hostility)
+        sst.Trace('END:UnitsCollection.Hostility')
         RETURN SELF.ul.Hostility
         
 UnitsCollection.SetHostility  PROCEDURE(LONG nHostility)
@@ -806,16 +770,15 @@ UnitsCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)
                 IF (SELF.ul.xPos < nXPos) AND (nXPos < SELF.ul.xPos + 50) THEN
                     IF (SELF.ul.yPos < nYPos) AND (nYPos < SELF.ul.yPos + 30) THEN
                         ! found Unit selection
-                        sst.Trace('UnitsCollection.SelectByMouse = ' & i#)
                         SELF.selTreePos     = SELF.ul.TreePos
                         SELF.selQueuePos    = i#
-                        RETURN TRUE
+                        RETURN i#
                     END                
                 END            
             END
         END
         
-        RETURN FALSE
+        RETURN 0
         
 UnitsCollection.CheckByMouse        PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
@@ -828,8 +791,6 @@ UnitsCollection.CheckByMouse        PROCEDURE(LONG nXPos, LONG nYPos)
                 IF (SELF.ul.xPos < nXPos) AND (nXPos < SELF.ul.xPos + 50) THEN
                     IF (SELF.ul.yPos < nYPos) AND (nYPos < SELF.ul.yPos + 30) THEN
                         ! found Unit selection
-                        !sst.Trace('UnitsCollection.CheckByMouse = ' & i#)
-                        GET(SELF.ul, currentSelQueuePos#)
                         RETURN i#
                     END                
                 END            

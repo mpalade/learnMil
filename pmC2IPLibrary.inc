@@ -174,8 +174,6 @@ g:NotDefined        EQUATE(1000)
 g:Point             EQUATE(1001)
 g:Line              EQUATE(1002)
 g:FreeLine          EQUATE(1003)
-g:Rectangle         EQUATE(1004)
-
 g:AxisAdvance       EQUATE(1010)
 g:Ambush            EQUATE(1011)
 g:Circle            EQUATE(1012)
@@ -187,9 +185,7 @@ g:Block             EQUATE(1014)
 g:Breach            EQUATE(1015)
 
 ! Action Type Equates
-aTpy:notDefined             EQUATE('notDefined')
-aTpy:notDef_Line            EQUATE('Line')
-aTpy:notDef_Rectangle       EQUATE('Rectangle')
+aTpy:notDefined     EQUATE('notDefined')
 
 aTpy:AdvanceToContact       EQUATE('900000')    ! Advance To Contact
 
@@ -298,19 +294,9 @@ ActionType              LONG
 ActionTypeCode          STRING(10)
 ActionPointsNumber      LONG
 xPos                    LONG, DIM(100)
-yPos                    LONG, DIM(100)
+yPos                        LONG, DIM(100)
 Resources               &UnitsList
                         END
-
-ActionsResources        QUEUE(ActionsQueue)
-Resources2                  &UnitsList
-                        END
-
-ActionsResTargets   QUEUE(ActionsResources)
-Targets                 &ActionsQueue
-                    END
-
-
 
 PosRecord           GROUP, TYPE
 xPos                        LONG
@@ -373,7 +359,6 @@ Init                    PROCEDURE(*ActionBasicRecord pArec), LONG
 Destruct                PROCEDURE()
 
 CheckLineByMouse        PROCEDURE(LONG nXPos, LONG nYPos), LONG
-CheckRectangleByMouse   PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
 
@@ -403,7 +388,6 @@ InsertNode              PROCEDURE
 InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
 AddNode                 PROCEDURE(*UnitBasicRecord pUrec), LONG
 GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
-GetNode                 PROCEDURE(LONG Pointer, *UnitBasicRecord pURec), BOOL
 GetNode                 PROCEDURE(), BOOl
 DeleteNode              PROCEDURE
 DisableNode             PROCEDURE
@@ -445,8 +429,6 @@ Destruct                    PROCEDURE()
 
 InsertAction                PROCEDURE(ActionBasicRecord parec)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec)
-InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec, UnitBasicRecord pTarget_urec)
-InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec, ActionBasicRecord pTarget_arec)
 GetAction                   PROCEDURE(LONG nPointer, *ActionBasicRecord pARec), LONG
 SelectByMouse               PROCEDURE(LONG nXPos, LONG nYPos), LONG
 CheckByMouse                PROCEDURE(LONG nXPos, LONG nYPos), LONG
@@ -467,7 +449,6 @@ drwImg                  &Draw
 TakeEvent               PROCEDURE(), VIRTUAL
 geometry                LONG        ! geometry equates
 isSelection             BOOL, PROTECTED
-isABSOSelected          PROCEDURE(), BOOL
 isMouseDown             BOOL, PROTECTED
 isPointsCollection      BOOL, PROTECTED
 
@@ -636,8 +617,6 @@ TakeMouseUp             PROCEDURE(), PRIVATE
     ! draw actions preview (during visual construction)
 Draw_Line               PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
 Draw_Line               PROCEDURE(PosRecord startPos, PosRecord endPos)
-Draw_Rectangle          PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
-Draw_Rectangle          PROCEDURE(PosRecord startPos, PosRecord endPos)
 
 Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
 Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
@@ -697,9 +676,7 @@ InsertAction            PROCEDURE()
 
 DrawAction              PROCEDURE()
 
-prevActionSelection     LONG, PROTECTED
 DisplaySelection        PROCEDURE(LONG nAPointer)
-DisplayUnselection      PROCEDURE(LONG nAPointer)
 
 
 ! persistence layer
