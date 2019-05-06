@@ -21,7 +21,7 @@ OMIT('***')
 
 ! JSON objects
 json                CLASS(JSONClass)
-reference           &UnitsList
+reference           &UnitsQueue
 !AddByReference          PROCEDURE (StringTheory pName,JSONClass pJson),VIRTUAL
 AddByReference          PROCEDURE (StringTheory pName,JSONClass pJson)
 
@@ -44,7 +44,7 @@ sst                 stringtheory
 json.Construct      PROCEDURE
     CODE
         PARENT.Construct
-        self.reference  &= NEW(UnitsList)
+        self.reference  &= NEW(UnitsQueue)
         
         
 json.Destruct       PROCEDURE
@@ -123,7 +123,11 @@ OverlayC2IP.MoveTo  PROCEDURE(LONG nXPos, LONG nYPos)
 
 OverlayC2IP.Construct       PROCEDURE()
     CODE
-        PARENT.Construct()  
+        PARENT.Construct() 
+        
+        ! the selected BSO is moved, default = FALSE
+        SELF.isBSOMoved         = FALSE
+        
         SELF.PolyPoints = 0    
         SELF.pp     &= NEW(PosList)
         SELF.al &= NEW(ActionsCollection)
@@ -680,6 +684,18 @@ targetAction                    GROUP(ActionBasicRecord)
                 actionRec.xPos[2]               = SELF.drwImg.MouseX()
                 actionRec.yPos[2]               = SELF.drwImg.MouseY()
             
+            OF aTpy:notDef_Polygon
+                ! a generic Polygon
+                actionRec.ActionName    = 'aTpy:notDef_Polygon'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:notDef_Polygon
+                    ! TO BE CORRECTED !!!
+                actionRec.ActionPointsNumber    = 2
+                actionRec.xPos[1]               = SELF.p1x
+                actionRec.yPos[1]               = SELF.p1y
+                actionRec.xPos[2]               = SELF.drwImg.MouseX()
+                actionRec.yPos[2]               = SELF.drwImg.MouseY()
+            
             OF aTpy:AdvanceToContact
                 ! Advance to contact
                 
@@ -751,6 +767,7 @@ targetAction                    GROUP(ActionBasicRecord)
             ASSERT(SELF.ul.GetNode(foundUnitTarget#, targetBSO), 'UnitsCollection.GetNode() error')
             sst.Trace('     OverlayC2IP.InsertAction : InsertAction(action, resource, target-Unit)')
             SELF.al.InsertAction(actionRec, selBSO, targetBSO)
+            SELF.lastOperation  = (CLIP(selBSO.UnitName) & ' ' & CLIP(actionRec.ActionName) & ' on target ' & CLIP(targetBSO.UnitName))            
         ELSE
             ! check for Action Target
             foundActionTarget#  = SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
@@ -760,10 +777,12 @@ targetAction                    GROUP(ActionBasicRecord)
                 ASSERT(SELF.al.GetAction(foundActionTarget#, targetAction), 'ActionCollection.GetAction() error')
                 sst.Trace('     OverlayC2IP.InsertAction : InsertAction(action, resource, target-Action)')
                 SELF.al.InsertAction(actionRec, selBSO, targetAction)
+                SELF.lastOperation  = (CLIP(selBSO.UnitName) & ' ' & CLIP(actionRec.ActionName) & ' on target ' & CLIP(targetAction.ActionName))            
             ELSE
                 ! no target found
                 sst.Trace('     OverlayC2IP.InsertAction : InsertAction(action, resource)')
                 SELF.al.InsertAction(actionRec, selBSO)
+                SELF.lastOperation  = (CLIP(selBSO.UnitName) & ' ' & CLIP(actionRec.ActionName))            
             END                                       
         END
                 
@@ -772,38 +791,42 @@ targetAction                    GROUP(ActionBasicRecord)
                 
         
 OverlayC2IP.TakeMouseDown   PROCEDURE()
-    CODE
-        ! Check the status of BSO selection
+    CODE                
         sst.Trace('OverlayC2IP.TakeMouseDown BEGIN')
+        
+        ! Check the status of BSO selection
         sst.Trace('     OverlayC2IP.TakeMouseDown : check BSO selection')
         IF (SELF.isSelection = FALSE) AND (SELF.isPointsCollection = FALSE) THEN
             ! check if it is a new BSO selection on the Overlay                
             IF SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) > 0 THEN
                 SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
                 SELF.isSelection    = TRUE
+                SELF.isBSOMoved     = FALSE
             ELSE
                 SELF.isSelection    = FALSE
             END
         END
         sst.Trace('     OverlayC2IP.TakeMouseDown : isBSOSelection = ' & SELF.isSelection)
         
+        
         ! Check the status of Generic Drawings selection
         sst.Trace('     OverlayC2IP.TakeMouseDown : check generic drawing selection')
-        !IF SELF.isDrawingSelection = FALSE THEN
-            IF SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) > 0 THEN
+        IF SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) > 0 THEN
+            ! validate the Drawing selection, only if a BSO was not selected
+            IF SELF.isSelection = FALSE THEN    
                 SELF.SelectDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
-                SELF.isDrawingSelection = TRUE
+                SELF.isDrawingSelection = TRUE                
+            ELSE
+                SELF.isDrawingSelection = FALSE
+            END            
             ELSE
                 ! check if is a generic drawing
                 IF SELF.geometry <> g:NotDefined THEN
                     SELF.isPointsCollection     = TRUE
-                ELSE
                 END
-            END            
-        !END                       
+        END            
         sst.Trace('     OverlayC2IP.TakeMouseDown : isDrawingSelection = ' & SELF.isDrawingSelection)
-     
-        
+             
         ! Check the status of Actions selection
                                 
         ! check if it is about to collect points for Action drawing / generic drawing
@@ -823,6 +846,11 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
         
 OverlayC2IP.TakeMouseMove   PROCEDURE()
     CODE
+        ! check if the current selected BSO is moved
+        IF SELF.isSelection = TRUE THEN
+            SELF.isBSOMoved = TRUE
+        END
+        
         IF SELF.isPointsCollection = TRUE THEN
             IF SELF.isMouseDown = TRUE THEN
                 ! previewing = TRUE
@@ -837,6 +865,10 @@ OverlayC2IP.TakeMouseMove   PROCEDURE()
                     SELF.Preview_FreeLine(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
                 OF g:Rectangle
                     SELF.Draw_Rectangle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                OF g:Polygon
+                    SELF.Draw_Polygon(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
+                OF g:FreeHand
+                    SELF.Draw_FreeHand(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)
                 OF g:AxisAdvance
                     ! Axis of Advance
                     SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), TRUE)                    
@@ -869,7 +901,7 @@ resourceObject                  BSO
 targetObject                    BSO
 actionRec                       GROUP(ActionBasicRecord)
                                 END
-    CODE
+    CODE                
         IF SELF.isPointsCollection = TRUE THEN
             IF SELF.isMouseDown = TRUE THEN                    
                 ! points collected
@@ -885,6 +917,12 @@ actionRec                       GROUP(ActionBasicRecord)
                 OF g:Rectangle
                     ! Rectangle
                     SELF.Draw_Rectangle(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
+                OF g:Polygon
+                    ! Polygon
+                    SELF.Draw_Polygon(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
+                OF g:FreeHand
+                    ! Polygon
+                    SELF.Draw_FreeHand(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)    
                 OF g:AxisAdvance
                     ! Axis of Advance
                     SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
@@ -921,11 +959,13 @@ actionRec                       GROUP(ActionBasicRecord)
             SELF.isDrawingSelection = FALSE
             SELF.isPointsCollection = FALSE
         ELSE
-            ! nothing
-            
-            SELF.MoveTo(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
-            
-            SELF.isSelection        = FALSE            
+            ! Update the position of the selected BSO, if the case            
+            IF (SELF.isSelection = TRUE) AND (SELF.isBSOMoved = TRUE) THEN
+                SELF.MoveTo(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())            
+                ! restore BSO selection status
+                SELF.isSelection        = FALSE            
+                SELF.isBSOMoved         = FALSE
+            END                                    
         END                   
         
         
@@ -1005,7 +1045,61 @@ OverlayC2IP.Draw_Rectangle  PROCEDURE(PosRecord startPos, PosRecord endPos)
 
         SELF.drwImg.Display()
         
+OverlayC2IP.Draw_Polygon  PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview = TRUE THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
+        END 
+            
+        ! Draw rectangle
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        SELF.drwImg.Line(SELF.p1x + 2, SELF.p1y + 2, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
         
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()
+
+OverlayC2IP.Draw_Polygon  PROCEDURE(PosRecord startPos, PosRecord endPos)        
+    CODE
+        dx# = endPos.xPos - startPos.xPos
+        dy# = endPos.yPos - startPos.yPos
+        
+        ! Draw line
+        SELF.drwImg.Line(startPos.xPos, startPos.yPos, dx#, dy#)
+        SELF.drwImg.Line(startPos.xPos + 2, startPos.yPos + 2, dx#, dy#)
+
+        SELF.drwImg.Display()        
+        
+        
+OverlayC2IP.Draw_FreeHand  PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
+    CODE
+        SELF.drwImg.Blank(COLOR:White)
+        IF bPreview = TRUE THEN            
+            SELF.drwImg.SetPenStyle(PEN:dash)
+        ELSE
+            SELF.drwImg.SetPenStyle(PEN:solid)            
+        END 
+            
+        ! Draw rectangle
+        SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        SELF.drwImg.Line(SELF.p1x + 2, SELF.p1y + 2, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        
+        SELF.drwImg.SetPenStyle(PEN:solid)
+        SELF.drwImg.Display()        
+        
+        
+OverlayC2IP.Draw_FreeHand  PROCEDURE(PosRecord startPos, PosRecord endPos)        
+    CODE
+        dx# = endPos.xPos - startPos.xPos
+        dy# = endPos.yPos - startPos.yPos
+        
+        ! Draw line
+        SELF.drwImg.Line(startPos.xPos, startPos.yPos, dx#, dy#)
+        SELF.drwImg.Line(startPos.xPos + 2, startPos.yPos + 2, dx#, dy#)
+
+        SELF.drwImg.Display()                
         
 OverlayC2IP.Preview_Arrow   PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
@@ -1268,6 +1362,14 @@ endPos                          GROUP(PosRecord)
             endPos.xPos     = SELF.al.al.xPos[2]
             endPos.yPos     = SELF.al.al.yPos[2]       
             SELF.Draw_Rectangle(startPos, endPos)                
+            
+        OF aTpy:notDef_Polygon
+            ! generic Polygon
+            startPos.xPos   = SELF.al.al.xPos[1]
+            startPos.yPos   = SELF.al.al.yPos[1]
+            endPos.xPos     = SELF.al.al.xPos[2]
+            endPos.yPos     = SELF.al.al.yPos[2]       
+            SELF.Draw_Polygon(startPos, endPos)                            
                     
             
         OF aTpy:AdvanceToContact

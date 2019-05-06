@@ -43,7 +43,7 @@ C2IP.Construct      PROCEDURE()
     
         SELF.labelEditMode  = FALSE        
         
-        SELF.isSelection        = FALSE        
+        SELF.isSelection        = FALSE                
         SELF.isPointsCollection = FALSE                
         SELF.isMouseDown        = FALSE
     
@@ -1255,7 +1255,9 @@ C2IP.isABSOSelected PROCEDURE()
         RETURN SELF.isSelection
         
         
-            
+C2IP.C2IPUtilities.Log      PROCEDURE()
+    CODE
+        RETURN CLIP(SELF.lastOperation)
         
 
         

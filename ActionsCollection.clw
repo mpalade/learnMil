@@ -28,14 +28,30 @@ sst                 stringtheory
 
 ActionsCollection.Construct   PROCEDURE
     CODE
-        SELF.al &= NEW(ActionsQueue)
+        SELF.al &= NEW(ActResTargets)
         
 ActionsCollection.Destruct   PROCEDURE
     CODE
+        ! Resources
         LOOP WHILE RECORDS(SELF.al.Resources)
             GET(SELF.al.Resources, 1)
             FREE(SELF.al.Resources)
             DISPOSE(SELF.al.Resources)
+            DELETE(SELF.al)
+        END
+        ! BSO Targets
+        LOOP WHILE RECORDS(SELF.al.BSOTargets)
+            GET(SELF.al.BSOTargets, 1)
+            FREE(SELF.al.BSOTargets)
+            DISPOSE(SELF.al.BSOTargets)
+            DELETE(SELF.al)
+        END
+        
+        ! Action Targets
+        LOOP WHILE RECORDS(SELF.al.ActTargets)
+            GET(SELF.al.ActTargets, 1)
+            FREE(SELF.al.ActTargets)
+            DISPOSE(SELF.al.ActTargets)
             DELETE(SELF.al)
         END
         
@@ -49,7 +65,7 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         SELF.al.xPos            = pARec.xPos
         SELF.al.yPos            = pARec.yPos       
         
-        SELF.al.Resources       &= NEW(UnitsList)
+        SELF.al.Resources       &= NEW(UnitsQueue)
         ! Resource1
         SELF.al.Resources.Echelon   = 1
         SELF.al.Resources.Hostility = 1
@@ -84,13 +100,16 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         
 ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasicRecord  pURec)
     CODE
+        sst.Trace('ActionsCollection.InsertAction(action, resource) BEGIN')
+        
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
         SELF.al.xPos            = pARec.xPos
         SELF.al.yPos            = pARec.yPos
         
-        SELF.al.Resources       &= NEW(UnitsList)
+        ! Resources
+        SELF.al.Resources       &= NEW(UnitsQueue)
         
         SELF.al.Resources.Echelon   = purec.Echelon
         SELF.al.Resources.Hostility = purec.Hostility
@@ -108,15 +127,20 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         
         ADD(SELF.al)   
         
+        sst.Trace('ActionsCollection.InsertAction(action, resource) END')
+        
 ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasicRecord  pURec, UnitBasicRecord pTarget_urec)        
     CODE
+        sst.Trace('ActionsCollection.InsertAction(action, resource, target-unit) BEGIN')
+        
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
         SELF.al.xPos            = pARec.xPos
         SELF.al.yPos            = pARec.yPos
         
-        SELF.al.Resources       &= NEW(UnitsList)
+        ! Resources
+        SELF.al.Resources       &= NEW(UnitsQueue)
         
         SELF.al.Resources.Echelon   = purec.Echelon
         SELF.al.Resources.Hostility = purec.Hostility
@@ -132,17 +156,37 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         
         ADD(SELF.al.Resources)
         
+        ! BSO Targets
+        SELF.al.BSOTargets  &= NEW(UnitsQueue)
+        SELF.al.BSOTargets.Echelon      = pTarget_urec.Echelon
+        SELF.al.BSOTargets.Hostility    = pTarget_urec.Hostility
+        SELF.al.BSOTargets.IsHQ         = pTarget_urec.IsHQ
+        SELF.al.BSOTargets.markForDel   = 0
+        SELF.al.BSOTargets.markForDisbl = 0
+        SELF.al.BSOTargets.TreePos      = pTarget_urec.TreePos
+        SELF.al.BSOTargets.UnitName     = pTarget_urec.UnitName
+        SELF.al.BSOTargets.UnitType     = pTarget_urec.UnitType
+        SELF.al.BSOTargets.UnitTypeCode = pTarget_urec.UnitTypeCode
+        SELF.al.BSOTargets.xPos         = pTarget_urec.xPos
+        SELF.al.BSOTargets.yPos         = pTarget_urec.yPos
+        ADD(SELF.al.BSOTargets)
+        
         ADD(SELF.al)
+        
+        sst.Trace('ActionsCollection.InsertAction(action, resource, target-unit) END')
 
 ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasicRecord  pURec, ActionBasicRecord pTarget_arec)                
     CODE
+        sst.Trace('ActionsCollection.InsertAction(action, resource, target-action) BEGIN')
+        
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
         SELF.al.xPos            = pARec.xPos
         SELF.al.yPos            = pARec.yPos
         
-        SELF.al.Resources       &= NEW(UnitsList)
+        ! Resources
+        SELF.al.Resources       &= NEW(UnitsQueue)
         
         SELF.al.Resources.Echelon   = purec.Echelon
         SELF.al.Resources.Hostility = purec.Hostility
@@ -158,7 +202,20 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         
         ADD(SELF.al.Resources)
         
+        !Action Targets
+        SELF.al.ActTargets      &= NEW(ActionsQueue)
+        SELF.al.ActTargets.ActionName               = pTarget_arec.ActionName
+        SELF.al.ActTargets.ActionPointsNumber       = pTarget_arec.ActionPointsNumber
+        SELF.al.ActTargets.ActionType               = pTarget_arec.ActionType
+        LOOP i# = 1 TO MAXIMUM(pTarget_arec.xPos, 1)
+            SELF.al.ActTargets.xPos[i#]                    = pTarget_arec.xPos[i#]
+            SELF.al.ActTargets.yPos[i#]                    = pTarget_arec.yPos[i#]
+        END                
+        ADD(SELF.al.ActTargets)
+        
         ADD(SELF.al)
+        
+        sst.Trace('ActionsCollection.InsertAction(action, resource, target-action) END')
         
 
 ActionsCollection.SelectByMouse     PROCEDURE(LONG nXPos, LONG nYPos)     

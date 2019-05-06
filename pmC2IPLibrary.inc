@@ -175,6 +175,8 @@ g:Point             EQUATE(1001)
 g:Line              EQUATE(1002)
 g:FreeLine          EQUATE(1003)
 g:Rectangle         EQUATE(1004)
+g:Polygon           EQUATE(1005)
+g:FreeHand          EQUATE(1006)
 
 g:AxisAdvance       EQUATE(1010)
 g:Ambush            EQUATE(1011)
@@ -190,6 +192,8 @@ g:Breach            EQUATE(1015)
 aTpy:notDefined             EQUATE('notDefined')
 aTpy:notDef_Line            EQUATE('Line')
 aTpy:notDef_Rectangle       EQUATE('Rectangle')
+aTpy:notDef_Polygon         EQUATE('Polygon')
+aTpy:notDef_FreeHand        EQUATE('FreeHand')
 
 aTpy:AdvanceToContact       EQUATE('900000')    ! Advance To Contact
 
@@ -277,7 +281,7 @@ aTpy:SearchArea     EQUATE('152200')    ! Search Are / Reconnaissance Area
 
 
 ! Units Queue Structure
-UnitsList           QUEUE, TYPE
+UnitsQueue           QUEUE, TYPE
 UnitName                STRING(100)
 UnitType                LONG
 UnitTypeCode            STRING(10)
@@ -299,30 +303,32 @@ ActionTypeCode          STRING(10)
 ActionPointsNumber      LONG
 xPos                    LONG, DIM(100)
 yPos                    LONG, DIM(100)
-Resources               &UnitsList
+!Resources                   &UnitsQueue
                         END
 
-ActionsResources        QUEUE(ActionsQueue)
-Resources2                  &UnitsList
-                        END
+! Action with Resources Queue Structure
+ActResQueue         QUEUE(ActionsQueue)
+Resources               &UnitsQueue
+                    END
 
-ActionsResTargets   QUEUE(ActionsResources)
-Targets                 &ActionsQueue
+! Action with Resources and Targets Queue Structure
+ActResTargets       QUEUE(ActResQueue)
+ActTargets              &ActionsQueue
+BSOTargets              &UnitsQueue
                     END
 
 
-
+! Position Record
 PosRecord           GROUP, TYPE
 xPos                        LONG
 yPos                        LONG
                     END
 
+! List of Positions
 PosList            QUEUE, TYPE
 xPos                        LONG
 yPos                        LONG
                     END
-
-
 
 ! Unit Basic Record Structure
 UnitBasicRecord     GROUP, TYPE
@@ -355,6 +361,12 @@ C2IPName                STRING(100)
                     END
 
 
+! C2IP Utilities
+C2IPUtilities       INTERFACE
+Log                     PROCEDURE(), STRING
+                    END
+
+
 BSO                 CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 urec                    GROUP(UnitBasicRecord)
                         END
@@ -378,8 +390,8 @@ CheckRectangleByMouse   PROCEDURE(LONG nXPos, LONG nYPos), LONG
 
 
 UnitsCollection       CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
-ul                      &UnitsList
-tmpul                   &UnitsList, PRIVATE
+ul                      &UnitsQueue
+tmpul                   &UnitsQueue, PRIVATE
 urec                    GROUP(UnitBasicRecord)
                         END
 
@@ -438,7 +450,7 @@ ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
 ActionsCollection     CLASS, MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
-al                          &ActionsQueue
+al                          &ActResTargets
 
 Construct                   PROCEDURE()
 Destruct                    PROCEDURE()
@@ -456,11 +468,12 @@ CheckLineByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG
     
 
 ! Generic C2IP structure
-C2IP                CLASS, MODULE('C2IP.clw'), LINK('C2IP.clw'), TYPE
+C2IP                CLASS, IMPLEMENTS(C2IPUtilities), MODULE('C2IP.clw'), LINK('C2IP.clw'), TYPE
 Name                    STRING(100)
 ul                      &UnitsCollection
 tmpul                   &UnitsCollection
 tmpUnitName             STRING(100), PRIVATE
+lastOperation           STRING(100), PROTECTED
 
 ! Draw representation
 drwImg                  &Draw
@@ -638,6 +651,10 @@ Draw_Line               PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE)
 Draw_Line               PROCEDURE(PosRecord startPos, PosRecord endPos)
 Draw_Rectangle          PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
 Draw_Rectangle          PROCEDURE(PosRecord startPos, PosRecord endPos)
+Draw_Polygon            PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
+Draw_Polygon            PROCEDURE(PosRecord startPos, PosRecord endPos)
+Draw_FreeHand           PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
+Draw_FreeHand           PROCEDURE(PosRecord startPos, PosRecord endPos)
 
 Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
 Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
@@ -656,6 +673,7 @@ p1y                     LONG, PROTECTED
 PolyPoints              LONG, PROTECTED
 pp                      &PosList, PROTECTED
 isDrawingSelection      BOOL, PROTECTED
+isBSOMoved              BOOL, PROTECTED
 
 TakePoints              PROCEDURE(LONG nGeometry)
 
@@ -697,6 +715,7 @@ InsertAction            PROCEDURE()
 
 DrawAction              PROCEDURE()
 
+prevBSOSelection        LONG, PROTECTED
 prevActionSelection     LONG, PROTECTED
 DisplaySelection        PROCEDURE(LONG nAPointer)
 DisplayUnselection      PROCEDURE(LONG nAPointer)

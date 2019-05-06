@@ -23,8 +23,8 @@ BSO.Destruct        PROCEDURE()
         
 UnitsCollection.Construct     PROCEDURE()
     CODE
-        SELF.ul     &= NEW(UnitsList)
-        SELF.tmpul  &=NEW(UnitsList)
+        SELF.ul     &= NEW(UnitsQueue)
+        SELF.tmpul  &=NEW(UnitsQueue)
         
 UnitsCollection.Destruct      PROCEDURE()
     CODE         
