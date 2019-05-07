@@ -303,6 +303,7 @@ ActionTypeCode          STRING(10)
 ActionPointsNumber      LONG
 xPos                    LONG, DIM(100)
 yPos                    LONG, DIM(100)
+ActionPoints            &PosList
 !Resources                   &UnitsQueue
                         END
 
@@ -351,6 +352,7 @@ ActionTypeCode          STRING(10)
 ActionPointsNumber      LONG
 xPos                    LONG, DIM(100)
 yPos                    LONG, DIM(100)
+ActionPoints            &PosList
                     END
 
 
@@ -654,7 +656,7 @@ Draw_Rectangle          PROCEDURE(PosRecord startPos, PosRecord endPos)
 Draw_Polygon            PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
 Draw_Polygon            PROCEDURE(PosRecord startPos, PosRecord endPos)
 Draw_FreeHand           PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
-Draw_FreeHand           PROCEDURE(PosRecord startPos, PosRecord endPos)
+Draw_FreeHand           PROCEDURE()
 
 Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
 Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED

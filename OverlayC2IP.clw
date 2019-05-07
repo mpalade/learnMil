@@ -696,6 +696,24 @@ targetAction                    GROUP(ActionBasicRecord)
                 actionRec.xPos[2]               = SELF.drwImg.MouseX()
                 actionRec.yPos[2]               = SELF.drwImg.MouseY()
             
+            OF aTpy:notDef_FreeHand
+                ! a generic Free Hand
+                actionRec.ActionName    = 'aTpy:notDef_FreeHand'
+                actionRec.ActionType    = 0
+                actionRec.ActionTypeCode        = aTpy:notDef_FreeHand
+                actionRec.ActionPoints  &= NEW(PosList)
+                LOOP i# = 1 TO SELF.PolyPoints
+                    GET(SELF.pp, i#)
+                    IF NOT ERRORCODE() THEN
+                        actionRec.xPos[i#]  = SELF.pp.xPos
+                        actionRec.yPos[i#]  = SELF.pp.yPos
+                        
+                        actionRec.ActionPoints.xPos = SELF.pp.xPos
+                        actionRec.ActionPoints.yPos = SELF.pp.yPos
+                        ADD(actionRec.ActionPoints)
+                    END                                        
+                END
+           
             OF aTpy:AdvanceToContact
                 ! Advance to contact
                 
@@ -1074,31 +1092,61 @@ OverlayC2IP.Draw_Polygon  PROCEDURE(PosRecord startPos, PosRecord endPos)
         
         
 OverlayC2IP.Draw_FreeHand  PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
-    CODE
-        SELF.drwImg.Blank(COLOR:White)
+    CODE                                            
         IF bPreview = TRUE THEN            
             SELF.drwImg.SetPenStyle(PEN:dash)
         ELSE
             SELF.drwImg.SetPenStyle(PEN:solid)            
         END 
-            
-        ! Draw rectangle
-        SELF.drwImg.Line(SELF.p1x, SELF.p1y, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
-        SELF.drwImg.Line(SELF.p1x + 2, SELF.p1y + 2, (nXPos - SELF.p1x), (nYPos - SELF.p1y))
+        
+        IF SELF.PolyPoints = 0 THEN
+            SELF.pp.xPos    = SELF.p1x
+            SELF.pp.yPos    = SELF.p1y
+            ADD(SELF.pp)
+            SELF.PolyPoints +=  1            
+        END        
+        
+        dx# = nXPos - SELF.pp.xPos
+        dy# = nYPos - SELF.pp.yPos
+        SELF.drwImg.Line(SELF.pp.xPos, SELF.pp.yPos, dx#, dy#)
+                
+        SELF.pp.xPos    = nXPos
+        SELF.pp.yPos    = nYPos
+        ADD(SELF.pp)      
+        SELF.PolyPoints +=  1
         
         SELF.drwImg.SetPenStyle(PEN:solid)
-        SELF.drwImg.Display()        
+        SELF.drwImg.Display()                        
         
         
-OverlayC2IP.Draw_FreeHand  PROCEDURE(PosRecord startPos, PosRecord endPos)        
-    CODE
-        dx# = endPos.xPos - startPos.xPos
-        dy# = endPos.yPos - startPos.yPos
+OverlayC2IP.Draw_FreeHand  PROCEDURE()        
+    CODE        
+        IF SELF.al.al.ActionPointsNumber > 0 THEN
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                prevX# = SELF.al.al.ActionPoints.xPos
+                prevY# = SELF.al.al.ActionPoints.yPos
+            END                        
+        END
+        IF SELF.al.al.ActionPointsNumber > 1 THEN
+            LOOP i# = 1 TO SELF.al.al.ActionPointsNumber
+                GET(SELF.al.al.ActionPoints, i#)
+                IF NOT ERRORCODE() THEN
+                    currX#  = SELF.al.al.ActionPoints.xPos
+                    currY#  = SELF.al.al.ActionPoints.yPos
+                    
+                    dx# = currX# - prevX#
+                    dy# = currY# - prevY#
+                    
+                    ! Draw line
+                    SELF.drwImg.Line(prevX#, prevY#, dx#, dy#)
+                    
+                    prevX#  = currX#
+                    prevY#  = currY#
+                END                
+            END            
+        END
         
-        ! Draw line
-        SELF.drwImg.Line(startPos.xPos, startPos.yPos, dx#, dy#)
-        SELF.drwImg.Line(startPos.xPos + 2, startPos.yPos + 2, dx#, dy#)
-
         SELF.drwImg.Display()                
         
 OverlayC2IP.Preview_Arrow   PROCEDURE(LONG nXPos, LONG nYPos)
@@ -1371,6 +1419,9 @@ endPos                          GROUP(PosRecord)
             endPos.yPos     = SELF.al.al.yPos[2]       
             SELF.Draw_Polygon(startPos, endPos)                            
                     
+        OF aTpy:notDef_FreeHand
+            ! generic Free Hand
+            SELF.Draw_FreeHand()
             
         OF aTpy:AdvanceToContact
             ! Advance to contact

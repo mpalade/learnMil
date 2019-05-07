@@ -63,7 +63,9 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
         SELF.al.xPos            = pARec.xPos
-        SELF.al.yPos            = pARec.yPos       
+        SELF.al.yPos            = pARec.yPos     
+        !!!
+        !SELF.al.ActionPoints
         
         SELF.al.Resources       &= NEW(UnitsQueue)
         ! Resource1
@@ -105,9 +107,21 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
+        !!! DIM
         SELF.al.xPos            = pARec.xPos
         SELF.al.yPos            = pARec.yPos
         
+        ! Action Points
+        SELF.al.ActionPoints    &= NEW(PosList)
+        LOOP i# = 1 TO RECORDS(parec.ActionPoints)
+            GET(parec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                SELF.al.ActionPoints.xPos   = parec.ActionPoints.xPos
+                SELF.al.ActionPoints.yPos   = parec.ActionPoints.yPos
+                ADD(SELF.al.ActionPoints)
+            END            
+        END
+                
         ! Resources
         SELF.al.Resources       &= NEW(UnitsQueue)
         
@@ -138,6 +152,17 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
         SELF.al.xPos            = pARec.xPos
         SELF.al.yPos            = pARec.yPos
+        
+        ! Action Points
+        SELF.al.ActionPoints    &= NEW(PosList)
+        LOOP i# = 1 TO RECORDS(parec.ActionPoints)
+            GET(parec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                SELF.al.ActionPoints.xPos   = parec.ActionPoints.xPos
+                SELF.al.ActionPoints.yPos   = parec.ActionPoints.yPos
+                ADD(SELF.al.ActionPoints)
+            END            
+        END
         
         ! Resources
         SELF.al.Resources       &= NEW(UnitsQueue)
@@ -184,6 +209,17 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
         SELF.al.xPos            = pARec.xPos
         SELF.al.yPos            = pARec.yPos
+        
+        ! Action Points
+        SELF.al.ActionPoints    &= NEW(PosList)
+        LOOP i# = 1 TO RECORDS(parec.ActionPoints)
+            GET(parec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                SELF.al.ActionPoints.xPos   = parec.ActionPoints.xPos
+                SELF.al.ActionPoints.yPos   = parec.ActionPoints.yPos
+                ADD(SELF.al.ActionPoints)
+            END            
+        END
         
         ! Resources
         SELF.al.Resources       &= NEW(UnitsQueue)
