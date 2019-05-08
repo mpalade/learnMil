@@ -62,9 +62,26 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
-        SELF.al.xPos            = pARec.xPos
-        SELF.al.yPos            = pARec.yPos     
+        
+        ! Action Points
+        !SELF.al.xPos            = pARec.xPos
+        !SELF.al.yPos            = pARec.yPos     
         !!!
+        OMIT('_noCompile')
+        SELF.al.ActionPoints    &= NEW(PosList)
+        LOOP i# = 1 TO RECORDS(parec.ActionPoints)
+            GET(parec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                SELF.al.ActionPoints.xPos   = parec.ActionPoints.xPos
+                SELF.al.ActionPoints.yPos   = parec.ActionPoints.yPos
+                ADD(SELF.al.ActionPoints)
+            END                
+        END
+        _noCompile
+        SELF.al.ActionPoints    &= NEW(PosList)
+        retVal# = SELF.C2IPOperators.Eql(SELF.al.ActionPoints, parec.ActionPoints)
+        
+        
         !SELF.al.ActionPoints
         
         SELF.al.Resources       &= NEW(UnitsQueue)
@@ -107,20 +124,12 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
-        !!! DIM
-        SELF.al.xPos            = pARec.xPos
-        SELF.al.yPos            = pARec.yPos
+        !SELF.al.xPos            = pARec.xPos
+        !SELF.al.yPos            = pARec.yPos
         
         ! Action Points
         SELF.al.ActionPoints    &= NEW(PosList)
-        LOOP i# = 1 TO RECORDS(parec.ActionPoints)
-            GET(parec.ActionPoints, i#)
-            IF NOT ERRORCODE() THEN
-                SELF.al.ActionPoints.xPos   = parec.ActionPoints.xPos
-                SELF.al.ActionPoints.yPos   = parec.ActionPoints.yPos
-                ADD(SELF.al.ActionPoints)
-            END            
-        END
+        retVal# = SELF.C2IPOperators.Eql(SELF.al.ActionPoints, parec.ActionPoints)        
                 
         ! Resources
         SELF.al.Resources       &= NEW(UnitsQueue)
@@ -150,19 +159,12 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
-        SELF.al.xPos            = pARec.xPos
-        SELF.al.yPos            = pARec.yPos
+        !SELF.al.xPos            = pARec.xPos
+        !SELF.al.yPos            = pARec.yPos
         
         ! Action Points
         SELF.al.ActionPoints    &= NEW(PosList)
-        LOOP i# = 1 TO RECORDS(parec.ActionPoints)
-            GET(parec.ActionPoints, i#)
-            IF NOT ERRORCODE() THEN
-                SELF.al.ActionPoints.xPos   = parec.ActionPoints.xPos
-                SELF.al.ActionPoints.yPos   = parec.ActionPoints.yPos
-                ADD(SELF.al.ActionPoints)
-            END            
-        END
+        retVal# = SELF.C2IPOperators.Eql(SELF.al.ActionPoints, parec.ActionPoints)
         
         ! Resources
         SELF.al.Resources       &= NEW(UnitsQueue)
@@ -207,19 +209,12 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
-        SELF.al.xPos            = pARec.xPos
-        SELF.al.yPos            = pARec.yPos
+        !SELF.al.xPos            = pARec.xPos
+        !SELF.al.yPos            = pARec.yPos
         
         ! Action Points
         SELF.al.ActionPoints    &= NEW(PosList)
-        LOOP i# = 1 TO RECORDS(parec.ActionPoints)
-            GET(parec.ActionPoints, i#)
-            IF NOT ERRORCODE() THEN
-                SELF.al.ActionPoints.xPos   = parec.ActionPoints.xPos
-                SELF.al.ActionPoints.yPos   = parec.ActionPoints.yPos
-                ADD(SELF.al.ActionPoints)
-            END            
-        END
+        retVal# = SELF.C2IPOperators.Eql(SELF.al.ActionPoints, parec.ActionPoints)
         
         ! Resources
         SELF.al.Resources       &= NEW(UnitsQueue)
@@ -243,10 +238,12 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         SELF.al.ActTargets.ActionName               = pTarget_arec.ActionName
         SELF.al.ActTargets.ActionPointsNumber       = pTarget_arec.ActionPointsNumber
         SELF.al.ActTargets.ActionType               = pTarget_arec.ActionType
-        LOOP i# = 1 TO MAXIMUM(pTarget_arec.xPos, 1)
-            SELF.al.ActTargets.xPos[i#]                    = pTarget_arec.xPos[i#]
-            SELF.al.ActTargets.yPos[i#]                    = pTarget_arec.yPos[i#]
-        END                
+        SELF.al.ActTargets.ActionPoints     &= NEW(PosList)
+        retVal# = SELF.C2IPOperators.Eql(SELF.al.ActTargets.ActionPoints, pTarget_arec.ActionPoints)        
+        !LOOP i# = 1 TO MAXIMUM(pTarget_arec.xPos, 1)
+        !    SELF.al.ActTargets.xPos[i#]                    = pTarget_arec.xPos[i#]
+        !    SELF.al.ActTargets.yPos[i#]                    = pTarget_arec.yPos[i#]
+        !END                
         ADD(SELF.al.ActTargets)
         
         ADD(SELF.al)
@@ -398,13 +395,35 @@ ActionsCollection.GetAction PROCEDURE(LONG nPointer, *ActionBasicRecord pARec)
             pARec.ActionPointsNumber    = SELF.al.ActionPointsNumber
             pARec.ActionType            = SELF.al.ActionType
             pARec.ActionTypeCode        = SELF.al.ActionTypeCode
-            LOOP i# = 1 TO MAXIMUM(SELF.al.xPos, 1)
-                pARec.xPos[i#]  = SELF.al.xPos[i#]
-                pARec.yPos[i#]  = SELF.al.yPos[i#]
+            pARec.ActionPoints          &= NEW(PosList)
+            LOOP i# = 1 TO RECORDS(SELF.al.ActionPoints)
+                GET(SELF.al.ActionPoints, i#)
+                IF NOT ERRORCODE() THEN
+                    pARec.ActionPoints.xPos = SELF.al.ActionPoints.xPos
+                    pARec.ActionPoints.yPos = SELF.al.ActionPoints.yPos
+                    ADD(pARec.ActionPoints)
+                END               
             END
+            
+            !LOOP i# = 1 TO MAXIMUM(SELF.al.xPos, 1)
+            !    pARec.xPos[i#]  = SELF.al.xPos[i#]
+            !    pARec.yPos[i#]  = SELF.al.yPos[i#]
+            !END
             
             RETURN TRUE
         ELSE
             RETURN FALSE
+        END      
+        
+ActionsCollection.C2IPOperators.Eql      PROCEDURE(PosList l1, PosList l2)
+    CODE
+        LOOP i# = 1 TO RECORDS(l2)
+            GET(l2, i#)
+            IF NOT ERRORCODE() THEN
+                l1.xPos = l2.xPos
+                l1.yPos = l2.yPos
+            ADD(l1)
+            END                        
         END
         
+        RETURN TRUE        

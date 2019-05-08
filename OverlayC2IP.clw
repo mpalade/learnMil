@@ -197,7 +197,7 @@ OverlayC2IP.DeployBSO       PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG n
         !sst.Trace('BEGIN:OverlayC2IP.DeployBSO')
         !sst.Trace('nXPos = ' & nXPos & ', nYPos = ' & nYPos)
         pUrec.xPos  = nXPos
-        pUrec.yPos  = nYPos
+        pUrec.yPos  = nYPos        
         
         errCode#    = SELF.ul.AddNode(pUrec)
         IF errCode# = TRUE THEN
@@ -657,57 +657,76 @@ targetAction                    GROUP(ActionBasicRecord)
                 actionRec.ActionName    = 'aTpy:notDefined'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:notDefined
+                
+                ! action Points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
             OF aTpy:notDef_Line
                 ! a generic Line
                 actionRec.ActionName    = 'aTpy:notDef_Line'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:notDef_Line
+                
+                ! action points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
             
             OF aTpy:notDef_Rectangle
                 ! a generic Rectangle
                 actionRec.ActionName    = 'aTpy:notDef_Rectangle'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:notDef_Rectangle
+            
+                ! action points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
             
             OF aTpy:notDef_Polygon
                 ! a generic Polygon
                 actionRec.ActionName    = 'aTpy:notDef_Polygon'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:notDef_Polygon
-                    ! TO BE CORRECTED !!!
+            
+                ! action points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
             
             OF aTpy:notDef_FreeHand
                 ! a generic Free Hand
                 actionRec.ActionName    = 'aTpy:notDef_FreeHand'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:notDef_FreeHand
+            
+                ! action points
+                actionRec.ActionPointsNumber    = SELF.PolyPoints
                 actionRec.ActionPoints  &= NEW(PosList)
                 LOOP i# = 1 TO SELF.PolyPoints
                     GET(SELF.pp, i#)
                     IF NOT ERRORCODE() THEN
-                        actionRec.xPos[i#]  = SELF.pp.xPos
-                        actionRec.yPos[i#]  = SELF.pp.yPos
-                        
                         actionRec.ActionPoints.xPos = SELF.pp.xPos
                         actionRec.ActionPoints.yPos = SELF.pp.yPos
                         ADD(actionRec.ActionPoints)
@@ -722,33 +741,45 @@ targetAction                    GROUP(ActionBasicRecord)
                 actionRec.ActionName    = 'aTpy:Ambush'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:Ambush
+                ! action points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
                 
             OF aTpy:CAI_Arrest
                 ! Arrest
                 actionRec.ActionName    = 'aTpy:CAI_Arrest'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:CAI_Arrest
+                ! action points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
                 
             OF aTpy:AxisOfAdvance_SupportingAttack
                 ! Attack
                 actionRec.ActionName    = 'aTpy:AxisOfAdvance_SupportingAttack'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:AxisOfAdvance_SupportingAttack
+                ! action points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()                           
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
 
             OF aTpy:AttackByFirePosition        
                 ! Attack By Fire
@@ -758,22 +789,30 @@ targetAction                    GROUP(ActionBasicRecord)
                 actionRec.ActionName    = 'aTpy:Block'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:Block
+                ! action points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()                           
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
             
             OF aTpy:Breach
                 ! Breach
                 actionRec.ActionName    = 'aTpy:Breach'
                 actionRec.ActionType    = 0
                 actionRec.ActionTypeCode        = aTpy:Breach
+                ! action points
                 actionRec.ActionPointsNumber    = 2
-                actionRec.xPos[1]               = SELF.p1x
-                actionRec.yPos[1]               = SELF.p1y
-                actionRec.xPos[2]               = SELF.drwImg.MouseX()
-                actionRec.yPos[2]               = SELF.drwImg.MouseY()           
+                actionRec.ActionPoints  &= NEW(PosList)
+                actionRec.ActionPoints.xPos     = SELF.p1x
+                actionRec.ActionPoints.yPos     = SELF.p1y            
+                ADD(actionRec.ActionPoints)
+                actionRec.ActionPoints.xPos     = SELF.drwImg.MouseX()
+                actionRec.ActionPoints.yPos     = SELF.drwImg.MouseY()           
+                ADD(actionRec.ActionPoints)
         END     
         
 
@@ -940,7 +979,7 @@ actionRec                       GROUP(ActionBasicRecord)
                     SELF.Draw_Polygon(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)
                 OF g:FreeHand
                     ! Polygon
-                    SELF.Draw_FreeHand(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)    
+                    SELF.Draw_FreeHand(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
                 OF g:AxisAdvance
                     ! Axis of Advance
                     SELF.Draw_AxisAdvance(SELF.drwImg.MouseX(), SELF.drwImg.MouseY(), FALSE)                        
@@ -1120,16 +1159,17 @@ OverlayC2IP.Draw_FreeHand  PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview)
         
         
 OverlayC2IP.Draw_FreeHand  PROCEDURE()        
-    CODE        
-        IF SELF.al.al.ActionPointsNumber > 0 THEN
+    CODE    
+        actionPointsNumber# = RECORDS(SELF.al.al.ActionPoints)
+        IF actionPointsNumber# > 0 THEN
             GET(SELF.al.al.ActionPoints, 1)
             IF NOT ERRORCODE() THEN
                 prevX# = SELF.al.al.ActionPoints.xPos
                 prevY# = SELF.al.al.ActionPoints.yPos
             END                        
         END
-        IF SELF.al.al.ActionPointsNumber > 1 THEN
-            LOOP i# = 1 TO SELF.al.al.ActionPointsNumber
+        IF actionPointsNumber# > 1 THEN
+            LOOP i# = 2 TO actionPointsNumber#
                 GET(SELF.al.al.ActionPoints, i#)
                 IF NOT ERRORCODE() THEN
                     currX#  = SELF.al.al.ActionPoints.xPos
@@ -1387,67 +1427,110 @@ endPos                          GROUP(PosRecord)
         CASE CLIP(SELF.al.al.ActionTypeCode)
         OF aTpy:notDefined
             ! not Defined
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.Draw_Line(startPos, endPos)
             
         OF aTpy:notDef_Line
             !MESSAGE('generic Line')
             ! generic Line
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.Draw_Line(startPos, endPos)            
             
         OF aTpy:notDef_Rectangle
             !MESSAGE('generic Rectangle')
             ! generic Rectangle
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.Draw_Rectangle(startPos, endPos)                
             
         OF aTpy:notDef_Polygon
             ! generic Polygon
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.Draw_Polygon(startPos, endPos)                            
                     
         OF aTpy:notDef_FreeHand
             ! generic Free Hand
             SELF.Draw_FreeHand()
+            SELF.Reset_FreeHand()
             
         OF aTpy:AdvanceToContact
             ! Advance to contact
             
         OF aTpy:Ambush
             ! Ambush
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.DA_Ambush(startPos, endPos)
             
         OF aTpy:CAI_Arrest
             ! Arrest
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.DA_Arrest(startPos, endPos)
             
         OF aTpy:AxisOfAdvance_SupportingAttack
             ! Attack
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.DA_AxisOfAdvance(startPos, endPos)
 
         OF aTpy:AttackByFirePosition        
@@ -1455,19 +1538,31 @@ endPos                          GROUP(PosRecord)
             
         OF aTpy:Block
             ! Block
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.DA_Block(startPos, endPos)
             
         OF aTpy:Breach
         !OF '340200'
             ! Breach
-            startPos.xPos   = SELF.al.al.xPos[1]
-            startPos.yPos   = SELF.al.al.yPos[1]
-            endPos.xPos     = SELF.al.al.xPos[2]
-            endPos.yPos     = SELF.al.al.yPos[2]       
+            GET(SELF.al.al.ActionPoints, 1)
+            IF NOT ERRORCODE() THEN
+                startPos.xPos   = SELF.al.al.ActionPoints.xPos
+                startPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END
+            GET(SELF.al.al.ActionPoints, 2)
+            IF NOT ERRORCODE() THEN
+                endPos.xPos   = SELF.al.al.ActionPoints.xPos
+                endPos.yPos   = SELF.al.al.ActionPoints.YPos
+            END            
             SELF.DA_Breach(startPos, endPos)
             
             
@@ -1657,9 +1752,22 @@ aRec                                    GROUP(ActionBasicRecord)
 selAction   Action
     CODE
         SELF.al.GetAction(nAPointer, aRec)
-        selAction.Init(aRec)
-        dx# = aRec.xPos[2] - aRec.xPos[1]
-        dy# = aRec.yPos[2] - aRec.yPos[1]
+        selAction.Init(aRec)        
+        
+        GET(aRec.ActionPoints, 1)
+        IF NOT ERRORCODE() THEN
+            xPos1#  = aRec.ActionPoints.xPos
+            yPos1#  = aRec.ActionPoints.yPos
+        END
+        GET(aRec.ActionPoints, 2)
+        IF NOT ERRORCODE() THEN
+            xPos2#  = aRec.ActionPoints.xPos
+            yPos2#  = aRec.ActionPoints.yPos
+        END
+        
+        dx# = xPos2# - xPos1#
+        dy# = yPos2# - yPos1#        
+        
         
         SELF.drwImg.Setpencolor(COLOR:White)
         SELF.drwImg.SetPenWidth(3)
@@ -1667,24 +1775,24 @@ selAction   Action
         CASE CLIP(aRec.ActionTypeCode)
         OF aTpy:notDefined
             ! display line
-            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
             ! display anchors
-            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+            SELF.drwImg.Box(xPos1# - 2, yPos1# - 2, 5, 5)
+            SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
         OF aTpy:notDef_Line
             ! display line
-            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
             ! display anchors
-            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+            SELF.drwImg.Box(xPos1# - 2, yPos1# - 2, 5, 5)
+            SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
         OF aTpy:notDef_Rectangle
             ! display Rectangle
-            SELF.drwImg.Box(aRec.xPos[1], aRec.yPos[1], dx#, dy#)            
+            SELF.drwImg.Box(xPos1#, yPos1#, dx#, dy#)            
             ! display anchors
-            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[1] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[2] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+            SELF.drwImg.Box(xPos1# - 2, yPos1# - 2, 5, 5)
+            SELF.drwImg.Box(xPos2# - 2, yPos1# - 2, 5, 5)
+            SELF.drwImg.Box(xPos1# - 2, yPos2# - 2, 5, 5)
+            SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
             
         END
                                 
@@ -1694,13 +1802,13 @@ selAction   Action
         CASE CLIP(aRec.ActionTypeCode)
         OF aTpy:notDefined
             ! display line
-            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
         OF aTpy:notDef_Line
             ! display line
-            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
         OF aTpy:notDef_Rectangle
             ! display Rectangle
-            SELF.drwImg.Box(aRec.xPos[1], aRec.yPos[1], dx#, dy#)            
+            SELF.drwImg.Box(xPos1#, yPos1#, dx#, dy#)            
         END
         
         SELF.drwImg.Display()
@@ -1712,8 +1820,20 @@ selAction   Action
     CODE
         SELF.al.GetAction(nAPointer, aRec)
         selAction.Init(aRec)
-        dx# = aRec.xPos[2] - aRec.xPos[1]
-        dy# = aRec.yPos[2] - aRec.yPos[1]
+        
+        GET(aRec.ActionPoints, 1)
+        IF NOT ERRORCODE() THEN
+            xPos1#  = aRec.ActionPoints.xPos
+            yPos1#  = aRec.ActionPoints.yPos
+        END
+        GET(aRec.ActionPoints, 2)
+        IF NOT ERRORCODE() THEN
+            xPos2#  = aRec.ActionPoints.xPos
+            yPos2#  = aRec.ActionPoints.yPos
+        END
+        
+        dx# = xPos2# - xPos1#
+        dy# = yPos2# - yPos1#        
         
         SELF.drwImg.Setpencolor(COLOR:Red)
         SELF.drwImg.SetPenWidth(3)
@@ -1721,24 +1841,24 @@ selAction   Action
         CASE CLIP(aRec.ActionTypeCode)
         OF aTpy:notDefined
             ! display line
-            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
             ! display anchors
-            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+            SELF.drwImg.Box(xPos1# - 2, yPos1# - 2, 5, 5)
+            SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
         OF aTpy:notDef_Line
             ! display line
-            SELF.drwImg.Line(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
             ! display anchors
-            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+            SELF.drwImg.Box(xPos1# - 2, yPos1# - 2, 5, 5)
+            SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
         OF aTpy:notDef_Rectangle
             ! display Rectangle
-            SELF.drwImg.Box(aRec.xPos[1], aRec.yPos[1], dx#, dy#)
+            SELF.drwImg.Box(xPos1#, yPos1#, dx#, dy#)
             ! display anchors
-            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[1] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[1] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[1] - 2, aRec.yPos[2] - 2, 5, 5)
-            SELF.drwImg.Box(aRec.xPos[2] - 2, aRec.yPos[2] - 2, 5, 5)
+            SELF.drwImg.Box(xPos1# - 2, yPos1# - 2, 5, 5)
+            SELF.drwImg.Box(xPos2# - 2, yPos1# - 2, 5, 5)
+            SELF.drwImg.Box(xPos1# - 2, yPos2# - 2, 5, 5)
+            SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
             
         END
                                 
@@ -1746,4 +1866,7 @@ selAction   Action
         SELF.drwImg.Setpencolor(COLOR:Black)
         SELF.drwImg.Display()
         
-        
+OverlayC2IP.Reset_FreeHand  PROCEDURE()
+    CODE
+        SELF.PolyPoints = 0
+        FREE(SELF.pp)        

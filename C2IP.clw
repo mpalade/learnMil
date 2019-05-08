@@ -58,7 +58,9 @@ C2IP.Destruct       PROCEDURE()
 C2IP.InitDraw     PROCEDURE(Draw pDraw)
 CODE
     ! Init Drawing Object    
-    SELF.drwImg     &= pDraw            
+    SELF.drwImg     &= pDraw     
+    
+    RETURN TRUE
                   
 C2IP.DrawNode_HQ    PROCEDURE()
     CODE

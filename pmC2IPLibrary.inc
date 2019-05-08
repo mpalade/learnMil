@@ -301,8 +301,8 @@ ActionName              STRING(100)
 ActionType              LONG
 ActionTypeCode          STRING(10)
 ActionPointsNumber      LONG
-xPos                    LONG, DIM(100)
-yPos                    LONG, DIM(100)
+!xPos                    LONG, DIM(100)
+!yPos                    LONG, DIM(100)
 ActionPoints            &PosList
 !Resources                   &UnitsQueue
                         END
@@ -350,8 +350,8 @@ ActionName              STRING(100)
 ActionType              LONG
 ActionTypeCode          STRING(10)
 ActionPointsNumber      LONG
-xPos                    LONG, DIM(100)
-yPos                    LONG, DIM(100)
+!xPos                    LONG, DIM(100)
+!yPos                    LONG, DIM(100)
 ActionPoints            &PosList
                     END
 
@@ -368,6 +368,12 @@ C2IPUtilities       INTERFACE
 Log                     PROCEDURE(), STRING
                     END
 
+! C2IP Operators
+C2IPOperators       INTERFACE
+Eql                     PROCEDURE(PosList l1, PosList l2), BOOL
+    END
+    
+
 
 BSO                 CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 urec                    GROUP(UnitBasicRecord)
@@ -381,6 +387,10 @@ Destruct                PROCEDURE()
 Action              CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 arec                    GROUP(ActionBasicRecord)
                         END
+xPos1                   LONG, PRIVATE
+yPos1                   LONG, PRIVATE
+xPos2                   LONG, PRIVATE
+yPos2                   LONG, PRIVATE
 
 Construct               PROCEDURE()
 Init                    PROCEDURE(*ActionBasicRecord pArec), LONG
@@ -451,7 +461,8 @@ CheckByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG
 ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
-ActionsCollection     CLASS, MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
+ActionsCollection   CLASS, IMPLEMENTS(C2IPOperators), | 
+                        MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
 al                          &ActResTargets
 
 Construct                   PROCEDURE()
@@ -657,6 +668,7 @@ Draw_Polygon            PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE)
 Draw_Polygon            PROCEDURE(PosRecord startPos, PosRecord endPos)
 Draw_FreeHand           PROCEDURE(LONG nXPos, LONG nYPos, BOOL bPreview = FALSE), PROTECTED
 Draw_FreeHand           PROCEDURE()
+Reset_FreeHand          PROCEDURE(), PRIVATE
 
 Preview_Arrow           PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED
 Preview_FreeLine        PROCEDURE(LONG nXPos, LONG nYPos), PROTECTED

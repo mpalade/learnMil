@@ -495,6 +495,7 @@ UnitsCollection.GetNode       PROCEDURE()
         
 Action.Construct    PROCEDURE()
     CODE
+        SELF.arec.ActionPoints          &= NEW(PosList)
         
 Action.Init    PROCEDURE(*ActionBasicRecord pARec)
     CODE
@@ -502,18 +503,40 @@ Action.Init    PROCEDURE(*ActionBasicRecord pARec)
         SELF.arec.ActionPointsNumber    = pArec.ActionPointsNumber
         SELF.arec.ActionType            = pArec.ActionType
         SELF.arec.ActionTypeCode        = pArec.ActionTypeCode
-        SELF.arec.xPos                  = pArec.xPos
-        SELF.arec.yPos                  = pArec.yPos
+        ! action points
+        !SELF.arec.ActionPoints          &= NEW(PosList)
+        LOOP i# = 1 TO RECORDS(pArec.ActionPoints)
+            GET(pArec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                SELF.arec.ActionPoints.xPos = pArec.ActionPoints.xPos
+                SELF.arec.ActionPoints.yPos = pArec.ActionPoints.yPos
+                ADD(SELF.arec.ActionPoints)
+                
+                ! usual Position records
+                CASE i#
+                OF 1
+                    SELF.xPos1  = pArec.ActionPoints.xPos
+                    SELF.yPos1  = pArec.ActionPoints.yPos
+                OF 2
+                    SELF.xPos2  = pArec.ActionPoints.xPos
+                    SELF.yPos2  = pArec.ActionPoints.yPos
+                END
+            END            
+        END
+        
+        !SELF.arec.xPos                  = pArec.xPos
+        !SELF.arec.yPos                  = pArec.yPos
         
         RETURN TRUE
         
 Action.Destruct     PROCEDURE()
     CODE
+        DISPOSE(SELF.arec.ActionPoints)
         
 Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
-        currentSlope$   = (SELF.arec.xPos[1] - SELF.arec.xPos[2]) / (SELF.arec.yPos[1] - SELF.arec.yPos[2])
-        computedSlope$  = (SELF.arec.xPos[1] - nXPos) / (SELF.arec.yPos[1] - nYPos)        
+        currentSlope$   = (SELF.xPos1 - SELF.xPos2) / (SELF.yPos1 - SELF.yPos2)
+        computedSlope$  = (SELF.xPos1 - nXPos) / (SELF.yPos1 - nYPos)        
         
         !MESSAGE('slopes ' & currentSlope$ & ' vs. ' & computedSlope$)
         IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
@@ -525,8 +548,8 @@ Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
 Action.CheckRectangleByMouse        PROCEDURE(LONG nXPos, LONG nYPos)                       
     CODE
         !sst.Trace('Action.CheckRectangleByMouse BEGIN')
-        IF (SELF.arec.xPos[1] <= nXPOs) AND (nXPos <= SELF.arec.xPos[2]) AND |
-            (SELF.arec.yPos[1] <= nYPos) AND (nYPos <= SELF.arec.yPos[2]) THEN
+        IF (SELF.xPos1 <= nXPOs) AND (nXPos <= SELF.xPos2) AND |
+            (SELF.yPos1 <= nYPos) AND (nYPos <= SELF.yPos2) THEN
             RETURN TRUE
         ELSE
             RETURN FALSE
