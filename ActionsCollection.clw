@@ -415,6 +415,16 @@ ActionsCollection.GetAction PROCEDURE(LONG nPointer, *ActionBasicRecord pARec)
             RETURN FALSE
         END      
         
+ActionsCollection.ChangeActionPos  PROCEDURE(LONG nPos, LONG nXPos, LONG nYPos)        
+    CODE
+        GET(SELF.al, nPos)
+        IF NOT ERRORCODE() THEN
+            ! move all the Action points            
+        END
+        
+        RETURN TRUE
+        
+        
 ActionsCollection.C2IPOperators.Eql      PROCEDURE(PosList l1, PosList l2)
     CODE
         LOOP i# = 1 TO RECORDS(l2)
@@ -427,3 +437,5 @@ ActionsCollection.C2IPOperators.Eql      PROCEDURE(PosList l1, PosList l2)
         END
         
         RETURN TRUE        
+        
+      

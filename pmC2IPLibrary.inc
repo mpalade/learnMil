@@ -401,6 +401,23 @@ CheckRectangleByMouse   PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
 
+! Points Collection Class
+! a collection of Point Onjects
+PointsCollection        CLASS, MODULE('PointsCollection.clw'), LINK('PointsCollection.clw'), TYPE
+pl                          &PosList
+
+Construct                   PROCEDURE()
+Destruct                    PROCEDURE()
+
+Init                        PROCEDURE(LONG nXpos, LONG nYPos), BOOL
+Init                        PROCEDURE(*PosRecord pPRec), BOOL
+
+InsertPoint                 PROCEDURE(LONG nXPos, LONG nYPos), BOOL
+InsertPoint                 PROCEDURE(*PosRecord pPRec), BOOL
+                        END
+
+! Units Collection Class
+! a collection of Units Objects
 UnitsCollection       CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 ul                      &UnitsQueue
 tmpul                   &UnitsQueue, PRIVATE
@@ -461,12 +478,17 @@ CheckByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG
 ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
-ActionsCollection   CLASS, IMPLEMENTS(C2IPOperators), | 
+
+! Actions Colleciton Class
+! a collection of Actions Objects
+ActionsCollection           CLASS, IMPLEMENTS(C2IPOperators), | 
                         MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
 al                          &ActResTargets
 
 Construct                   PROCEDURE()
 Destruct                    PROCEDURE()
+
+ChangeActionPos             PROCEDURE(LONG nPos, LONG nXPos, LONG nYPos), BOOL
 
 InsertAction                PROCEDURE(ActionBasicRecord parec)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec)
@@ -688,6 +710,11 @@ PolyPoints              LONG, PROTECTED
 pp                      &PosList, PROTECTED
 isDrawingSelection      BOOL, PROTECTED
 isBSOMoved              BOOL, PROTECTED
+isDrawingMoved          BOOL, PROTECTED
+selectedDrawingPos      LONG, PRIVATE
+selectedDrawing         GROUP(ActionBasicRecord), PRIVATE
+                        END
+
 
 TakePoints              PROCEDURE(LONG nGeometry)
 
@@ -708,6 +735,7 @@ SelectDrawingByMouse    PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 CheckByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 CheckDrawingByMouse     PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 MoveTo                  PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
+MoveDrawingTo           PROCEDURE(LONG nXPos, LONG nYPos), LONG, VIRTUAL
 
 SetGeometry             PROCEDURE(LONG nGeometry), LONG
 SetActionTypeCode       PROCEDURE(STRING sActionTypeCode), LONG

@@ -119,7 +119,17 @@ OverlayC2IP.MoveTo  PROCEDURE(LONG nXPos, LONG nYPos)
         PARENT.MoveTo(nXPos, nYPos)
         SELF.Redraw()
         RETURN TRUE
+        
+OverlayC2IP.MoveDrawingTo   PROCEDURE(LONG nXPos, LONG nYPos)                    
+movingAction                    GROUP(ActionBasicRecord)
+                                END
 
+    CODE
+        !something        
+        SELF.al.ChangeActionPos(SELF.selectedDrawingPos, nXPos, nYPos)    
+        
+        SELF.Redraw()
+        RETURN TRUE
 
 OverlayC2IP.Construct       PROCEDURE()
     CODE
@@ -127,6 +137,7 @@ OverlayC2IP.Construct       PROCEDURE()
         
         ! the selected BSO is moved, default = FALSE
         SELF.isBSOMoved         = FALSE
+        SELF.isDrawingMoved     = FALSE
         
         SELF.PolyPoints = 0    
         SELF.pp     &= NEW(PosList)
@@ -868,11 +879,14 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
         
         ! Check the status of Generic Drawings selection
         sst.Trace('     OverlayC2IP.TakeMouseDown : check generic drawing selection')
-        IF SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) > 0 THEN
+        SELF.selectedDrawingPos = SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+        IF SELF.selectedDrawingPos > 0 THEN
             ! validate the Drawing selection, only if a BSO was not selected
             IF SELF.isSelection = FALSE THEN    
                 SELF.SelectDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
-                SELF.isDrawingSelection = TRUE                
+                SELF.isDrawingSelection = TRUE         
+                ! memorize the selected Drawing
+                ASSERT(SELF.al.GetAction(SELF.selectedDrawingPos, SELF.selectedDrawing), 'ActionCollection.GetAction() error')
             ELSE
                 SELF.isDrawingSelection = FALSE
             END            
@@ -908,6 +922,12 @@ OverlayC2IP.TakeMouseMove   PROCEDURE()
             SELF.isBSOMoved = TRUE
         END
         
+        ! check if the current selected Drawing is moved
+        IF SELF.isDrawingSelection = TRUE THEN
+            SELF.isDrawingMoved = TRUE
+        END        
+        
+        ! check if it is points selection
         IF SELF.isPointsCollection = TRUE THEN
             IF SELF.isMouseDown = TRUE THEN
                 ! previewing = TRUE
@@ -1022,7 +1042,16 @@ actionRec                       GROUP(ActionBasicRecord)
                 ! restore BSO selection status
                 SELF.isSelection        = FALSE            
                 SELF.isBSOMoved         = FALSE
-            END                                    
+            END     
+            
+            ! Update the position of the selected Action, if the case
+            IF (SELF.isDrawingSelection = TRUE) AND (SELF.isDrawingMoved = TRUE) THEN
+                SELF.MoveDrawingTo(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())            
+                ! restore Drawing selection status
+                SELF.isDrawingSelection = FALSE            
+                SELF.isDrawingMoved     = FALSE
+            END
+            
         END                   
         
         
