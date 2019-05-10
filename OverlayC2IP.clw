@@ -125,10 +125,19 @@ movingAction                    GROUP(ActionBasicRecord)
                                 END
 
     CODE
+        sst.Trace('OverlayC2IP.MoveDrawingTo BEGIN')
+        
         !something        
-        SELF.al.ChangeActionPos(SELF.selectedDrawingPos, nXPos, nYPos)    
+        ! move with dx & dy
+        dx# = nXPos - SELF.refSelectedXPos
+        dy# = nYPos - SELF.refSelectedYPos
+
+        sst.Trace('     OverlayC2IP.MoveDrawingTo translate(' & dx# & ',' & dy# & ')')
+        SELF.al.ChangeActionPos(SELF.selectedDrawingPos, dx#, dy#)    
         
         SELF.Redraw()
+        
+        sst.Trace('OverlayC2IP.MoveDrawingTo END')
         RETURN TRUE
 
 OverlayC2IP.Construct       PROCEDURE()
@@ -862,13 +871,20 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
     CODE                
         sst.Trace('OverlayC2IP.TakeMouseDown BEGIN')
         
+        selXPos#    = SELF.drwImg.MouseX()
+        selYPos#    = SELF.drwImg.MouseY()
+        
         ! Check the status of BSO selection
         sst.Trace('     OverlayC2IP.TakeMouseDown : check BSO selection')
         IF (SELF.isSelection = FALSE) AND (SELF.isPointsCollection = FALSE) THEN
             ! check if it is a new BSO selection on the Overlay                
-            IF SELF.CheckByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY()) > 0 THEN
-                SELF.SelectByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+            IF SELF.CheckByMouse(selXPos#, selYPos#) > 0 THEN
+                SELF.SelectByMouse(selXPos#, selYPos#)
                 SELF.isSelection    = TRUE
+                SELF.refSelectedXPos    = selXPos#
+                SELF.refSelectedYPos    = selYPos#
+                sst.Trace('     OverlayC2IP.TakeMouseDown : BSO reference(' & SELF.refSelectedXPos & ',' & |
+                    SELF.refSelectedYPos & ')')
                 SELF.isBSOMoved     = FALSE
             ELSE
                 SELF.isSelection    = FALSE
@@ -879,16 +895,23 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
         
         ! Check the status of Generic Drawings selection
         sst.Trace('     OverlayC2IP.TakeMouseDown : check generic drawing selection')
-        SELF.selectedDrawingPos = SELF.CheckDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
+        SELF.selectedDrawingPos = SELF.CheckDrawingByMouse(selXPos#, selYPos#)
         IF SELF.selectedDrawingPos > 0 THEN
             ! validate the Drawing selection, only if a BSO was not selected
             IF SELF.isSelection = FALSE THEN    
-                SELF.SelectDrawingByMouse(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())
-                SELF.isDrawingSelection = TRUE         
+                SELF.SelectDrawingByMouse(selXPos#, selYPos#)
+                SELF.isDrawingSelection = TRUE      
+                SELF.refSelectedXPos    = selXPos#
+                SELF.refSelectedYPos    = selYPos#
+                sst.Trace('     OverlayC2IP.TakeMouseDown : Drawing reference(' & SELF.refSelectedXPos & ',' & |
+                    SELF.refSelectedYPos & ')')
+                
                 ! memorize the selected Drawing
                 ASSERT(SELF.al.GetAction(SELF.selectedDrawingPos, SELF.selectedDrawing), 'ActionCollection.GetAction() error')
+                SELF.isDrawingMoved = FALSE
             ELSE
                 SELF.isDrawingSelection = FALSE
+                !SELF.isDrawingMoved     = FALSE
             END            
             ELSE
                 ! check if is a generic drawing
@@ -904,8 +927,8 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
         IF SELF.isPointsCollection = TRUE THEN
             IF SELF.isMouseDown = FALSE THEN
                 ! collect points
-                SELF.p1x    = SELF.drwImg.MouseX()
-                SELF.p1y    = SELF.drwImg.MouseY()            
+                SELF.p1x    = selXPos#
+                SELF.p1y    = selYPos#
                 
                 SELF.isMouseDown    = TRUE
             ELSE
@@ -917,6 +940,8 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
         
 OverlayC2IP.TakeMouseMove   PROCEDURE()
     CODE
+        !sst.Trace('OverlayC2IP.TakeMouseMove BEGIN')
+        
         ! check if the current selected BSO is moved
         IF SELF.isSelection = TRUE THEN
             SELF.isBSOMoved = TRUE
@@ -970,7 +995,9 @@ OverlayC2IP.TakeMouseMove   PROCEDURE()
             END                                                                
             ELSE
                 ! nothing
-        END                                                                                    
+        END     
+        
+        !sst.Trace('OverlayC2IP.TakeMouseMove END')
         
 OverlayC2IP.TakeMouseUp     PROCEDURE
 newAction                       Action
@@ -979,6 +1006,8 @@ targetObject                    BSO
 actionRec                       GROUP(ActionBasicRecord)
                                 END
     CODE                
+        sst.Trace('OverlayC2IP.TakeMouseUp BEGIN')
+        
         IF SELF.isPointsCollection = TRUE THEN
             IF SELF.isMouseDown = TRUE THEN                    
                 ! points collected
@@ -1046,13 +1075,17 @@ actionRec                       GROUP(ActionBasicRecord)
             
             ! Update the position of the selected Action, if the case
             IF (SELF.isDrawingSelection = TRUE) AND (SELF.isDrawingMoved = TRUE) THEN
-                SELF.MoveDrawingTo(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())            
+                SELF.MoveDrawingTo(SELF.drwImg.MouseX(), SELF.drwImg.MouseY())       
+                sst.Trace('     OverlayC2IP.TakeMouseUp to (' & SELF.drwImg.MouseX() & ',' & |
+                    SELF.drwImg.MouseY() & ')')
                 ! restore Drawing selection status
                 SELF.isDrawingSelection = FALSE            
                 SELF.isDrawingMoved     = FALSE
             END
             
-        END                   
+        END   
+        
+        sst.Trace('OverlayC2IP.TakeMouseUp END')
         
         
 OverlayC2IP.TakeEvent       PROCEDURE()
@@ -1823,6 +1856,37 @@ selAction   Action
             SELF.drwImg.Box(xPos1# - 2, yPos2# - 2, 5, 5)
             SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
             
+        OF aTpy:notDef_FreeHand
+            ! display Free Hand
+            LOOP i# = 1 TO RECORDS(aRec.ActionPoints)
+                IF i# = 1 THEN
+                    xPos1#  = aRec.ActionPoints.xPos
+                    yPos1#  = aRec.ActionPoints.yPos
+                END
+                IF i# = 2 THEN
+                    xPos2#  = aRec.ActionPoints.xPos
+                    yPos2#  = aRec.ActionPoints.yPos
+                    
+                    dx# = xPos2# - xPos1#
+                    dy# = yPos2# - yPos1#        
+                    
+                    SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
+                END
+                IF i# > 2 THEN
+                    xPos1#  = xPos2#
+                    yPos1#  = yPos2#
+                    
+                    xPos2#  = aRec.ActionPoints.xPos
+                    yPos2#  = aRec.ActionPoints.yPos
+                    
+                    dx# = xPos2# - xPos1#
+                    dy# = yPos2# - yPos1#        
+                    
+                    SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
+                END
+                
+            END
+            
         END
                                 
         SELF.drwImg.SetPenWidth(1)
@@ -1888,6 +1952,38 @@ selAction   Action
             SELF.drwImg.Box(xPos2# - 2, yPos1# - 2, 5, 5)
             SELF.drwImg.Box(xPos1# - 2, yPos2# - 2, 5, 5)
             SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
+        OF aTpy:notDef_FreeHand
+            ! display Free Hand
+            LOOP i# = 1 TO RECORDS(aRec.ActionPoints)
+                IF i# = 1 THEN
+                    xPos1#  = aRec.ActionPoints.xPos
+                    yPos1#  = aRec.ActionPoints.yPos
+                END
+                IF i# = 2 THEN
+                    xPos2#  = aRec.ActionPoints.xPos
+                    yPos2#  = aRec.ActionPoints.yPos
+                    
+                    dx# = xPos2# - xPos1#
+                    dy# = yPos2# - yPos1#        
+                    
+                    SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
+                END
+                IF i# > 2 THEN
+                    xPos1#  = xPos2#
+                    yPos1#  = yPos2#
+                    
+                    xPos2#  = aRec.ActionPoints.xPos
+                    yPos2#  = aRec.ActionPoints.yPos
+                    
+                    dx# = xPos2# - xPos1#
+                    dy# = yPos2# - yPos1#        
+                    
+                    SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
+                END
+                
+            END
+            
+            ! display anchors
             
         END
                                 

@@ -80,6 +80,10 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         _noCompile
         SELF.al.ActionPoints    &= NEW(PosList)
         retVal# = SELF.C2IPOperators.Eql(SELF.al.ActionPoints, parec.ActionPoints)
+
+        ! APoints is a CLASS
+        ! all ActionPoints references whould be changed with APoints references
+        SELF.al.APoints     &= NEW(PointsCollection)
         
         
         !SELF.al.ActionPoints
@@ -367,10 +371,22 @@ foundAction                             Action
                     SELF.GetAction(i#, aRec)
                     foundAction.Init(aRec)
                     IF foundAction.CheckRectangleByMouse(nXPos, nYPos) THEN
-                        ! found Line
+                        ! found Rectangle
                         ret#    = i#
                         BREAK
                     END                   
+                OF aTpy:notDef_FreeHand
+                    ! generic Free Hand
+                    sst.Trace('     ActionsCollection.CheckByMouse : verify aTpy:notDef_FreeHand')
+                    
+                    ! verify Free Hand                   
+                    SELF.GetAction(i#, aRec)
+                    foundAction.Init(aRec)
+                    IF foundAction.CheckFreeHandByMouse(nXPos, nYPos) THEN
+                        ! found Free Hand
+                        ret#    = i#
+                        BREAK
+                    END                       
                 END
             END
             
@@ -415,13 +431,27 @@ ActionsCollection.GetAction PROCEDURE(LONG nPointer, *ActionBasicRecord pARec)
             RETURN FALSE
         END      
         
-ActionsCollection.ChangeActionPos  PROCEDURE(LONG nPos, LONG nXPos, LONG nYPos)        
+ActionsCollection.ChangeActionPos  PROCEDURE(LONG nPos, LONG nDX, LONG nDY)        
     CODE
+        !sst.Trace('ActionsCollection.ChangeActionPos BEGIN')
+        
         GET(SELF.al, nPos)
         IF NOT ERRORCODE() THEN
             ! move all the Action points            
+            
+            LOOP i# = 1 TO RECORDS(SELF.al.ActionPoints)
+                GET(SELF.al.ActionPoints, i#)
+                IF NOT ERRORCODE() THEN
+                    SELF.al.ActionPoints.xPos   = SELF.al.ActionPoints.xPos + nDX
+                    SELF.al.ActionPoints.yPos   = SELF.al.ActionPoints.yPos + nDY
+                    PUT(SELF.al.ActionPoints)
+                END
+                
+            END
+            
         END
         
+        !sst.Trace('ActionsCollection.ChangeActionPos END')
         RETURN TRUE
         
         

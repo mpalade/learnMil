@@ -304,6 +304,7 @@ ActionPointsNumber      LONG
 !xPos                    LONG, DIM(100)
 !yPos                    LONG, DIM(100)
 ActionPoints            &PosList
+APoints                 &PointsCollection
 !Resources                   &UnitsQueue
                         END
 
@@ -398,6 +399,7 @@ Destruct                PROCEDURE()
 
 CheckLineByMouse        PROCEDURE(LONG nXPos, LONG nYPos), LONG
 CheckRectangleByMouse   PROCEDURE(LONG nXPos, LONG nYPos), LONG
+CheckFreeHandByMouse    PROCEDURE(LONG nXPos, LONG nYPos), LONG
                     END
 
 
@@ -488,7 +490,8 @@ al                          &ActResTargets
 Construct                   PROCEDURE()
 Destruct                    PROCEDURE()
 
-ChangeActionPos             PROCEDURE(LONG nPos, LONG nXPos, LONG nYPos), BOOL
+! Move all action points with dx & dy
+ChangeActionPos             PROCEDURE(LONG nPos, LONG nDX, LONG nDY), BOOL
 
 InsertAction                PROCEDURE(ActionBasicRecord parec)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec)
@@ -708,6 +711,9 @@ p1x                     LONG, PROTECTED
 p1y                     LONG, PROTECTED
 PolyPoints              LONG, PROTECTED
 pp                      &PosList, PROTECTED
+
+refSelectedXPos         LONG, PRIVATE
+refSelectedYPos         LONG, PRIVATE
 isDrawingSelection      BOOL, PROTECTED
 isBSOMoved              BOOL, PROTECTED
 isDrawingMoved          BOOL, PROTECTED

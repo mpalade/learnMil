@@ -556,6 +556,50 @@ Action.CheckRectangleByMouse        PROCEDURE(LONG nXPos, LONG nYPos)
         END
         !sst.Trace('Action.CheckRectangleByMouse END')
         
+Action.CheckFreeHandByMouse PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE                
+
+        retVal# = FALSE
+        LOOP i# = 1 TO RECORDS(SELF.arec.ActionPoints)
+            GET(SELF.arec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                IF i# = 1 THEN
+                    xPos1# = SELF.arec.ActionPoints.xPos
+                    yPos1# = SELF.arec.ActionPoints.yPos
+                END
+                IF i# = 2 THEN
+                    xPos2# = SELF.arec.ActionPoints.xPos
+                    yPos2# = SELF.arec.ActionPoints.yPos
+                    
+                    currentSlope$   = (xPos1# - xPos2#) / (yPos1# - yPos2#)
+                    computedSlope$  = (xPos1# - nXPos) / (yPos1# - nYPos)    
+                    
+                    IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
+                        retVal# = TRUE
+                        BREAK                        
+                    END
+                END
+                IF i# > 2 THEN
+                    xPos1#  = xPos2#
+                    yPos1#  = yPos2#
+                    
+                    xPos2# = SELF.arec.ActionPoints.xPos
+                    yPos2# = SELF.arec.ActionPoints.yPos
+                    
+                    currentSlope$   = (xPos1# - xPos2#) / (yPos1# - yPos2#)
+                    computedSlope$  = (xPos1# - nXPos) / (yPos1# - nYPos)      
+                    
+                    IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
+                        retVal# = TRUE
+                        BREAK
+                    END
+                END                                                                                         
+            END                        
+        END        
+        
+        RETURN retVal#
+        
+        
                               
         
         
