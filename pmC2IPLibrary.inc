@@ -380,6 +380,8 @@ ActionPointsNumber      LONG
 !xPos                    LONG, DIM(100)
 !yPos                    LONG, DIM(100)
 ActionPoints            &PosList
+
+editableText            STRING(100)
                     END
 
 
@@ -428,6 +430,9 @@ highestY                LONG, PRIVATE
 Construct               PROCEDURE()
 Init                    PROCEDURE(*ActionBasicRecord pArec), LONG
 Destruct                PROCEDURE()
+
+ComputeSelectRectangle  PROCEDURE(), PRIVATE
+GetAnchorPoints         PROCEDURE(*LONG pLowestX, *LONG pLowestY, *LONG pHighestX, *LONG pHighestY), BOOL
 
 CheckLineByMouse        PROCEDURE(LONG nXPos, LONG nYPos), LONG
 CheckRectangleByMouse   PROCEDURE(LONG nXPos, LONG nYPos), LONG
@@ -517,7 +522,8 @@ ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 ! a collection of Actions Objects
 ActionsCollection           CLASS, IMPLEMENTS(C2IPOperators), | 
                         MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
-al                          &ActResTargetsQueue
+al                          &ActResTargetsQueue         ! a queue of action records
+!collection                  &ActResTargetsClassQueue    ! a queue of action classes
 
 Construct                   PROCEDURE()
 Destruct                    PROCEDURE()
@@ -753,6 +759,7 @@ isDrawingMoved          BOOL, PROTECTED
 selectedDrawingPos      LONG, PRIVATE
 selectedDrawing         GROUP(ActionBasicRecord), PRIVATE
                         END
+textBuffer              STRING(100), PRIVATE
 
 
 TakePoints              PROCEDURE(LONG nGeometry)

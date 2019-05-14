@@ -561,6 +561,57 @@ Action.Destruct     PROCEDURE()
     CODE
         DISPOSE(SELF.arec.ActionPoints)
         
+        
+Action.ComputeSelectRectangle       PROCEDURE()
+    CODE
+        LOOP i# = 1 TO RECORDS(SELF.arec.ActionPoints)
+            GET(SELF.arec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN                                
+                x#  = SELF.arec.ActionPoints.xPos
+                y#  = SELF.arec.ActionPoints.yPos
+                ! usual Position records
+                CASE i#
+                OF 1
+                    SELF.lowestX = x#
+                    SELF.lowestY = y#
+                OF 2                    
+                    IF x# < SELF.lowestX THEN
+                        SELF.lowestX    = x#
+                    ELSE
+                        SELF.highestX   = x#
+                    END
+                    IF y# < SELF.lowestY THEN
+                        SELF.lowestY    = y#
+                    ELSE
+                        SELF.highestY   = y#
+                    END                                                           
+                ELSE
+                    ! lowest & highest
+                    IF x# < SELF.lowestX THEN
+                        SELF.lowestX    = x#
+                    END
+                    IF x# > SELF.highestX THEN
+                        SELF.highestX    = x#
+                    END
+                    IF y# < SELF.lowestY THEN
+                        SELF.lowestY    = y#
+                    END
+                    IF y# > SELF.highestY THEN
+                        SELF.highestY   = y#
+                    END                    
+                END
+            END            
+        END
+        
+Action.GetAnchorPoints      PROCEDURE(*LONG pLowestX, *LONG pLowestY, *LONG pHighestX, *LONG pHighestY)        
+    CODE
+        SELF.ComputeSelectRectangle()
+        pLowestX    = SELF.lowestX
+        pLowestY    = SELF.lowestY
+        pHighestX   = SELF.highestX
+        pHighestY   = SELF.highestY
+        RETURN TRUE
+        
 Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
         currentSlope$   = (SELF.xPos1 - SELF.xPos2) / (SELF.yPos1 - SELF.yPos2)

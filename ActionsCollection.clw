@@ -447,7 +447,7 @@ ActionsCollection.GetAction PROCEDURE(LONG nPointer, *Action pAction)
                     pAction.arec.ActionPoints.yPos  = SELF.al.ActionPoints.yPos
                     ADD(pAction.arec.ActionPoints)
                 END               
-            END            
+            END       
             RETURN TRUE
         ELSE
             RETURN FALSE

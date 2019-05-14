@@ -155,6 +155,8 @@ OverlayC2IP.Construct       PROCEDURE()
         SELF.isDrawingSelection = FALSE
         
         SELF.prevActionSelection    = 0
+        
+        SELF.textBuffer = ''
                    
         
 OverlayC2IP.Destruct        PROCEDURE()
@@ -868,8 +870,9 @@ targetAction                    GROUP(ActionBasicRecord)
                 
         
 OverlayC2IP.TakeMouseDown   PROCEDURE()
+sMessage        STRING(100)
     CODE                
-        sst.Trace('OverlayC2IP.TakeMouseDown BEGIN')
+        sst.Trace('OverlayC2IP.TakeMouseDown BEGIN')                
         
         selXPos#    = SELF.drwImg.MouseX()
         selYPos#    = SELF.drwImg.MouseY()
@@ -920,6 +923,20 @@ OverlayC2IP.TakeMouseDown   PROCEDURE()
                 END
         END            
         sst.Trace('     OverlayC2IP.TakeMouseDown : isDrawingSelection = ' & SELF.isDrawingSelection)
+        
+        ! double click
+        CASE KEYCODE()
+        OF MouseLeft2
+            !MESSAGE('double click')
+            
+            LOOP WHILE KEYBOARD()
+                ASK
+            END
+            ASK
+            SELF.textBuffer = CLIP(SELF.textBuffer) & CHR(KEYCHAR())                                
+            SELF.drwImg.Show(selXPos#, selYPos#, CLIP(SELF.textBuffer))                
+            SELF.drwImg.Display()                                                   
+        END
              
         ! Check the status of Actions selection
                                 
@@ -1104,11 +1121,17 @@ OverlayC2IP.TakeEvent       PROCEDURE()
             
         OF EVENT:MouseUp
             ! mouse up     
-            SELF.TakeMouseUp()                        
+            SELF.TakeMouseUp()                                    
             
         OF EVENT:Drop
             ! DROP
-        END        
+        END   
+        LOOP WHILE KEYBOARD()
+            ASK
+            SELF.textBuffer    = CLIP(SELF.textBuffer) & CHR(KEYCHAR())
+        END
+
+        
         
 OverlayC2IP.TakePoints     PROCEDURE(LONG nGeometry)
     CODE
@@ -1811,7 +1834,14 @@ CODE
 OverlayC2IP.DisplayUnselection      PROCEDURE(LONG nAPointer)
 aRec                                    GROUP(ActionBasicRecord)
                                         END
-selAction   Action
+
+selAction                               Action
+
+lowestX                                 LONG
+lowestY                                 LONG
+highestX                                LONG
+highestY                                LONG
+
     CODE
         SELF.al.GetAction(nAPointer, aRec)
         selAction.Init(aRec)        
@@ -1875,6 +1905,16 @@ selAction   Action
             SELF.drwImg.Box(xPos1#, yPos1#, dx#, dy#)            
         OF aTpy:notDef_FreeHand
             ! display Free Hand
+                ! display containing rectangle
+            retVal# = selAction.GetAnchorPoints(lowestX, lowestY, highestX, highestY)
+            IF retVal# = TRUE THEN
+                dx# = highestX - lowestX
+                dy# = highestY - lowestY
+                SELF.drwImg.Box(lowestX, lowestY, dx#, dy#)
+            END
+            
+                !selAction.
+            OMIT('_noCompile')
             LOOP i# = 1 TO RECORDS(aRec.ActionPoints)
                 IF i# = 1 THEN
                     xPos1#  = aRec.ActionPoints.xPos
@@ -1903,6 +1943,7 @@ selAction   Action
                 END
                 
             END
+            _noCompile
         END
         
         SELF.drwImg.Display()
@@ -1910,7 +1951,13 @@ selAction   Action
 OverlayC2IP.DisplaySelection        PROCEDURE(LONG nAPointer)    
 aRec                                    GROUP(ActionBasicRecord)
                                         END
-selAction   Action
+selAction                               Action
+
+lowestX                                 LONG
+lowestY                                 LONG
+highestX                                LONG
+highestY                                LONG
+
     CODE
         sst.Trace('OverlayC2IP.DisplaySelection BEGIN')
         
@@ -1960,6 +2007,15 @@ selAction   Action
             sst.Trace('     OverlayC2IP.DisplaySelection aRec.ActionTypeCode = aTpy:notDef_FreeHand')
             sst.Trace('     OverlayC2IP.DisplaySelection RECORDS(aRec.ActionPoints) = ' & RECORDS(aRec.ActionPoints))
             
+                ! display containing rectangle
+            retVal# = selAction.GetAnchorPoints(lowestX, lowestY, highestX, highestY)
+            IF retVal# = TRUE THEN
+                dx# = highestX - lowestX
+                dy# = highestY - lowestY
+                SELF.drwImg.Box(lowestX, lowestY, dx#, dy#)
+            END
+            
+            OMIT('_noCompile')
             LOOP i# = 1 TO RECORDS(aRec.ActionPoints)
                 IF i# = 1 THEN
                     xPos1#  = aRec.ActionPoints.xPos
@@ -1988,6 +2044,7 @@ selAction   Action
                 END
                 
             END
+            _noCompile
             
             ! display anchors
             
