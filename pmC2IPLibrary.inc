@@ -433,6 +433,7 @@ Destruct                PROCEDURE()
 
 ComputeSelectRectangle  PROCEDURE(), PRIVATE
 GetAnchorPoints         PROCEDURE(*LONG pLowestX, *LONG pLowestY, *LONG pHighestX, *LONG pHighestY), BOOL
+SetText                 PROCEDURE(STRING sText), BOOL
 
 CheckLineByMouse        PROCEDURE(LONG nXPos, LONG nYPos), LONG
 CheckRectangleByMouse   PROCEDURE(LONG nXPos, LONG nYPos), LONG
@@ -759,6 +760,7 @@ isDrawingMoved          BOOL, PROTECTED
 selectedDrawingPos      LONG, PRIVATE
 selectedDrawing         GROUP(ActionBasicRecord), PRIVATE
                         END
+selectedDrawingClass    &Action
 textBuffer              STRING(100), PRIVATE
 
 

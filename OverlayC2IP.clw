@@ -157,10 +157,12 @@ OverlayC2IP.Construct       PROCEDURE()
         SELF.prevActionSelection    = 0
         
         SELF.textBuffer = ''
+        SELF.selectedDrawingClass   &= NEW(Action)
                    
         
 OverlayC2IP.Destruct        PROCEDURE()
-    CODE        
+    CODE       
+        DISPOSE(SELF.selectedDrawingClass)
         DISPOSE(SELF.pp)
         DISPOSE(SELF.al)
         PARENT.Destruct()
@@ -911,6 +913,7 @@ sMessage        STRING(100)
                 
                 ! memorize the selected Drawing
                 ASSERT(SELF.al.GetAction(SELF.selectedDrawingPos, SELF.selectedDrawing), 'ActionCollection.GetAction() error')
+                ASSERT(SELF.al.GetAction(SELF.selectedDrawingPos, SELF.selectedDrawingClass), 'ActionCollection.GetAction() error')
                 SELF.isDrawingMoved = FALSE
             ELSE
                 SELF.isDrawingSelection = FALSE
@@ -926,16 +929,22 @@ sMessage        STRING(100)
         
         ! double click
         CASE KEYCODE()
-        OF MouseLeft2
-            !MESSAGE('double click')
-            
-            LOOP WHILE KEYBOARD()
+        OF MouseLeft2             
+            LOOP UNTIL KEYBOARD()
                 ASK
+                IF KEYCODE() = EnterKey THEN
+                    BREAK
+                END                
+                SELF.textBuffer = CLIP(SELF.textBuffer) & CHR(KEYCHAR())                                
             END
-            ASK
-            SELF.textBuffer = CLIP(SELF.textBuffer) & CHR(KEYCHAR())                                
+            
             SELF.drwImg.Show(selXPos#, selYPos#, CLIP(SELF.textBuffer))                
-            SELF.drwImg.Display()                                                   
+            SELF.drwImg.Display()   
+            IF SELF.isDrawingSelection THEN
+                SELF.selectedDrawingClass.SetText(SELF.textBuffer)
+            END
+            
+            SELF.textBuffer = ''
         END
              
         ! Check the status of Actions selection
@@ -1108,7 +1117,7 @@ actionRec                       GROUP(ActionBasicRecord)
 OverlayC2IP.TakeEvent       PROCEDURE()
     CODE
         !! check BSO 
-        !PARENT.TakeEvent()
+        !PARENT.TakeEvent()        
                 
         CASE EVENT()            
         OF EVENT:MouseDown            
@@ -1125,11 +1134,7 @@ OverlayC2IP.TakeEvent       PROCEDURE()
             
         OF EVENT:Drop
             ! DROP
-        END   
-        LOOP WHILE KEYBOARD()
-            ASK
-            SELF.textBuffer    = CLIP(SELF.textBuffer) & CHR(KEYCHAR())
-        END
+        END           
 
         
         

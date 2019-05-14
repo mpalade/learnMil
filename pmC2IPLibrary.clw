@@ -612,6 +612,11 @@ Action.GetAnchorPoints      PROCEDURE(*LONG pLowestX, *LONG pLowestY, *LONG pHig
         pHighestY   = SELF.highestY
         RETURN TRUE
         
+Action.SetText      PROCEDURE(STRING sText)
+    CODE
+        SELF.arec.editableText  = sText
+        RETURN TRUE
+        
 Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
         currentSlope$   = (SELF.xPos1 - SELF.xPos2) / (SELF.yPos1 - SELF.yPos2)
