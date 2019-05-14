@@ -1857,6 +1857,23 @@ selAction   Action
             SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
             
         OF aTpy:notDef_FreeHand
+            ! display anchors                                    
+        END
+                                
+        SELF.drwImg.SetPenWidth(1)
+        SELF.drwImg.Setpencolor(COLOR:Black)
+        
+        CASE CLIP(aRec.ActionTypeCode)
+        OF aTpy:notDefined
+            ! display line
+            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
+        OF aTpy:notDef_Line
+            ! display line
+            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
+        OF aTpy:notDef_Rectangle
+            ! display Rectangle
+            SELF.drwImg.Box(xPos1#, yPos1#, dx#, dy#)            
+        OF aTpy:notDef_FreeHand
             ! display Free Hand
             LOOP i# = 1 TO RECORDS(aRec.ActionPoints)
                 IF i# = 1 THEN
@@ -1886,22 +1903,6 @@ selAction   Action
                 END
                 
             END
-            
-        END
-                                
-        SELF.drwImg.SetPenWidth(1)
-        SELF.drwImg.Setpencolor(COLOR:Black)
-        
-        CASE CLIP(aRec.ActionTypeCode)
-        OF aTpy:notDefined
-            ! display line
-            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
-        OF aTpy:notDef_Line
-            ! display line
-            SELF.drwImg.Line(xPos1#, yPos1#, dx#, dy#)
-        OF aTpy:notDef_Rectangle
-            ! display Rectangle
-            SELF.drwImg.Box(xPos1#, yPos1#, dx#, dy#)            
         END
         
         SELF.drwImg.Display()
@@ -1911,6 +1912,8 @@ aRec                                    GROUP(ActionBasicRecord)
                                         END
 selAction   Action
     CODE
+        sst.Trace('OverlayC2IP.DisplaySelection BEGIN')
+        
         SELF.al.GetAction(nAPointer, aRec)
         selAction.Init(aRec)
         
@@ -1954,6 +1957,9 @@ selAction   Action
             SELF.drwImg.Box(xPos2# - 2, yPos2# - 2, 5, 5)
         OF aTpy:notDef_FreeHand
             ! display Free Hand
+            sst.Trace('     OverlayC2IP.DisplaySelection aRec.ActionTypeCode = aTpy:notDef_FreeHand')
+            sst.Trace('     OverlayC2IP.DisplaySelection RECORDS(aRec.ActionPoints) = ' & RECORDS(aRec.ActionPoints))
+            
             LOOP i# = 1 TO RECORDS(aRec.ActionPoints)
                 IF i# = 1 THEN
                     xPos1#  = aRec.ActionPoints.xPos
@@ -1990,6 +1996,8 @@ selAction   Action
         SELF.drwImg.SetPenWidth(1)
         SELF.drwImg.Setpencolor(COLOR:Black)
         SELF.drwImg.Display()
+        
+        sst.Trace('OverlayC2IP.DisplaySelection BEGIN')
         
 OverlayC2IP.Reset_FreeHand  PROCEDURE()
     CODE

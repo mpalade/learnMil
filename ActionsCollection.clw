@@ -28,7 +28,7 @@ sst                 stringtheory
 
 ActionsCollection.Construct   PROCEDURE
     CODE
-        SELF.al &= NEW(ActResTargets)
+        SELF.al &= NEW(ActResTargetsQueue)
         
 ActionsCollection.Destruct   PROCEDURE
     CODE
@@ -430,6 +430,28 @@ ActionsCollection.GetAction PROCEDURE(LONG nPointer, *ActionBasicRecord pARec)
         ELSE
             RETURN FALSE
         END      
+
+ActionsCollection.GetAction PROCEDURE(LONG nPointer, *Action pAction)        
+    CODE
+        GET(SELF.al, nPointer)
+        IF NOT ERRORCODE() THEN                        
+            pAction.arec.ActionName         = SELF.al.ActionName
+            pAction.arec.ActionPointsNumber = SELF.al.ActionPointsNumber
+            pAction.arec.ActionType         = SELF.al.ActionType
+            pAction.arec.ActionTypeCode     = SELF.al.ActionTypeCode
+            pAction.arec.ActionPoints       &= NEW(PosList)
+            LOOP i# = 1 TO RECORDS(SELF.al.ActionPoints)
+                GET(SELF.al.ActionPoints, i#)
+                IF NOT ERRORCODE() THEN
+                    pAction.arec.ActionPoints.xPos  = SELF.al.ActionPoints.xPos
+                    pAction.arec.ActionPoints.yPos  = SELF.al.ActionPoints.yPos
+                    ADD(pAction.arec.ActionPoints)
+                END               
+            END            
+            RETURN TRUE
+        ELSE
+            RETURN FALSE
+        END
         
 ActionsCollection.ChangeActionPos  PROCEDURE(LONG nPos, LONG nDX, LONG nDY)        
     CODE

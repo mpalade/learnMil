@@ -517,9 +517,37 @@ Action.Init    PROCEDURE(*ActionBasicRecord pARec)
                 OF 1
                     SELF.xPos1  = pArec.ActionPoints.xPos
                     SELF.yPos1  = pArec.ActionPoints.yPos
+                    
+                    SELF.lowestX = SELF.xPos1
+                    SELF.lowestY = SELF.yPos1
                 OF 2
                     SELF.xPos2  = pArec.ActionPoints.xPos
                     SELF.yPos2  = pArec.ActionPoints.yPos
+                    
+                    IF SELF.xPos2 < SELF.lowestX THEN
+                        SELF.lowestX    = SELF.xPos2
+                    ELSE
+                        SELF.highestX   = SELF.xPos2
+                    END
+                    IF SELF.yPos2 < SELF.lowestY THEN
+                        SELF.lowestY    = SELF.yPos2
+                    ELSE
+                        SELF.highestY   = SELF.yPos2
+                    END                                                           
+                ELSE
+                    ! lowest & highest
+                    IF pArec.ActionPoints.xPos < SELF.lowestX THEN
+                        SELF.lowestX    = pArec.ActionPoints.xPos
+                    END
+                    IF pArec.ActionPoints.xPos > SELF.highestX THEN
+                        SELF.highestX    = pArec.ActionPoints.xPos
+                    END
+                    IF pArec.ActionPoints.yPos < SELF.lowestY THEN
+                        SELF.lowestY    = pArec.ActionPoints.yPos
+                    END
+                    IF pArec.ActionPoints.yPos > SELF.highestY THEN
+                        SELF.highestY   = pArec.ActionPoints.yPos
+                    END                    
                 END
             END            
         END
@@ -560,6 +588,16 @@ Action.CheckFreeHandByMouse PROCEDURE(LONG nXPos, LONG nYPos)
     CODE                
 
         retVal# = FALSE
+        
+        IF (SELF.lowestX <= nXPos) AND |
+            (nXPos <= SELF.highestX) AND |
+            (SELF.lowestY <= nYPos) AND |
+            (nYPos <= SELF.highestY) THEN
+            retVal# = TRUE            
+        END
+        
+        
+        OMIT('_noCompile')
         LOOP i# = 1 TO RECORDS(SELF.arec.ActionPoints)
             GET(SELF.arec.ActionPoints, i#)
             IF NOT ERRORCODE() THEN
@@ -596,6 +634,7 @@ Action.CheckFreeHandByMouse PROCEDURE(LONG nXPos, LONG nYPos)
                 END                                                                                         
             END                        
         END        
+        _noCompile
         
         RETURN retVal#
         

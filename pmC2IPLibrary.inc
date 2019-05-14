@@ -293,9 +293,16 @@ yPos                    LONG
 TreePos                 LONG
 markForDel              BOOL
 markForDisbl            BOOL
+                        END
+
+! Queue of BSOs (Classes)
+UnitsClassQueue     QUEUE, TYPE
+unit                    &BSO
                     END
 
+
 ! Actions Queue Structure
+    ! should become obsolete
 ActionsQueue         QUEUE, TYPE
 ActionName              STRING(100)
 ActionType              LONG
@@ -308,17 +315,36 @@ APoints                 &PointsCollection
 !Resources                   &UnitsQueue
                         END
 
+! Queue of Actions (Classes)
+ActionsClassQueue   QUEUE, TYPE
+action                  &Action
+                    END
+
+
 ! Action with Resources Queue Structure
+    ! should become obsolete
 ActResQueue         QUEUE(ActionsQueue)
 Resources               &UnitsQueue
                     END
 
+! Queue of Action with Resources (Classes)
+ActResClassQueue    QUEUE(ActionsClassQueue)
+resources               &UnitsClassQueue
+                    END
+
+
 ! Action with Resources and Targets Queue Structure
-ActResTargets       QUEUE(ActResQueue)
+    ! should become obsolete
+ActResTargetsQueue  QUEUE(ActResQueue)
 ActTargets              &ActionsQueue
 BSOTargets              &UnitsQueue
                     END
 
+! Queue of Actions with Resources and Targets (Classes)
+ActResTargetsClassQueue     QUEUE(ActResClassQueue)
+actTargets                      &ActionsClassQueue
+BSOtargets                      &UnitsClassQueue
+                            END
 
 ! Position Record
 PosRecord           GROUP, TYPE
@@ -388,10 +414,16 @@ Destruct                PROCEDURE()
 Action              CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
 arec                    GROUP(ActionBasicRecord)
                         END
+! the firs 2 points - usually for most actions
 xPos1                   LONG, PRIVATE
 yPos1                   LONG, PRIVATE
 xPos2                   LONG, PRIVATE
 yPos2                   LONG, PRIVATE
+! lowerX, lowerY, highestX, highestY - the points that define the containing rectangle
+lowestX                 LONG, PRIVATE
+lowestY                 LONG, PRIVATE
+highestX                LONG, PRIVATE
+highestY                LONG, PRIVATE
 
 Construct               PROCEDURE()
 Init                    PROCEDURE(*ActionBasicRecord pArec), LONG
@@ -485,7 +517,7 @@ ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 ! a collection of Actions Objects
 ActionsCollection           CLASS, IMPLEMENTS(C2IPOperators), | 
                         MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
-al                          &ActResTargets
+al                          &ActResTargetsQueue
 
 Construct                   PROCEDURE()
 Destruct                    PROCEDURE()
@@ -498,6 +530,7 @@ InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord p
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec, UnitBasicRecord pTarget_urec)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec, ActionBasicRecord pTarget_arec)
 GetAction                   PROCEDURE(LONG nPointer, *ActionBasicRecord pARec), LONG
+GetAction                   PROCEDURE(LONG nPointer, *Action pAction), LONG
 SelectByMouse               PROCEDURE(LONG nXPos, LONG nYPos), LONG
 CheckByMouse                PROCEDURE(LONG nXPos, LONG nYPos), LONG
 CheckLineByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG
