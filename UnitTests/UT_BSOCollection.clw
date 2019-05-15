@@ -151,6 +151,16 @@ UT_BSOCollection.AddSpecificNode    PROCEDURE(*UnitBasicRecord pURec)
         RETURN TRUE
         
         
+UT_BSOCollection.AddGet     PROCEDURE()
+myBSO                           BSO
+myColl                          UnitsCollection
+receivedBSO                     BSO
+
+    CODE
+        myBSO.urec.UnitName = 'myName'
+        myColl.BSOCollOpr.Add(myBSO)
+        myColl.BSOCollOpr.Get(1, receivedBSO)
+        ASSERT(myBSO.urec.UnitName = receivedBSO.urec.UnitName, 'myColl.BSOCollOpr.Get(1, receivedBSO) ERROR')
         
         
         

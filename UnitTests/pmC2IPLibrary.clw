@@ -1082,24 +1082,38 @@ BSO.BSOOpr.Eql      PROCEDURE(BSO c)
         
         sst.Trace('BSO.BSOOpr.Eql      PROCEDURE(BSO c) END')        
         RETURN TRUE
-        
-
-GenericCollection.CollectionOperators.Eql   PROCEDURE(GenericCollection c1, GenericCollection c2)
+                
+SECTION('GenericCollection INTERFACES')
+GenericCollection.CollectionOperators.Eql   PROCEDURE(GenericCollection c)
     CODE
         RETURN TRUE
         
+GenericCollection.CollectionOperators.Get   PROCEDURE()
+    CODE
+        RETURN TRUE
+                
+GenericCollection.CollectionOperators.Add   PROCEDURE(GenericClass C)
+    CODE
+        RETURN TRUE
+        
+SECTION('GenericClass INTERFACES')        
 GenericClass.ClassOperators.Eql     PROCEDURE(GenericClass c)
     CODE
         RETURN TRUE
 
-UnitsCollection.BSOCollOpr.Eql     PROCEDURE(GenericCollection c1, GenericCollection c2)
+SECTION('UnitsCollection INTERFACES')        
+UnitsCollection.BSOCollOpr.Eql     PROCEDURE(GenericCollection c)
     CODE
-        RETURN PARENT.CollectionOperators.Eql(c1, c2)
+        RETURN PARENT.CollectionOperators.Eql(c)
         
-UnitsCollection.BSOCollOpr.Eql     PROCEDURE(UnitsCollection c1, UnitsCollection c2)
+UnitsCollection.BSOCollOpr.Eql     PROCEDURE(UnitsCollection c)
     CODE
-        sst.Trace('UnitsCollection.CollectionOperators.Eql     PROCEDURE(GenericCollection c1, GenericCollection c2) BEGIN')
+        sst.Trace('UnitsCollection.BSOCollOpr.Eql     PROCEDURE(UnitsCollection c) BEGIN')
  
+        LOOP i# = 1 TO RECORDS(c.collection)
+
+        END
+        
         OMIT('_noCompile')
         c1.collection.unit.urec.UnitName  = pBSO.urec.UnitName
         c1.collection.unit.urec.UnitType  = pBSO.urec.UnitType
@@ -1113,5 +1127,41 @@ UnitsCollection.BSOCollOpr.Eql     PROCEDURE(UnitsCollection c1, UnitsCollection
         SELF.selQueuePos    = POINTER(SELF.collection)
         _noCompile
                 
-        sst.Trace('UnitsCollection.CollectionOperators.Eql     PROCEDURE(GenericCollection c1, GenericCollection c2) END')
+        sst.Trace('UnitsCollection.BSOCollOpr.Eql     PROCEDURE(UnitsCollection c) END')
         RETURN TRUE
+
+        
+UnitsCollection.BSOCollOpr.Add      PROCEDURE(GenericClass c)
+    CODE
+        RETURN PARENT.CollectionOperators.Add(c)
+        
+UnitsCollection.BSOCollOpr.Add      PROCEDURE(BSO cBSO)
+    CODE
+        SELF.collection.unit    &= NEW(BSO)
+        retVal# = SELF.collection.unit.BSOOpr.Eql(cBSO)
+        ADD(SELF.collection)
+        RETURN retVal#
+        
+        
+UnitsCollection.BSOCollOpr.Get      PROCEDURE()
+    CODE
+        RETURN PARENT.CollectionOperators.Get()
+        
+        
+UnitsCollection.BSOCollOpr.Get      PROCEDURE(LONG nIndex, *BSO pBSO)
+    CODE
+        IF (nIndex <= RECORDS(SELF.collection)) AND (nIndex<>0) THEN
+            GET(SELF.collection, nIndex)
+            IF NOT ERRORCODE() THEN
+                pBSO.BSOOpr.Eql(SELF.collection.unit)
+                retVal# = TRUE
+            ELSE
+                retVal# = FALSE
+            END
+            
+        ELSE
+            retVal# = FALSE
+        END
+        
+        RETURN retVal#
+        

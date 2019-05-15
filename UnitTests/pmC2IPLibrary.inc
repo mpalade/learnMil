@@ -407,11 +407,15 @@ Eql                     PROCEDURE(PosList l1, PosList l2), BOOL
 
 ! Collection Operators
 CollectionOperators INTERFACE
-Eql                     PROCEDURE(GenericCollection c1, GenericCollection c2), BOOL
+Add                     PROCEDURE(GenericClass c), BOOL
+Get                     PROCEDURE(), BOOL
+Eql                     PROCEDURE(GenericCollection c), BOOL
                     END
 
 BSOCollOpr          INTERFACE(CollectionOperators)
-Eql                     PROCEDURE(UnitsCollection c1, UnitsCollection c2), BOOL
+Add                     PROCEDURE(BSO cBSO), BOOL
+Get                     PROCEDURE(LONG nIndex, *BSO pBSO), BOOL
+Eql                     PROCEDURE(UnitsCollection c), BOOL
                     END
 
 ClassOperators      INTERFACE

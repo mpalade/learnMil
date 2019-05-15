@@ -119,6 +119,9 @@ testOrgChart        UT_OrgChartC2IP
         testBSO.Eql()
         !testBSO.DestroyContext()
         
+        ! BSO Collection
+        testBSOCollection.AddGet()
+        
         OMIT('_noCompile')
         ! BSO Collection
         ! Units Collection

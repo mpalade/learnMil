@@ -6,6 +6,6 @@ Destruct                PROCEDURE
 InitContext             PROCEDURE
 DestroyContext          PROCEDURE
 
-Eql                     PROCEDURE
+Eql             PROCEDURE
     END
     

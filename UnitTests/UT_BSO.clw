@@ -56,6 +56,5 @@ bso2                BSO
         
         sst.Trace('UT_BSO.Eql          PROCEDURE END')
         
-        
 
 
