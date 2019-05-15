@@ -4,6 +4,7 @@
     END
 
     INCLUDE('Equates.CLW'),ONCE
+    INCLUDE('KEYCODES.CLW'),ONCE
     INCLUDE('pmC2IPLibrary.INC'),ONCE
 
 ! Local objects
@@ -21,18 +22,24 @@ BSO.Construct       PROCEDURE()
 BSO.Destruct        PROCEDURE()
     CODE
         
-BSOCollection.Construct     PROCEDURE()
+UnitsCollection.Construct     PROCEDURE()
     CODE
-        SELF.ul     &= NEW(UnitsList)
-        SELF.tmpul  &=NEW(UnitsList)
+        SELF.ul     &= NEW(UnitsQueue)
+        SELF.tmpul  &=NEW(UnitsQueue)
         
-BSOCollection.Destruct      PROCEDURE()
-    CODE         
+        ! collection
+        SELF.collection &= NEW(UnitsClassQueue)
+        
+UnitsCollection.Destruct      PROCEDURE()
+    CODE
+        ! collection
+        DISPOSE(SELF.collection)
+        
         DISPOSE(SELF.tmpul)
         DISPOSE(SELF.ul)   
         
     
-BSOCollection.prepRndName   PROCEDURE
+UnitsCollection.prepRndName   PROCEDURE
 tmpUnitName     STRING(100)
     CODE
         LOOP 10 TIMES
@@ -41,9 +48,9 @@ tmpUnitName     STRING(100)
         
         RETURN tmpUnitName
         
-BSOCollection.insertFirstNode PROCEDURE
+UnitsCollection.insertFirstNode PROCEDURE
     CODE
-        sst.Trace('START:BSOCollection.insertFirstNode')
+        !sst.Trace('START:UnitsCollection.insertFirstNode')
         SELF.ul.UnitName        = SELF.prepRndName()
         !SELF.ul.UnitType        = uTpy:notDefined
         SELF.ul.UnitTypeCode    = ''
@@ -60,21 +67,21 @@ BSOCollection.insertFirstNode PROCEDURE
             SELF.selTreePos     = 1     
             SELF.maxTreePos     = 1
             SELF.selQueuePos    = POINTER(SELF.ul)
-            sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
-            sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
-            sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+            !sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+            !sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+            !sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
         ELSE
-            sst.Trace('ADD(SELF.ul) error')
+            !sst.Trace('ADD(SELF.ul) error')
         END
-        sst.Trace('END:BSOCollection.insertFirstNode')
+        !sst.Trace('END:UnitsCollection.insertFirstNode')
         
         
         
         
         
-BSOCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
+UnitsCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
     CODE
-        sst.Trace('START:BSOCollection.prepNewNode')        
+        !sst.Trace('START:UnitsCollection.prepNewNode')        
         CLEAR(SELF.urec)
         SELF.urec.TreePos       = SELF.selTreePos
         SELF.urec.UnitName      = SELF.prepRndName()
@@ -86,11 +93,11 @@ BSOCollection.prepNewNode   PROCEDURE(LONG nNewRecPosition)
         SELF.urec.IsHQ          = SELF.ul.IsHQ
         SELF.urec.xPos          = (SELF.urec.TreePos-1)*50 + 1
         SELF.urec.yPos          = (nNewRecPosition - 1)*30 + 1
-        sst.Trace('END:BSOCollection.prepNewNode')        
+        !sst.Trace('END:UnitsCollection.prepNewNode')        
         
-BSOCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
+UnitsCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
     CODE
-        sst.Trace('START:BSOCollection.moveNodesToTmp')        
+        !sst.Trace('START:UnitsCollection.moveNodesToTmp')        
         FREE(SELF.tmpul)       
         LOOP i# = nStartPos TO nEndPos
             GET(SELF.ul, i#)
@@ -106,19 +113,19 @@ BSOCollection.moveNodesToTmp        PROCEDURE(LONG nStartPos, LONG nEndPos)
                 ADD(SELF.tmpul)
             END            
         END
-        sst.Trace('END:BSOCollection.moveNodesToTmp')        
+        !sst.Trace('END:UnitsCollection.moveNodesToTmp')        
         
-BSOCollection.addEmptyNode       PROCEDURE
+UnitsCollection.addEmptyNode       PROCEDURE
     CODE
-        sst.Trace('START:BSOCollection.insertEmptyNode')        
+        !sst.Trace('START:UnitsCollection.insertEmptyNode')        
         ADD(SELF.ul)
         IF NOT ERRORCODE() THEN
         END        
-        sst.Trace('END:BSOCollection.insertEmptyNode')        
+        !sst.Trace('END:UnitsCollection.insertEmptyNode')        
         
-BSOCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
+UnitsCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
     CODE
-        sst.Trace('START:BSOCollection.insertCurrentNode')        
+        !sst.Trace('START:UnitsCollection.insertCurrentNode')        
         GET(SELF.ul, nPosition)
         IF NOT ERRORCODE() THEN
             SELF.ul.TreePos     = SELF.urec.TreePos
@@ -133,11 +140,11 @@ BSOCollection.insertCurrentPrepNode     PROCEDURE(LONG nPosition)
             SELF.ul.markForDisbl    = FALSE
             PUT(SELF.ul)
         END
-        sst.Trace('END:BSOCollection.insertCurrentNode')        
+        !sst.Trace('END:UnitsCollection.insertCurrentNode')        
         
-BSOCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)        
+UnitsCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)        
     CODE
-        sst.Trace('START:BSOCollection.moveNodesBackFromTmp')        
+        !sst.Trace('START:UnitsCollection.moveNodesBackFromTmp')        
         j# = 0
         LOOP i# = nStartPos TO RECORDS(SELF.ul)
             j# = j# + 1
@@ -159,11 +166,11 @@ BSOCollection.moveNodesBackFromTmp  PROCEDURE(LONG nStartPos)
                 END                    
             END            
         END        
-        sst.Trace('END:BSOCollection.moveNodesBackFromTmp')        
+        !sst.Trace('END:UnitsCollection.moveNodesBackFromTmp')        
         
-BSOCollection.insertLastNode        PROCEDURE()
+UnitsCollection.insertLastNode        PROCEDURE()
     CODE
-        sst.Trace('START:BSOCollection.insertLastNode')        
+        !sst.Trace('START:UnitsCollection.insertLastNode')        
         SELF.ul.TreePos         = SELF.urec.TreePos
         SELF.ul.UnitName        = SELF.urec.UnitName
         SELF.ul.UnitType        = SELF.urec.UnitType
@@ -178,80 +185,80 @@ BSOCollection.insertLastNode        PROCEDURE()
         IF NOT ERRORCODE() THEN
             SELF.selQueuePos    = POINTER(SELF.ul)
             SELF.selTreePos     = SELF.ul.TreePos
-            sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
-            sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
-            sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+            !sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+            !sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+            !sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
         ELSE
-            sst.Trace('ADD(SELF.ul) error')
+            !sst.Trace('ADD(SELF.ul) error')
         END        
-        sst.Trace('END:BSOCollection.insertLastNode')        
+        !sst.Trace('END:UnitsCollection.insertLastNode')        
         
         
         
-BSOCollection.InsertNode    PROCEDURE
+UnitsCollection.InsertNode    PROCEDURE
 tmpUnitName     STRING(100)
 CODE
     ! insert a new node to the current collection
-    sst.Trace('START:BSOCollection.InsertNode')
+    !sst.Trace('START:UnitsCollection.InsertNode')
         
     tmpUnitName    = SELF.prepRndName()
     
     IF RECORDS(SELF.ul) = 0 THEN
         ! 1st records
-        sst.Trace('1st queue record')        
-        sst.Trace('CALL:SELF.insertFirstNode()')
+        !sst.Trace('1st queue record')        
+        !sst.Trace('CALL:SELF.insertFirstNode()')
         SELF.insertFirstNode()                   
     ELSE
         ! inside the queue
-        sst.Trace('inside the queue')
+        !sst.Trace('inside the queue')
         
         ! increment Tree Position
-        sst.Trace('increment Tree Position')
+        !sst.Trace('increment Tree Position')
         SELF.selTreePos  = SELF.ul.TreePos + 1
         IF SELF.selTreePos > SELF.maxTreePos THEN
             SELF.maxTreePos = SELF.selTreePos
         END
         
         ! preserve current position and all records number
-        sst.Trace('preserve current position and all records number')
+        !sst.Trace('preserve current position and all records number')
         allPos# = RECORDS(SELF.ul)
                 
         ! prepare the new record
-        sst.Trace('prepare the new record')
-        sst.Trace('CALL:SELF.prepNewNode()')
+        !sst.Trace('prepare the new record')
+        !sst.Trace('CALL:SELF.prepNewNode()')
         SELF.prepNewNode(SELF.selQueuePos + 1)               
         
         ! check the position inside the queue
         ! move to the temporary queue
         ! change yPos values
-        sst.Trace('check the position inside the queue')
+        !sst.Trace('check the position inside the queue')
         IF (SELF.selQueuePos + 1) < (allPos# + 1) THEN            
             ! in the middle of queue
-            sst.Trace('in the middle of queue')           
-            sst.Trace('CALL:SELF.moveNodesToTmp(SELF.selQueuePos + 1, allPos#)')           
+            !sst.Trace('in the middle of queue')           
+            !sst.Trace('CALL:SELF.moveNodesToTmp(SELF.selQueuePos + 1, allPos#)')           
             SELF.moveNodesToTmp(SELF.selQueuePos + 1, allPos#)
                                     
             ! add empty record
-            sst.Trace('add empty record')
-            sst.Trace('CALL:SELF.addEmptyNode()')           
+            !sst.Trace('add empty record')
+            !sst.Trace('CALL:SELF.addEmptyNode()')           
             SELF.addEmptyNode()            
             
             
             ! insert current record
-            sst.Trace('insert current record')
-            sst.Trace('CALL:SELF.insertCurrentNode(SELF.selQueuePos + 1)')           
+            !sst.Trace('insert current record')
+            !sst.Trace('CALL:SELF.insertCurrentNode(SELF.selQueuePos + 1)')           
             SELF.insertCurrentPrepNode(SELF.selQueuePos + 1)        
                         
             ! copy back records
-            sst.Trace('copy back records')
+            !sst.Trace('copy back records')
             IF POINTER(SELF.tmpul) > 0 THEN
-                sst.Trace('CALL:SELF.moveNodesBackFromTmp(SELF.selQueuePos + 2)')                                           
+                !sst.Trace('CALL:SELF.moveNodesBackFromTmp(SELF.selQueuePos + 2)')                                           
                 SELF.moveNodesBackFromTmp(SELF.selQueuePos + 2)
                 
             END    
             
             ! get new current Position            
-            sst.Trace('get new current Position')
+            !sst.Trace('get new current Position')
             SELF.selQueuePos    = SELF.selQueuePos + 1
             GET(SELF.ul, SELF.selQueuePos + 1)
             IF NOT ERRORCODE() THEN
@@ -259,18 +266,18 @@ CODE
             END                        
         ELSE
             ! last on queue
-            sst.Trace('last on queue')
-            sst.Trace('CALL:SELF.insertLastNode()')             
+            !sst.Trace('last on queue')
+            !sst.Trace('CALL:SELF.insertLastNode()')             
             SELF.insertLastNode()            
         END                              
     END
-    sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
-    sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
-    sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
-    sst.Trace('END:BSOCollection.InsertNode')
+    !sst.Trace('SELF.selTreePos = ' & SELF.selTreePos)
+    !sst.Trace('SELF.maxTreePos = ' & SELF.maxTreePos)
+    !sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+    !sst.Trace('END:UnitsCollection.InsertNode')
     
     
-BSOCollection.InsertNode    PROCEDURE(*UnitBasicRecord pURec)
+UnitsCollection.InsertNode    PROCEDURE(*UnitBasicRecord pURec)
 tmpUnitName         STRING(100)
 CODE
     ! do something
@@ -415,9 +422,15 @@ CODE
               
     END        
     
-    RETURN TRUE        
+    RETURN TRUE       
     
-BSOCOllection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
+UnitsCollection.InsertNode  PROCEDURE(*BSO pBSO)
+    CODE
+        sst.Trace('UnitsCollection.InsertNode  PROCEDURE(*BSO pBSO) BEGIN')
+        
+        sst.Trace('UnitsCollection.InsertNode  PROCEDURE(*BSO pBSO) END')
+           
+UnitsCollection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
     CODE
         SELF.ul.UnitName        = pUrec.UnitName
         SELF.ul.UnitType        = pURec.UnitType
@@ -434,9 +447,29 @@ BSOCOllection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
         ADD(SELF.ul)
         
         SELF.selQueuePos    = POINTER(SELF.ul)
+        !MESSAGE('Units = ' & RECORDS(SELF.ul))
         RETURN TRUE
         
-BSOCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
+UnitsCollection.AddNode  PROCEDURE(*BSO pBSO)
+    CODE
+        sst.Trace('UnitsCollection.AddNode  PROCEDURE(*BSO pBSO) BEGIN')
+        
+        SELF.collection.unit.urec.UnitName  = pBSO.urec.UnitName
+        SELF.collection.unit.urec.UnitType  = pBSO.urec.UnitType
+        SELF.collection.unit.urec.UnitTypeCode  = pBSO.urec.UnitTypeCode
+        SELF.collection.unit.urec.Echelon       = pBSO.urec.Echelon
+        SELF.collection.unit.urec.Hostility     = pBSO.urec.Hostility
+        SELF.collection.unit.urec.IsHQ          = pBSO.urec.IsHQ
+        SELF.collection.unit.urec.xPos          = pBSO.urec.xPos
+        SELF.collection.unit.urec.yPos          = pBSO.urec.yPos
+        ADD(SELF.collection)
+        SELF.selQueuePos    = POINTER(SELF.collection)
+                
+        sst.Trace('UnitsCollection.AddNode  PROCEDURE(*BSO pBSO) END')
+        RETURN TRUE
+        
+        
+UnitsCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
     CODE
         ! get current node
     
@@ -456,7 +489,33 @@ BSOCollection.GetNode       PROCEDURE(*UnitBasicRecord pURec)
             RETURN FALSE
         END    
         
-BSOCollection.GetNode       PROCEDURE()
+UnitsCollection.GetNode       PROCEDURE(LONG nPointer, *UnitBasicRecord pURec)
+    CODE
+        ! get current node
+        
+        currPos# = POINTER(SELF.ul)
+        
+        GET(SELF.ul, nPointer)
+        IF NOT ERRORCODE() THEN
+            pUrec.UnitName          = SELF.ul.UnitName
+            pUrec.UnitType          = SELF.ul.UnitType
+            pUrec.UnitTypeCode      = SELF.ul.UnitTypeCode
+            pUrec.Echelon           = SELF.ul.Echelon
+            pURec.Hostility         = SELF.ul.Hostility
+            pUrec.IsHQ              = SELF.ul.IsHQ
+            pUrec.xPos              = SELF.ul.xPos
+            pUrec.yPos              = SELF.ul.yPos
+            pUrec.TreePos           = SELF.ul.TreePos
+            ret#    = TRUE
+        ELSE
+            ret#    = FALSE
+        END
+        
+        GET(SELF.ul, currPos#)
+        RETURN ret#
+               
+        
+UnitsCollection.GetNode       PROCEDURE()
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -464,10 +523,215 @@ BSOCollection.GetNode       PROCEDURE()
         ELSE
             RETURN FALSE
         END
+
+        
+Action.Construct    PROCEDURE()
+    CODE
+        SELF.arec.ActionPoints          &= NEW(PosList)
+        
+Action.Init    PROCEDURE(*ActionBasicRecord pARec)
+    CODE
+        SELF.arec.ActionName            = pArec.ActionName
+        SELF.arec.ActionPointsNumber    = pArec.ActionPointsNumber
+        SELF.arec.ActionType            = pArec.ActionType
+        SELF.arec.ActionTypeCode        = pArec.ActionTypeCode
+        ! action points
+        !SELF.arec.ActionPoints          &= NEW(PosList)
+        LOOP i# = 1 TO RECORDS(pArec.ActionPoints)
+            GET(pArec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                SELF.arec.ActionPoints.xPos = pArec.ActionPoints.xPos
+                SELF.arec.ActionPoints.yPos = pArec.ActionPoints.yPos
+                ADD(SELF.arec.ActionPoints)
+                
+                ! usual Position records
+                CASE i#
+                OF 1
+                    SELF.xPos1  = pArec.ActionPoints.xPos
+                    SELF.yPos1  = pArec.ActionPoints.yPos
+                    
+                    SELF.lowestX = SELF.xPos1
+                    SELF.lowestY = SELF.yPos1
+                OF 2
+                    SELF.xPos2  = pArec.ActionPoints.xPos
+                    SELF.yPos2  = pArec.ActionPoints.yPos
+                    
+                    IF SELF.xPos2 < SELF.lowestX THEN
+                        SELF.lowestX    = SELF.xPos2
+                    ELSE
+                        SELF.highestX   = SELF.xPos2
+                    END
+                    IF SELF.yPos2 < SELF.lowestY THEN
+                        SELF.lowestY    = SELF.yPos2
+                    ELSE
+                        SELF.highestY   = SELF.yPos2
+                    END                                                           
+                ELSE
+                    ! lowest & highest
+                    IF pArec.ActionPoints.xPos < SELF.lowestX THEN
+                        SELF.lowestX    = pArec.ActionPoints.xPos
+                    END
+                    IF pArec.ActionPoints.xPos > SELF.highestX THEN
+                        SELF.highestX    = pArec.ActionPoints.xPos
+                    END
+                    IF pArec.ActionPoints.yPos < SELF.lowestY THEN
+                        SELF.lowestY    = pArec.ActionPoints.yPos
+                    END
+                    IF pArec.ActionPoints.yPos > SELF.highestY THEN
+                        SELF.highestY   = pArec.ActionPoints.yPos
+                    END                    
+                END
+            END            
+        END
+        
+        !SELF.arec.xPos                  = pArec.xPos
+        !SELF.arec.yPos                  = pArec.yPos
+        
+        RETURN TRUE
+        
+Action.Destruct     PROCEDURE()
+    CODE
+        DISPOSE(SELF.arec.ActionPoints)
+        
+        
+Action.ComputeSelectRectangle       PROCEDURE()
+    CODE
+        LOOP i# = 1 TO RECORDS(SELF.arec.ActionPoints)
+            GET(SELF.arec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN                                
+                x#  = SELF.arec.ActionPoints.xPos
+                y#  = SELF.arec.ActionPoints.yPos
+                ! usual Position records
+                CASE i#
+                OF 1
+                    SELF.lowestX = x#
+                    SELF.lowestY = y#
+                OF 2                    
+                    IF x# < SELF.lowestX THEN
+                        SELF.lowestX    = x#
+                    ELSE
+                        SELF.highestX   = x#
+                    END
+                    IF y# < SELF.lowestY THEN
+                        SELF.lowestY    = y#
+                    ELSE
+                        SELF.highestY   = y#
+                    END                                                           
+                ELSE
+                    ! lowest & highest
+                    IF x# < SELF.lowestX THEN
+                        SELF.lowestX    = x#
+                    END
+                    IF x# > SELF.highestX THEN
+                        SELF.highestX    = x#
+                    END
+                    IF y# < SELF.lowestY THEN
+                        SELF.lowestY    = y#
+                    END
+                    IF y# > SELF.highestY THEN
+                        SELF.highestY   = y#
+                    END                    
+                END
+            END            
+        END
+        
+Action.GetAnchorPoints      PROCEDURE(*LONG pLowestX, *LONG pLowestY, *LONG pHighestX, *LONG pHighestY)        
+    CODE
+        SELF.ComputeSelectRectangle()
+        pLowestX    = SELF.lowestX
+        pLowestY    = SELF.lowestY
+        pHighestX   = SELF.highestX
+        pHighestY   = SELF.highestY
+        RETURN TRUE
+        
+Action.SetText      PROCEDURE(STRING sText)
+    CODE
+        SELF.arec.editableText  = sText
+        RETURN TRUE
+        
+Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        currentSlope$   = (SELF.xPos1 - SELF.xPos2) / (SELF.yPos1 - SELF.yPos2)
+        computedSlope$  = (SELF.xPos1 - nXPos) / (SELF.yPos1 - nYPos)        
+        
+        !MESSAGE('slopes ' & currentSlope$ & ' vs. ' & computedSlope$)
+        IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
+            RETURN TRUE
+        ELSE
+            RETURN FALSE
+        END
+        
+Action.CheckRectangleByMouse        PROCEDURE(LONG nXPos, LONG nYPos)                       
+    CODE
+        !sst.Trace('Action.CheckRectangleByMouse BEGIN')
+        IF (SELF.xPos1 <= nXPOs) AND (nXPos <= SELF.xPos2) AND |
+            (SELF.yPos1 <= nYPos) AND (nYPos <= SELF.yPos2) THEN
+            RETURN TRUE
+        ELSE
+            RETURN FALSE
+        END
+        !sst.Trace('Action.CheckRectangleByMouse END')
+        
+Action.CheckFreeHandByMouse PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE                
+
+        retVal# = FALSE
+        
+        IF (SELF.lowestX <= nXPos) AND |
+            (nXPos <= SELF.highestX) AND |
+            (SELF.lowestY <= nYPos) AND |
+            (nYPos <= SELF.highestY) THEN
+            retVal# = TRUE            
+        END
+        
+        
+        OMIT('_noCompile')
+        LOOP i# = 1 TO RECORDS(SELF.arec.ActionPoints)
+            GET(SELF.arec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                IF i# = 1 THEN
+                    xPos1# = SELF.arec.ActionPoints.xPos
+                    yPos1# = SELF.arec.ActionPoints.yPos
+                END
+                IF i# = 2 THEN
+                    xPos2# = SELF.arec.ActionPoints.xPos
+                    yPos2# = SELF.arec.ActionPoints.yPos
+                    
+                    currentSlope$   = (xPos1# - xPos2#) / (yPos1# - yPos2#)
+                    computedSlope$  = (xPos1# - nXPos) / (yPos1# - nYPos)    
+                    
+                    IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
+                        retVal# = TRUE
+                        BREAK                        
+                    END
+                END
+                IF i# > 2 THEN
+                    xPos1#  = xPos2#
+                    yPos1#  = yPos2#
+                    
+                    xPos2# = SELF.arec.ActionPoints.xPos
+                    yPos2# = SELF.arec.ActionPoints.yPos
+                    
+                    currentSlope$   = (xPos1# - xPos2#) / (yPos1# - yPos2#)
+                    computedSlope$  = (xPos1# - nXPos) / (yPos1# - nYPos)      
+                    
+                    IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
+                        retVal# = TRUE
+                        BREAK
+                    END
+                END                                                                                         
+            END                        
+        END        
+        _noCompile
+        
+        RETURN retVal#
+        
+        
+                              
         
         
         
-BSOCollection.DeleteNode     PROCEDURE
+UnitsCollection.DeleteNode     PROCEDURE
 CODE
     ! do something
     
@@ -516,7 +780,7 @@ CODE
         
     END                
     
-BSOCollection.DisableNode    PROCEDURE
+UnitsCollection.DisableNode    PROCEDURE
 CODE
     ! do something
     
@@ -527,7 +791,7 @@ CODE
         PUT(SELF.ul)
     END   
     
-BSOCollection.SelUp     PROCEDURE
+UnitsCollection.SelUp     PROCEDURE
 CODE
     ! do something
     
@@ -539,7 +803,7 @@ CODE
     END
     
     
-BSOCollection.SelDown     PROCEDURE
+UnitsCollection.SelDown     PROCEDURE
 CODE
     ! do something
     
@@ -551,60 +815,60 @@ CODE
     END
     
     
-BSOCollection.SelLeft     PROCEDURE
+UnitsCollection.SelLeft     PROCEDURE
 CODE
     ! do something
     RETURN TRUE
         
     
-BSOCollection.SelRight     PROCEDURE
+UnitsCollection.SelRight     PROCEDURE
 CODE
     ! do something    
     RETURN TRUE
                    
-BSOCollection.Records       PROCEDURE()        
+UnitsCollection.Records       PROCEDURE()        
     CODE
-        sst.Trace('BEGIN:BSOCollection.Records')
-        sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
-        sst.Trace('END:BSOCollection.Records')
+        !sst.Trace('BEGIN:UnitsCollection.Records')
+        !sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
+        !sst.Trace('END:UnitsCollection.Records')
         RETURN RECORDS(SELF.ul)
         
-BSOCollection.Pointer       PROCEDURE()
+UnitsCollection.Pointer       PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.Pointer')
-        sst.Trace('POINTER(SELF.ul) = ' & POINTER(SELF.ul))
-        sst.Trace('END:BSOCollection.Pointer')
+        !sst.Trace('BEGIN:UnitsCollection.Pointer')
+        !sst.Trace('POINTER(SELF.ul) = ' & POINTER(SELF.ul))
+        !sst.Trace('END:UnitsCollection.Pointer')
         RETURN POINTER(SELF.ul)
         
-BSOCollection.GetCurrentSelPos      PROCEDURE()
+UnitsCollection.GetCurrentSelPos      PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.GetCurrentSelPos')
-        sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
-        sst.Trace('END:BSOCollection.GetCurrentSelPos')
+        !sst.Trace('BEGIN:UnitsCollection.GetCurrentSelPos')
+        !sst.Trace('SELF.selQueuePos = ' & SELF.selQueuePos)
+        !sst.Trace('END:UnitsCollection.GetCurrentSelPos')
         RETURN SELF.selQueuePos
         
                                 
 
-BSOCollection.Get        PROCEDURE()
+UnitsCollection.Get        PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.Get()')
+        !sst.Trace('BEGIN:UnitsCollection.Get()')
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
-            succes# = TRUE
+            success# = TRUE
         ELSE
             success# = FALSE
         END
-        sst.Trace('END:BSOCollection.Get')
+        !sst.Trace('END:UnitsCollection.Get')
         RETURN success#
 
-BSOCollection.UnitTypeCode  PROCEDURE()
+UnitsCollection.UnitTypeCode  PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.UnitTypeCode')
-        sst.Trace('SELF.ul.UnitTypeCode = ' & SELF.ul.UnitTypeCode)
-        sst.Trace('END:BSOCollection.UnitTypeCode')
+        !sst.Trace('BEGIN:UnitsCollection.UnitTypeCode')
+        !sst.Trace('SELF.ul.UnitTypeCode = ' & SELF.ul.UnitTypeCode)
+        !sst.Trace('END:UnitsCollection.UnitTypeCode')
         RETURN SELF.ul.UnitTypeCode
         
-BSOCOllection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
+UnitsCollection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN       
@@ -619,14 +883,14 @@ BSOCOllection.SetUnitTypeCode       PROCEDURE(STRING sUnitTypeCode)
             RETURN FALSE
         END    
         
-BSOCollection.Echelon      PROCEDURE()        
+UnitsCollection.Echelon      PROCEDURE()        
     CODE
-        sst.Trace('BEGIN:BSOCollection.Echelon')
-        sst.Trace('SELF.ul.Echelon = ' & SELF.ul.Echelon)
-        sst.Trace('END:BSOCollection.Echelon')
+        !sst.Trace('BEGIN:UnitsCollection.Echelon')
+        !sst.Trace('SELF.ul.Echelon = ' & SELF.ul.Echelon)
+        !sst.Trace('END:UnitsCollection.Echelon')
         RETURN SELF.ul.Echelon                
 
-BSOCollection.SetEchelon    PROCEDURE(LONG nEchelon)
+UnitsCollection.SetEchelon    PROCEDURE(LONG nEchelon)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -642,23 +906,23 @@ BSOCollection.SetEchelon    PROCEDURE(LONG nEchelon)
             RETURN FALSE
         END    
         
-BSOCollection.xPos  PROCEDURE()
+UnitsCollection.xPos  PROCEDURE()
     CODE
         RETURN SELF.ul.xPos
                                 
         
-BSOCollection.yPos  PROCEDURE()
+UnitsCollection.yPos  PROCEDURE()
     CODE
         RETURN SELF.ul.yPos
         
-BSOCollection.Hostility     PROCEDURE()
+UnitsCollection.Hostility     PROCEDURE()
     CODE
-        sst.Trace('BEGIN:BSOCollection.Hostility')
-        sst.Trace('SELF.ul.Hostility = ' & SELF.ul.Hostility)
-        sst.Trace('END:BSOCollection.Hostility')
+        !sst.Trace('BEGIN:UnitsCollection.Hostility')
+        !sst.Trace('SELF.ul.Hostility = ' & SELF.ul.Hostility)
+        !sst.Trace('END:UnitsCollection.Hostility')
         RETURN SELF.ul.Hostility
         
-BSOCollection.SetHostility  PROCEDURE(LONG nHostility)
+UnitsCollection.SetHostility  PROCEDURE(LONG nHostility)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -675,16 +939,16 @@ BSOCollection.SetHostility  PROCEDURE(LONG nHostility)
         END    
                                
         
-BSOCollection.markForDisbl  PROCEDURE()
+UnitsCollection.markForDisbl  PROCEDURE()
     CODE
         RETURN SELF.ul.markForDel
         
-BSOCollection.IsHQ  PROCEDURE()
+UnitsCollection.IsHQ  PROCEDURE()
     CODE
         ! do something
         RETURN SELF.ul.IsHQ
 
-BSOCollection.SetHQ PROCEDURE(BOOL bIsHQ)
+UnitsCollection.SetHQ PROCEDURE(BOOL bIsHQ)
     CODE
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
@@ -700,12 +964,13 @@ BSOCollection.SetHQ PROCEDURE(BOOL bIsHQ)
             RETURN FALSE
         END    
         
-BSOCollection.UnitName      PROCEDURE
+UnitsCollection.UnitName      PROCEDURE
     CODE
         RETURN SELF.ul.UnitName
         
-BSOCollection.SetUnitName   PROCEDURE(STRING sUnitName)
+UnitsCollection.SetUnitName   PROCEDURE(STRING sUnitName)
     CODE
+        !MESSAGE('selQPos = ' & SELF.selQueuePos)
         GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
             SELF.ul.UnitName    = sUnitName
@@ -713,19 +978,21 @@ BSOCollection.SetUnitName   PROCEDURE(STRING sUnitName)
             IF NOT ERRORCODE() THEN
                 RETURN TRUE
             ELSE
+                MESSAGE('error PUT')
                 RETURN FALSE                
             END
         ELSE
+            !MESSAGE('error GET')
             RETURN FALSE
         END
                
                 
-BSOCollection.TreePos       PROCEDURE
+UnitsCollection.TreePos       PROCEDURE
     CODE
         RETURN SELF.ul.TreePos
         
         
-BSOCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)        
+UnitsCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)        
     CODE
         LOOP i# = 1 TO RECORDS(SELF.ul)
             GET(SELF.ul, i#)
@@ -733,8 +1000,30 @@ BSOCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)
                 IF (SELF.ul.xPos < nXPos) AND (nXPos < SELF.ul.xPos + 50) THEN
                     IF (SELF.ul.yPos < nYPos) AND (nYPos < SELF.ul.yPos + 30) THEN
                         ! found Unit selection
+                        sst.Trace('UnitsCollection.SelectByMouse = ' & i#)
                         SELF.selTreePos     = SELF.ul.TreePos
                         SELF.selQueuePos    = i#
+                        RETURN TRUE
+                    END                
+                END            
+            END
+        END
+        
+        RETURN FALSE
+        
+UnitsCollection.CheckByMouse        PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE
+        currentSelTreePos# = SELF.selTreePos
+        currentSelQueuePos# = SELF.selQueuePos
+                
+        LOOP i# = 1 TO RECORDS(SELF.ul)
+            GET(SELF.ul, i#)
+            IF NOT ERRORCODE() THEN
+                IF (SELF.ul.xPos < nXPos) AND (nXPos < SELF.ul.xPos + 50) THEN
+                    IF (SELF.ul.yPos < nYPos) AND (nYPos < SELF.ul.yPos + 30) THEN
+                        ! found Unit selection
+                        !sst.Trace('UnitsCollection.CheckByMouse = ' & i#)
+                        GET(SELF.ul, currentSelQueuePos#)
                         RETURN i#
                     END                
                 END            
@@ -743,1833 +1032,86 @@ BSOCollection.SelectByMouse PROCEDURE(LONG nXPos, LONG nYPos)
         
         RETURN 0
         
-     
-C2IP.Construct      PROCEDURE()
-    CODE
-        ! initialize default objects    
-    !SELF.ul     &= NEW(UnitsList)
-    !SELF.tmpul  &= NEW(UnitsList)
-        SELF.ul     &= NEW(BSOCollection)
-        SELF.tmpul  &= NEW(BSOCollection)
-    
-    ! default C2IP Name
-    SELF.Name   = ''
-    LOOP 10 TIMES
-        SELF.Name = CLIP(SELF.Name) & CHR(RANDOM(97, 122))    
-    END       
-    
-    ! referenced C2IPs list
-    SELF.refC2IPs   &= NEW(C2IPsList)
-    
-    SELF.labelEditMode  = FALSE
         
-C2IP.Destruct       PROCEDURE()
-    CODE    
-        ! destroy default objects    
-        DISPOSE(SELF.refC2IPs)        
-        DISPOSE(SELF.tmpul)
-        DISPOSE(SELF.ul)
-        
-C2IP.InitDraw     PROCEDURE(Draw pDraw)
-CODE
-    ! Init Drawing Object    
-    SELF.drwImg     &= pDraw        
-                  
-OrgChartC2IP.Construct     PROCEDURE()
+UnitsCollection.ChangeNodePos PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
-        PARENT.Construct()    
-
-OrgChartC2IP.Redraw PROCEDURE()
-nCurrentUnitType    LONG
-CODE
-    ! redraw OrgChar C2IP content
-    sst.Trace('BEGIN:OrgChartC2IP.Redraw')
-    
-    SELF.drwImg.Blank(COLOR:White)
-    SELF.drwImg.Setpencolor(COLOR:Black)
-    SELF.drwImg.SetPenWidth(1)
-    
-    sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
-    LOOP i# = 1 TO RECORDS(SELF.ul)
-        GET(SELF.ul.ul, i#)
-        sst.Trace('i# = ' & i#)
+        GET(SELF.ul, SELF.selQueuePos)
         IF NOT ERRORCODE() THEN
-            ! Unit Type Code
-            sst.Trace('! Unit Type Code = ' & CLIP(SELF.ul.UnitTypeCode()) )
-            CASE CLIP(SELF.ul.UnitTypeCode())
-            OF '120300'
-                ! Amphibious
-                IF SELF.DrawNode_Amphibious(FALSE) = TRUE THEN
-                END
-            OF '120400'
-                ! Antitank/Antiarmor
-                IF SELF.DrawNode_Antiarmor(FALSE) = TRUE THEN
-                END
-            OF '120401'
-                ! Antitank/Antiarmor->Armored
-                IF SELF.DrawNode_Antiarmor_Armored(FALSE) = TRUE THEN
-                END
-            OF '120402'
-                ! Antitank/Antiarmor->Motorized
-                IF SELF.DrawNode_Antiarmor_Motorized(FALSE) = TRUE THEN
-                END
-            OF '120500'
-                ! Armor/Armored/Mechanized/Self-Propelled/Tracked
-                IF SELF.DrawNode_Armor(FALSE) = TRUE THEN
-                END
-            OF '120501'
-                !Armor/Armored/Mechanized/Self-Propelled/Tracked->Reconnaissance/Cavalry/Scout
-                IF SELF.DrawNode_Armor_Recon(FALSE) = TRUE THEN
-                END
-            OF '120502'
-                ! Armor/Armored/Mechanized/Self-Propelled/Tracked->Amphibious
-                IF SELF.DrawNode_Armor_Amphibious(FALSE) = TRUE THEN
-                END
-            OF '120600'
-                ! Army Aviation/Aviation Rotary Wing
-                IF SELF.DrawNode_ArmyAviation(FALSE) = TRUE THEN
-                END
-            OF '120601'
-                ! Army Aviation/Aviation Rotary Wing->Reconnaissance
-                IF SELF.DrawNode_ArmyAviation_Recon(FALSE) = TRUE THEN
-                END
-            OF '120700'
-                ! Aviation Composite
-                IF SELF.DrawNode_AviationComposite(FALSE) = TRUE THEN
-                END
-            OF '120800'
-                ! Aviation Fixed Wing
-                IF SELF.DrawNode_AviationFixedWing(FALSE) = TRUE THEN
-                END
-            OF '120801'
-                ! Aviation Fixed Wing->Reconnaissance
-                IF SELF.DrawNode_AviationFixedWing_Recon(FALSE) = TRUE THEN
-                END
-            OF '120900'
-                ! Combat
-                IF SELF.DrawNode_Combat(FALSE) = TRUE THEN
-                END
-            OF '121000'
-                ! Combined Arms
-                IF SELF.DrawNode_CombinedArms(FALSE) = TRUE THEN
-                END
-            OF '121100'
-                ! Infantry
-                IF SELF.DrawNode_Infantry(FALSE) = TRUE THEN
-                END
-            OF '121101'
-                ! Infantry Amphibious
-                IF SELF.DrawNode_Infantry_Amphibious(FALSE) = TRUE THEN
-                END
-            OF '121102'
-                ! Infantry Armored/Mechanized/Tracked
-                IF SELF.DrawNode_Infantry_Armored(FALSE) = TRUE THEN
-                END
-            OF '121103'
-                ! Infantry Main Gun System
-                IF SELF.DrawNode_Infantry_MainGunSystem(FALSE) = TRUE THEN
-                END
-            OF '121104'
-                ! Infantry Motorized
-                IF SELF.DrawNode_Infantry_Motorized(FALSE) = TRUE THEN
-                END
-            OF '121105'
-                ! Infantry Infantry Fighting Vehicle
-                IF SELF.DrawNode_Infantry_FightingVehicle(FALSE) = TRUE THEN
-                END
-            OF '121200'
-                ! Observer
-                IF SELF.DrawNode_Observer(FALSE) = TRUE THEN
-                END
-            OF '121300'
-                ! Reconnaissance/Cavalry/Scout
-                IF SELF.DrawNode_Reconnaissance(FALSE) = TRUE THEN
-                END
-            OF '121301'
-                ! Reconnaissance/Cavalry/Scout -> Reconnaissance and Surveillance
-                IF SELF.DrawNode_Reconnaissance_Recon(FALSE) = TRUE THEN
-                END
-            OF '121302'
-                ! Reconnaissance/Cavalry/Scout -> Marine
-                IF SELF.DrawNode_Reconnaissance_Marine(FALSE) = TRUE THEN
-                END
-            OF '121303'
-                ! Reconnaissance/Cavalry/Scout -> Motorized
-                IF SELF.DrawNode_Reconnaissance_Motorized(FALSE) = TRUE THEN
-                END
-            OF '121400'
-                ! Sea Air Land (SEAL)
-            OF '121500'
-                ! Snipper
-            OF '121600'
-                ! Surveillance
-            OF '121700'
-                ! Special Forces
-            OF '121800'
-                ! Special Operations Forces (SOF)
-            OF '121801'
-                ! Special Operations Forces (SOF) -> 	Fixed Wing MISO
-            OF '121802'
-                ! Special Operations Forces (SOF) -> 	Ground
-            OF '121803'
-                ! Special Operations Forces (SOF) -> 	Special Boat
-            OF '121804'
-                ! Special Operations Forces (SOF) -> 	Special SSNR
-            OF '121805'
-                ! Special Operations Forces (SOF) -> 	Underwater Demolition Team
-            OF '121900'
-                ! Unmanned Aerial Systems
-            OF '130000'
-                ! Fires
-            OF '130100'
-                ! Air Defense
-            OF '130101'
-                ! Air Defense -> Main Gun System
-            OF '130102'
-                ! Air Defense -> Missile
-            OF '130200'
-                ! Air/Land Naval Gunfire Liaison
-            OF '130300'
-                ! Field Artillery
-            OF '130301'
-                ! Field Artillery -> Self-propelled
-            OF '130302'
-                ! Field Artillery -> Target Acquisition
-            OF '130400'
-                ! Field Artillery Observer
-            OF '130500'
-                ! Joint Fire Support
-            OF '130600'
-                ! Meteorological
-            OF '130700'
-                ! Missile
-            OF '130800'
-                ! Mortar
-            OF '130801'
-                ! Mortar -> Armored/Mechanized/Tracked
-            OF '130802'
-                ! Mortar ->	Self-Propelled Wheeled
-            OF '130803'
-                ! Mortar -> Towed
-            OF '130900'
-                ! Survey
-            OF '140000'
-                ! Protection
-            OF '140100'
-                ! Chemical Biological Radiological Nuclear Defense
-            OF '140101'
-                ! Chemical Biological Radiological Nuclear Defense -> Mechanized
-            OF '140102'
-                ! Chemical Biological Radiological Nuclear Defense -> Motorized
-            OF '140103'
-                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance
-            OF '140104'
-                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Armored
-            OF '140105'
-                ! Chemical Biological Radiological Nuclear Defense -> Reconnaissance Equipped
-            OF '140200'
-                ! Combat Support (Maneuver Enhancement)
-            OF '140300'
-                ! Criminal Investigation Division
-            OF '140400'
-                ! Diving
-            OF '140500'
-                ! Dog
-            OF '140600'
-                ! Drilling
-            OF '140700'
-                ! Engineer
-                IF SELF.DrawNode_Engineer(FALSE) = TRUE THEN
-                END
-            OF '140701'
-                ! Engineer -> Mechanized
-                IF SELF.DrawNode_Engineer_Mechanized(FALSE) = TRUE THEN
-                END
-            OF '140702'
-                ! Engineer -> Motorized
-                IF SELF.DrawNode_Engineer_Motorized(FALSE) = TRUE THEN
-                END
-            OF '140703'
-                ! Engineer -> Reconnaissance
-                IF SELF.DrawNode_Engineer_Recon(FALSE) = TRUE THEN
-                END
-            ELSE
-                IF SELF.DrawNode_Default(FALSE) = TRUE THEN
-                END
-            END                                    
+            SELF.ul.xPos    = nXPos
+            SELF.ul.yPos    = nYPos
+            PUT(SELF.ul)
+        END 
             
-            ! Echelon
-            CASE SELF.ul.Echelon()
-            OF echTpy:Team
-                ! Team
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-            OF echTpy:Squad
-                ! Squad
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-            OF echTpy:Section
-                ! Section
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-            OF echTpy:Platoon
-                ! Platoon
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 7, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-                SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-            OF echTpy:Company
-                ! Company
-                SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 0, 4)
-            OF echTpy:Battalion
-                ! Battalion
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 1, SELF.ul.yPos() - 6, 0, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 0, 4)
-            OF echTpy:Regiment
-                ! Regiment
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 0, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 0, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 2, SELF.ul.yPos() - 6, 0, 4)
-            OF echTpy:Brigade
-                ! Brigade
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Division
-                ! Divion
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Corps
-                ! Corps
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Army
-                ! Army
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 3, 4, -4) 
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:ArmyGroup
-                ! Army Group
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 10, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 10, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 8, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 8, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Theater
-                ! Theater
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 15, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 15, SELF.ul.yPos() - 3, 4, -4) 
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 3, 4, -4) 
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 3, 4, -4)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 11, SELF.ul.yPos() - 6, 4, 4)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 11, SELF.ul.yPos() - 3, 4, -4)
-            OF echTpy:Command
-                ! Command
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 3, SELF.ul.yPos() - 6, 0, 5)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 4, 5, 0)
-                
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 0, 5)
-                SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 4, 5, 0)
-            END
-        END
+        RETURN 0
         
-    END
-    
-    SELF.drwImg.Display()
-    sst.Trace('END:OrgChartC2IP.Redraw')
-    
-
-OrgChartC2IP.DrawNode       PROCEDURE(LONG nUnitType=0)
-err1                            BOOL
-err2                            BOOL
-err3                            BOOL
-
-CODE
-    ! do something
-    
-    ! Unit Type
-    CASE nUnitType
-    OF uTpy:infantry
-        err1 = SELF.DrawNode_Infantry()
-    ELSE
-        ! Default Node
-        err1 = SELF.DrawNode_Default()                       
-    END
-    
-    err2 = SELF.DrawNode_Echelon()           
-    
-    RETURN TRUE
-    
-    
-    
-
-!OrgChartC2IP.DrawNode_*.*
-OrgChartC2IP.DrawNode_Default       PROCEDURE(BOOL bAutoDisplay)
-nFillColor      LONG
+BSO.Init            PROCEDURE(*UnitBasicRecord pUrec)
     CODE
-        sst.Trace('BEGIN:OrgChartC2IP.DrawNode_Default')
-        SELF.drwImg.Setpencolor(COLOR:Black)
-        SELF.drwImg.SetPenWidth(1)
-        
-        ! Fill color depending on Hostility
-        sst.Trace('SELF.ul.Hostility() = ' & SELF.ul.Hostility())
-        CASE CLIP(SELF.ul.Hostility())
-        OF hTpy:Unknown
-            ! yellow
-            nFillColor  = COLOR:Unknown
-            sst.Trace('nFillColor = COLOR:Unknown')
-        OF hTpy:AssumedFriend
-            ! blue
-            nFillColor  = COLOR:AssumedFriend
-            sst.Trace('nFillColor = COLOR:AssumedFriend')
-        OF hTpy:Friend
-            ! blue
-            nFillColor  = COLOR:Friend
-            sst.Trace('nFillColor = COLOR:Friend')
-        OF hTpY:Neutral
-            ! green
-            nFillColor  = COLOR:Neutral
-            sst.Trace('nFillColor = COLOR:Neutral')
-        OF hTpy:Suspect
-            ! red
-            nFillColor  = COLOR:Suspect
-            sst.Trace('nFillColor = COLOR:Suspect')
-        OF hTpy:Hostile
-            ! red
-            nFillColor  = COLOR:Hostile        
-            sst.Trace('nFillColor = COLOR:Hostile')
-        ELSE
-            nFillColor  = COLOR:Unknown
-            sst.Trace('nFillColor = COLOR:Unknown')
-        END            
-        
-        ! Fill color depeding on Enable/Disable status for new drag&drop selections
-        sst.Trace('SELF.ul.markForDisbl() = ' & SELF.ul.markForDisbl())
-        IF SELF.ul.markForDisbl() = TRUE THEN
-            ! Display as unable for newer selections
-            nFillColor  = COLOR:NodeDisabled    
-            sst.Trace('nFillColor = ' & nFillColor)
-        END    
-        sst.Trace('nFillColor = ' & nFillColor)
-        sst.Trace('before BOX')
-        SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
-        sst.Trace('after BOX')
-        sst.Trace('before SHOW')
-        SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())   
-        sst.Trace('after SHOW')
-        
-        sst.Trace('SELF.ul.IsHQ() = ' & SELF.ul.IsHQ())
-        IF SELF.ul.IsHQ() THEN
-            ! Is HQ
-            SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 0, 10)
-        END
-        
-        sst.Trace('bAutoDisplay = ' & bAutoDisplay)
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
-    
-        sst.Trace('END:OrgChartC2IP.DrawNode_Default')
-        RETURN TRUE      
-    
-OrgChartC2IP.Draw_innerSine PROCEDURE()
-    CODE
-        ! inner sine function
-        SELF.drwImg.Arc(SELF.ul.xPos() - 5, SELF.ul.yPos() + 15 + 5, 10, -10, 2700, 3599)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 5, SELF.ul.yPos() + 15 + 5, 10, -10, 0, 1800)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 5 + 10, SELF.ul.yPos() + 10, 10, 10, 1800, 3599)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 + 5, 10, -10, 0, 1800)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 25 + 10, SELF.ul.yPos() + 10, 10, 10, 1800, 3599)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 50 - 5, SELF.ul.yPos() + 20, 10, -10, 900, 1800)
-        
-OrgChartC2IP.Draw_innerEllipse       PROCEDURE()
-    CODE        
-        ! inner ellipse
-        SELF.drwImg.Line(SELF.ul.xPos() + 15, SELF.ul.yPos() + 10, 20, 0)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 15 + 20 - 5, SELF.ul.yPos() + 10, 10, 10, 2700, 900)
-        SELF.drwImg.Line(SELF.ul.xPos() + 15, SELF.ul.yPos() + 20, 20, 0)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 5 + 5, SELF.ul.yPos() + 10, 10, 10, 900, 2700)
-        
-OrgChartC2IP.Draw_medianLine        PROCEDURE()
-    CODE
-        ! median line
-        SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos(), 0, 30)
-
-OrgChartC2IP.Draw_secondDiag        PROCEDURE()
-    CODE        
-        ! second diagonal
-        SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 50, -30)
-        
-OrgChartC2IP.Draw_innerFork     PROCEDURE()
-    CODE
-        ! inner fork
-    SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() + 15 - 5, 10, 0)
-    SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() + 15 - 5, 0, 10)
-    SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 - 5, 0, 10)
-    SELF.drwImg.Line(SELF.ul.xPos() + 25 + 5, SELF.ul.yPos() + 15 - 5, 0, 10)
-        
-        
-OrgChartC2IP.Draw_innerPapillon     PROCEDURE()
-pVertices    LONG, DIM(6)
-    CODE
-        ! inner papillon
-        pVertices[1] = SELF.ul.xPos() + 25 - 5
-        pVertices[2] = SELF.ul.yPos() + 15 - 5
-        pVertices[3] = SELF.ul.xPos() + 25
-        pVertices[4] = SELF.ul.yPos() + 15
-        pVertices[5] = SELF.ul.xPos() + 25 - 5
-        pVertices[6] = SELF.ul.yPos() + 15 + 5
-        SELF.drwImg.Polygon(pVertices, COLOR:Black)
-        pVertices[1] = SELF.ul.xPos() + 25
-        pVertices[2] = SELF.ul.yPos() + 15
-        pVertices[3] = SELF.ul.xPos() + 25 + 5
-        pVertices[4] = SELF.ul.yPos() + 15 - 5
-        pVertices[5] = SELF.ul.xPos() + 25 + 5
-        pVertices[6] = SELF.ul.yPos() + 15 + 5
-        SELF.drwImg.Polygon(pVertices, COLOR:Black)
-        
-OrgChartC2IP.Draw_innerSmallClepsydra    PROCEDURE()
-pVertices    LONG, DIM(6)
-    CODE
-        ! inner clepsydra
-        pVertices[1] = SELF.ul.xPos() + 25 - 5
-        pVertices[2] = SELF.ul.yPos() + 15 - 5
-        pVertices[3] = SELF.ul.xPos() + 25 + 5
-        pVertices[4] = SELF.ul.yPos() + 15 - 5
-        pVertices[5] = SELF.ul.xPos() + 25
-        pVertices[6] = SELF.ul.yPos() + 15
-        SELF.drwImg.Polygon(pVertices, COLOR:Black)
-        pVertices[1] = SELF.ul.xPos() + 25
-        pVertices[2] = SELF.ul.yPos() + 15
-        pVertices[3] = SELF.ul.xPos() + 25 + 5
-        pVertices[4] = SELF.ul.yPos() + 15 + 5
-        pVertices[5] = SELF.ul.xPos() + 25 - 5
-        pVertices[6] = SELF.ul.yPos() + 15 + 5
-        SELF.drwImg.Polygon(pVertices, COLOR:Black)        
-        
-OrgChartC2IP.Draw_innerSmallRoundPapillon        PROCEDURE()
-pVertices    LONG, DIM(6)
-    CODE
-        ! inner small papillon
-        pVertices[1] = SELF.ul.xPos() + 25 - 4
-        pVertices[2] = SELF.ul.yPos() + 15 - 1
-        pVertices[3] = SELF.ul.xPos() + 25
-        pVertices[4] = SELF.ul.yPos() + 15
-        pVertices[5] = SELF.ul.xPos() + 25 - 4
-        pVertices[6] = SELF.ul.yPos() + 15 + 1
-        SELF.drwImg.Polygon(pVertices, COLOR:Black)
-        pVertices[1] = SELF.ul.xPos() + 25
-        pVertices[2] = SELF.ul.yPos() + 15
-        pVertices[3] = SELF.ul.xPos() + 25 + 4
-        pVertices[4] = SELF.ul.yPos() + 15 - 1
-        pVertices[5] = SELF.ul.xPos() + 25 + 4
-        pVertices[6] = SELF.ul.yPos() + 15 + 1
-        SELF.drwImg.Polygon(pVertices, COLOR:Black)
-        
-        ! inner arc chords
-        !SELF.drwImg.Chord(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() + 15 - 1, - 2, 3, 900, 2700, COLOR:Black)
-        !SELF.drwImg.Chord(SELF.ul.xPos() + 25 + 2, SELF.ul.yPos() + 15 - 1, 2, 3, 2700, 3599, COLOR:Black)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 25 - 4 - 2, SELF.ul.yPos() + 15 - 1, 2, 3, 900, 2700)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 25 + 4 + 2, SELF.ul.yPos() + 15 - 1, 2, 3, 2700, 3599)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 25 + 4 + 2, SELF.ul.yPos() + 15 - 1, 2, 3, 0, 900)
-        
-    
-OrgChartC2IP.Draw_innerRoundPapillon      PROCEDURE()
-pVertices           LONG, DIM(6)
-    CODE
-        ! inner papillon
-        SELF.Draw_innerPapillon()
-        ! inner chords
-        SELF.drwImg.Arc(SELF.ul.xPos() + 25 - 5 - 5, SELF.ul.yPos() + 15 - 5, 10, 10, 900, 2700)
-        !SELF.drwImg.Chord(SELF.ul.xPos() + 25 - 5 - 5, SELF.ul.yPos() + 15 - 5, 10, 10, 900, 2700, COLOR:Black)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 - 5, 10, 10, 2700, 3599)
-        !SELF.drwImg.Chord(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 - 5, 10, 10, 2700, 3599, COLOR:Black)
-        SELF.drwImg.Arc(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 - 5, 10, 10, 0, 900)
-        !SELF.drwImg.Chord(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 - 5, 10, 10, 0, 900, COLOR:Black)
-        
-OrgChartC2IP.Draw_innerTriangle PROCEDURE
-pVertices           LONG, DIM(6)
-    CODE
-        ! inner triangle
-        pVertices[1] = SELF.ul.xPos() + 25 - 5
-        pVertices[2] = SELF.ul.yPos() + 15 + 2
-        pVertices[3] = SELF.ul.xPos() + 25
-        pVertices[4] = SELF.ul.yPos() + 15 - 3
-        pVertices[5] = SELF.ul.xPos() + 25 + 5
-        pVertices[6] = SELF.ul.yPos() + 15 + 2
-        SELF.drwImg.Polygon(pVertices, COLOR:Black, COLOR:Black)
-               
-                                                     
-OrgChartC2IP.DrawNode_Amphibious PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        erroCode#   = SELF.DrawNode_Default(bAutoDisplay)    
-        
-        ! inner sine function
-        SELF.Draw_innerSine()
-        
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
+        SELF.urec.Echelon       = pUrec.Echelon
+        SELF.urec.Hostility     = pUrec.Hostility
+        SELF.urec.IsHQ          = pUrec.IsHQ
+        SELF.urec.TreePos       = pUrec.TreePos
+        SELF.urec.UnitName      = pUrec.UnitName
+        SELF.urec.UnitType      = pUrec.UnitType
+        SELF.urec.UnitTypeCode  = pUrec.UnitTypeCode
+        SELF.urec.xPos          = pUrec.xPos
+        SELF.urec.yPos          = pUrec.yPos                
         
         RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Antiarmor PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        erroCode#   = SELF.DrawNode_Default(bAutoDisplay)    
-        
-        ! inner arrow
-        SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 25, -30)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos(), 25, 30)            
-        
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-        
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Antiarmor_Armored PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        
-        errCode#    = SELF.DrawNode_Antiarmor(bAutoDisplay)
-        SELF.Draw_innerEllipse()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
-        
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Antiarmor_Motorized       PROCEDURE(BOOL bAutoDisplay)
-    CODE        
-        errCode#    = SELF.DrawNode_Antiarmor(bAutoDisplay)
-        SELF.Draw_medianLine()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Armor      PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#   = SELF.DrawNode_Default(bAutoDisplay)    
-        
-        ! inner ellipse
-        SELF.Draw_innerEllipse()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        
-    RETURN TRUE
-
-OrgChartC2IP.DrawNode_Armor_Recon        PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Armor(bAutoDisplay)
-        ! 2nd diagonal
-        SELF.Draw_secondDiag()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Armor_Amphibious   PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Armor(bAutoDisplay)
-        ! inner sine
-        SELF.Draw_innerSine()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-                RETURN TRUE
-        
-OrgChartC2IP.DrawNode_ArmyAviation  PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#   = SELF.DrawNode_Default(bAutoDisplay)
-        ! inner papillon
-        SELF.Draw_innerPapillon()                
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_ArmyAviation_Recon     PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_ArmyAviation(bAutoDisplay)
-        ! second diagonale
-        SELF.Draw_secondDiag()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        RETURN TRUE                
-        
-OrgChartC2IP.DrawNode_AviationComposite     PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Default()
-        ! clepsydra
-        SELF.Draw_innerSmallClepsydra()
-        ! round papillon
-        SELF.Draw_innerSmallRoundPapillon()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_AviationFixedWing     PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Default()
-        ! inner round papillon
-        SELF.Draw_innerRoundPapillon()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        RETURN TRUE        
-        
-OrgChartC2IP.DrawNode_AviationFixedWing_Recon     PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_AviationFixedWing(bAutoDisplay)        
-        ! inner second diagonal
-        SELF.Draw_secondDiag()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        RETURN TRUE        
-                
-        
-OrgChartC2IP.DrawNode_Combat         PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Default()
-        ! CBT
-        SELF.drwImg.Show(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() + 15 + 5, 'CBT')       
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_CombinedArms   PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Default(bAutoDisplay)
-        
-        ! inner ellipse
-        SELF.Draw_innerEllipse()
-        ! inner empty clepsydra
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() + 15 - 5, 20, 10)        
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() + 15 + 5, 20, -10)
 
         
+BSO.BSOOpr.Eql      PROCEDURE(GenericClass c)
+    CODE
+        RETURN PARENT.ClassOperators.Eql(c)
         
+BSO.BSOOpr.Eql      PROCEDURE(BSO c)
+    CODE
+        sst.Trace('BSO.BSOOpr.Eql      PROCEDURE(BSO c) BEGIN')        
+                
+        SELF.urec.Echelon     = c.urec.Echelon
+        SELF.urec.Hostility   = c.urec.Hostility
+        SELF.urec.IsHQ        = c.urec.IsHQ
+        SELF.urec.TreePos     = c.urec.TreePos        
+        sst.Trace('     SELF.urec.UnitName = ' & SELF.urec.UnitName)
+        sst.Trace('     c.urec.UnitName = ' & c.urec.UnitName)
+        SELF.urec.UnitName    = c.urec.UnitName        
+        sst.Trace('     SELF.urec.UnitName = ' & SELF.urec.UnitName)
+        SELF.urec.UnitType    = c.urec.UnitType
+        SELF.urec.UnitTypeCode    = c.urec.UnitTypeCode
+        SELF.urec.xPos        = c.urec.xPos
+        SELF.urec.yPos        = c.urec.yPos
         
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END 
+        sst.Trace('BSO.BSOOpr.Eql      PROCEDURE(BSO c) END')        
         RETURN TRUE
         
-        
-    
-OrgChartC2IP.DrawNode_Infantry      PROCEDURE(BOOL bAutoDisplay)
-nFillColor          LONG
-CODE
 
-    errCode#    = SELF.DrawNode_Default(bAutoDisplay)
-    SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30)
-    SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 50, -30)    
-    
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    RETURN TRUE
-    
-    
-OrgChartC2IP.DrawNode_Infantry_Amphibious        PROCEDURE(BOOL bAutoDisplay)
-CODE
-    errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)
-    
-    ! inner sine function
-    SELF.Draw_innerSine()    
-        
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    RETURN TRUE
-    
-OrgChartC2IP.DrawNode_Infantry_Armored   PROCEDURE(BOOL bAutoDisplay)    
-CODE
-    errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)
-    
-    SELF.Draw_innerEllipse()    
-            
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    RETURN TRUE
-    
-OrgChartC2IP.DrawNode_Infantry_MainGunSystem   PROCEDURE(BOOL bAutoDisplay)    
-CODE
-    errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)    
-
-    ! Left line
-    SELF.drwImg.Line(SELF.ul.xPos() + 8, SELF.ul.yPos(), 0, 30)
-    
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    RETURN TRUE
-    
-OrgChartC2IP.DrawNode_Infantry_Motorized   PROCEDURE(BOOL bAutoDisplay)    
-CODE
-    errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)    
-    
-    ! Midle line
-    SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos(), 0, 30)    
-    
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    RETURN TRUE    
-    
-OrgChartC2IP.DrawNode_Infantry_FightingVehicle   PROCEDURE(BOOL bAutoDisplay)    
-CODE
-    errCode#    = SELF.DrawNode_Infantry(bAutoDisplay)    
-    
-    ! inner ellipse
-    SELF.drwImg.Line(SELF.ul.xPos() + 15, SELF.ul.yPos() + 10, 20, 0)
-    SELF.drwImg.Arc(SELF.ul.xPos() + 15 + 20 - 5, SELF.ul.yPos() + 10, 10, 10, 2700, 900)
-    SELF.drwImg.Line(SELF.ul.xPos() + 15, SELF.ul.yPos() + 20, 20, 0)
-    SELF.drwImg.Arc(SELF.ul.xPos() + 5 + 5, SELF.ul.yPos() + 10, 10, 10, 900, 2700)
-    ! Left line
-    SELF.drwImg.Line(SELF.ul.xPos() + 8, SELF.ul.yPos(), 0, 30)
-        
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    RETURN TRUE    
-
-    
-        
-!OrgChartC2IP.DrawNode_Observer
-OrgChartC2IP.DrawNode_Observer      PROCEDURE(BOOL bAutoDisplay)    
-nFillColor      LONG
-CODE
-    SELF.drwImg.Setpencolor(COLOR:Black)
-    SELF.drwImg.SetPenWidth(1)
-    
-    ! Fill color depending on Hostility
-    CASE SELF.ul.Hostility()
-    OF hTpy:Unknown
-        ! yellow
-        nFillColor  = COLOR:Unknown
-    OF hTpy:AssumedFriend
-        ! blue
-        nFillColor  = COLOR:AssumedFriend
-    OF hTpy:Friend
-        ! blue
-        nFillColor  = COLOR:Friend
-    OF hTpY:Neutral
-        ! green
-        nFillColor  = COLOR:Neutral
-    OF hTpy:Suspect
-        ! red
-        nFillColor  = COLOR:Suspect
-    OF hTpy:Hostile
-        ! red
-        nFillColor  = COLOR:Hostile        
-    ELSE
-        nFillColor  = COLOR:Unknown
-    END            
-    
-    ! Fill color depeding on Enable/Disable status for new drag&drop selections
-    IF SELF.ul.markForDisbl() = TRUE THEN
-        ! Display as unable for newer selections
-        nFillColor  = COLOR:NodeDisabled    
-    END    
-    SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, nFillColor)
-        
-    SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())
-    ! inner triangle
-    SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() + 15 + 2, 5, -5)
-    SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos() + 15 - 3, 5, 5)      
-    SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() + 15 + 2, 10, 0)
-    
-    IF SELF.ul.IsHQ() THEN
-        SELF.drwImg.Line(SELF.ul.xPos(), SELF.ul.yPos() + 30, 0, 10)
-    END
-    
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    RETURN TRUE
-    
-OrgChartC2IP.DrawNode_Reconnaissance        PROCEDURE(BOOL bAutoDisplay)
+GenericCollection.CollectionOperators.Eql   PROCEDURE(GenericCollection c1, GenericCollection c2)
     CODE
-        errCode#    = SELF.DrawNode_Default()        
-        ! inner second diagonal
-        SELF.Draw_secondDiag()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
         RETURN TRUE
         
-OrgChartC2IP.DrawNode_Reconnaissance_Recon  PROCEDURE(BOOL bAutoDisplay)
+GenericClass.ClassOperators.Eql     PROCEDURE(GenericClass c)
     CODE
-        errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
-        ! inner triangle
-        SELF.Draw_innerTriangle()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
         RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Reconnaissance_Marine PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
-        ! inner ellipse
-        SELF.Draw_innerSine()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Reconnaissance_Motorized      PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Reconnaissance(bAutoDisplay)        
-        ! inner middle line
-        SELF.Draw_medianLine()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
-        RETURN TRUE
-        
-        
-OrgChartC2IP.DrawNode_Engineer      PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Default()        
-        ! inner fork
-        SELF.Draw_innerFork()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Engineer_Mechanized   PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
-        ! inner ellipse
-        SELF.Draw_innerEllipse()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Engineer_Motorized    PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
-        ! inner median line
-        SELF.Draw_medianLine()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
-        RETURN TRUE
-        
-OrgChartC2IP.DrawNode_Engineer_Recon        PROCEDURE(BOOL bAutoDisplay)
-    CODE
-        errCode#    = SELF.DrawNode_Engineer(bAutoDisplay)
-        ! inner second diagonal
-        SELF.Draw_secondDiag()
-        
-        IF bAutoDisplay THEN
-            SELF.drwImg.Display()
-        END
-        RETURN TRUE
-    
-OrgChartC2IP.DrawNode_Echelon       PROCEDURE(BOOL bAutoDisplay)
-CODE
-    SELF.drwImg.Setpencolor(COLOR:Black)
-    SELF.drwImg.SetPenWidth(1)        
-    
-    CASE SELF.ul.Echelon()
-    OF echTpy:Team
-        ! Team
-        SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-    OF echTpy:Squad
-        ! Squad
-        SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-    OF echTpy:Section
-        ! Section
-        SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-        SELF.drwImg.Ellipse(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-    OF echTpy:Platoon
-        ! Platoon
-        SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 7, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-        SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-        SELF.drwImg.Ellipse(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4, COLOR:Black)
-    OF echTpy:Company
-        ! Company
-        SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 0, 4)
-    OF echTpy:Battalion
-        ! Battalion
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 1, SELF.ul.yPos() - 6, 0, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 0, 4)
-    OF echTpy:Regiment
-        ! Regiment
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 0, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25, SELF.ul.yPos() - 6, 0, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 2, SELF.ul.yPos() - 6, 0, 4)
-    OF echTpy:Brigade
-        ! Brigade
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-    OF echTpy:Division
-        ! Division
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-    OF echTpy:Corps
-        ! Corps
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4)        
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 3, 4, -4)
-    OF echTpy:Army
-        ! Army
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 3, 4, -4) 
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 3, 4, -4)
-    OF echTpy:ArmyGroup
-        ! Army Group
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 10, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 10, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 2, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 8, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 8, SELF.ul.yPos() - 3, 4, -4)
-    OF echTpy:Theater
-        !Theater
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 15, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 15, SELF.ul.yPos() - 3, 4, -4) 
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 10, SELF.ul.yPos() - 3, 4, -4) 
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 6, SELF.ul.yPos() - 3, 4, -4)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 11, SELF.ul.yPos() - 6, 4, 4)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 11, SELF.ul.yPos() - 3, 4, -4)
-    OF echTpy:Command
-        ! Command
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 3, SELF.ul.yPos() - 6, 0, 5)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 - 5, SELF.ul.yPos() - 4, 5, 0)
-                
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 3, SELF.ul.yPos() - 6, 0, 5)
-        SELF.drwImg.Line(SELF.ul.xPos() + 25 + 1, SELF.ul.yPos() - 4, 5, 0)
-    END
-    
-    IF bAutoDisplay THEN
-        SELF.drwImg.Display()
-    END
-    
-    
-    RETURN TRUE
-    
 
-    
-    
-    
-    
-OrgChartC2IP.InsertNode     PROCEDURE
+UnitsCollection.BSOCollOpr.Eql     PROCEDURE(GenericCollection c1, GenericCollection c2)
     CODE
-        SELF.DisplayUnselection()
-        SELF.ul.InsertNode()
-        SELF.Redraw()
-        SELF.DisplaySelection()
+        RETURN PARENT.CollectionOperators.Eql(c1, c2)
         
-OrgChartC2IP.InsertNode     PROCEDURE(*UnitBasicRecord pURec)
+UnitsCollection.BSOCollOpr.Eql     PROCEDURE(UnitsCollection c1, UnitsCollection c2)
     CODE
-        errCode#    = SELF.ul.InsertNode(pUrec)
-        IF errCode# = TRUE THEN
-            SELF.Redraw()
-        END
-        
-        
-    
-OrgChartC2IP.GetNode     PROCEDURE(*UnitBasicRecord pURec)
-CODE
-    ! get current node
-    
-    GET(SELF.ul.ul, SELF.selQueuePos)
-    IF NOT ERRORCODE() THEN
-        pUrec.UnitName          = SELF.ul.UnitName()
-        !pUrec.UnitType          = SELF.ul.UnitType()
-        pUrec.UnitTypeCode      = SELF.ul.UnitTypeCode()
-        pUrec.Echelon           = SELF.ul.Echelon()
-        pURec.Hostility         = SELF.ul.Hostility()
-        pUrec.IsHQ              = SELF.ul.IsHQ()
-        pUrec.xPos              = SELF.ul.xPos()
-        pUrec.yPos              = SELF.ul.yPos()
-        pUrec.TreePos           = SELF.ul.TreePos()
-        RETURN TRUE
-    ELSE
-        RETURN FALSE
-    END    
-    
-OrgChartC2IP.DeleteNode     PROCEDURE
-CODE
-    ! do something
-    SELF.ul.DeleteNode()
-    SELF.Redraw()  
-    SELF.DisplaySelection()
-    
-    OMIT('__reeng')
-    GET(SELF.ul, SELF.selQueuePos)
-    IF NOT ERRORCODE() THEN
-        ! Mark for deletion current record
-        currentTreePos# = SELF.ul.TreePos
-        SELF.ul.markForDel  = TRUE
-        PUT(SELF.ul)
-        !DELETE(SELF.ul)
-        
-        ! Mark for deletion all below records in deeper tree postions        
-        LOOP i# = POINTER(SELF.ul)+1 TO RECORDS(SELF.ul)
-            GET(SELF.ul, i#)
-            IF NOT ERRORCODE() THEN
-                IF SELF.ul.TreePos > currentTreePos# THEN
-                    SELF.ul.markForDel  = TRUE
-                    PUT(SELF.ul)                    
-                ELSE
-                    BREAK
-                END                
-            END            
-        END
-        
-    END
-
-    ! Remove all marked for deletion records
-    i# = 1
-    LOOP
-        GET(SELF.ul, i#)
-        IF NOT ERRORCODE() THEN
-            IF SELF.ul.markForDel = TRUE THEN
-                DELETE(SELF.ul)
-                IF ERRORCODE() THEN
-                    BREAK
-                END
-                i# = 1
-            ELSE
-                SELF.ul.yPos()    = (POINTER(SELF.ul)-1)*30 + 1
-                PUT(SELF.ul)
-                i# = i# + 1
-            END            
-        ELSE
-            BREAK
-        END
-        
-    END
-    __reeng    
-    
-    
-    
-OrgChartC2IP.DisableNode    PROCEDURE
-CODE
-    ! do something
-    SELF.ul.DisableNode()
-    SELF.Redraw()  
-    SELF.DisplaySelection()
-    
-    OMIT('__reeng')
-    GET(SELF.ul, SELF.selQueuePos)
-    IF NOT ERRORCODE() THEN
-        ! Mark for disableling for new drag&drop selection
-        SELF.ul.markForDisbl  = TRUE
-        PUT(SELF.ul)
-    END
-    __reeng
-    
-    
-    
-    
-    
-OrgChartC2IP.DisplaySelection     PROCEDURE
-CODE
-    ! display SELECTION frame (red) for the current selection
-    sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection')
-    IF SELF.ul.GetNode() = TRUE THEN
-        SELF.drwImg.Setpencolor(COLOR:Red)
-        SELF.drwImg.SetPenWidth(3)
-        SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(),50,30)
-        !SELF.drwImg.Show(SELF.ul.xPos() + 5 + 50, SELF.ul.yPos() + 11, SELF.ul.UnitName())
-        SELF.drwImg.Display()
-    END
-    sst.Trace('END:OrgChartC2IP.DisplaySelection')
-    
-OrgChartC2IP.DisplaySelection       PROCEDURE(LONG nXPos, LONG nYPos)
-    CODE
-        sst.Trace('BEGIN:OrgChartC2IP.DisplaySelection(' & nXPos & ', ' & nYPos & ')')
-        SELF.drwImg.Setpencolor(COLOR:Red)
-        SELF.drwImg.SetPenWidth(3)
-        SELF.drwImg.Box(nXPos, nYPos,50,30)        
-        SELF.drwImg.Display()
-        sst.Trace('END:OrgChartC2IP.DisplaySelection')
-        
-    
-    
-OrgChartC2IP.DisplayUnselection     PROCEDURE
-CODE
-    ! display NORMAL frame (black) for the current selection
-    sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection')
-    IF SELF.ul.GetNode() = TRUE THEN
-        SELF.drwImg.Setpencolor(COLOR:White)
-        SELF.drwImg.SetPenWidth(3)
-        SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(),50,30)
-        SELF.drwImg.Setpencolor(COLOR:Black)
-        SELF.drwImg.SetPenWidth(1)
-        SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(),50,30)
-        SELF.drwImg.Display()
-    END
-    sst.Trace('END:OrgChartC2IP.DisplayUnselection')
-    
-OrgChartC2IP.DisplayUnselection     PROCEDURE(LONG nXPos, LONG nYPos)
-    CODE
-        sst.Trace('BEGIN:OrgChartC2IP.DisplayUnselection (' & nXPos & ', ' & nYPos & ')')
-        SELF.drwImg.Setpencolor(COLOR:White)
-        SELF.drwImg.SetPenWidth(3)
-        SELF.drwImg.Box(nXPos, nYPos,50,30)
-        SELF.drwImg.Setpencolor(COLOR:Black)
-        SELF.drwImg.SetPenWidth(1)
-        SELF.drwImg.Box(nXPos, nYPos,50,30)
-        SELF.drwImg.Display()
-        sst.Trace('END:OrgChartC2IP.DisplayUnselection')
-        
-    
-OrgChartC2IP.SelUp     PROCEDURE
-CODE
-    ! do something        
-    SELF.DisplayUnselection()
-    IF SELF.ul.SelUp() = TRUE THEN        
-        ! do something
-    END
-    SELF.DisplaySelection()
-     
-    
-OrgChartC2IP.SelDown     PROCEDURE
-CODE
-    ! do something
-    SELF.DisplayUnselection()
-    IF SELF.ul.SelDown() = TRUE THEN
-        ! do something
-    END
-    SELF.DisplaySelection()
-    
-    OMIT('__reeng')
-    IF SELF.selQueuePos<RECORDS(SELF.ul) THEN
-        SELF.DisplayUnselection()
-        !SELF.Redraw()
-        SELF.selQueuePos = SELF.selQueuePos+1
-        SELF.DisplaySelection()
-    END
-    __reeng
-    
-    
-OrgChartC2IP.SelLeft     PROCEDURE
-CODE
-    ! do something
-    
-    
-    
-    
-OrgChartC2IP.SelRight     PROCEDURE
-CODE
-    ! do something
-    
-    
-    
-    
-OrgChartC2IP.SelectByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
-CODE
-    ! do something
-    sst.Trace('BEGIN:OrgChartC2IP.SelectByMouse')
-    
-    curSel#     = SELF.ul.Pointer()
-    curXPos#    = SELF.ul.xPos()
-    curYPos#    = SELF.ul.yPos()
-        
-    nodeFoundPos#   = SELF.ul.SelectByMouse(nXPos, nYPos)
-    IF nodeFoundPos# > 0 THEN
-        sst.Trace('node found')
-        sst.Trace('curSel# = ' & curSel#)
-        sst.Trace('curXPos# = ' & curXPos#)
-        sst.Trace('curYPos# = ' & curYPos#)
-        SELF.DisplayUnselection(curXPos#, curYPos#)
-        
-        SELF.selTreePos     = SELF.ul.TreePos()
-        SELF.selQueuePos    = SELF.ul.Pointer()
-        SELF.DisplaySelection()
-    END
-                
-    sst.Trace('END:OrgChartC2IP.SelectByMouse')
-    IF nodeFoundPos# > 0 THEN
-        RETURN TRUE
-    ELSE
-        RETURN FALSE
-    END
-        
-OrgChartC2IP.Unselect     PROCEDURE()
-CODE
-    ! do something
-    
-    SELF.DisplayUnselection()
-    
-    RETURN TRUE
-    
-    
-    
-    
-    
-OrgChartC2IP.Destruct     PROCEDURE
-CODE        
-    PARENT.Destruct()
-    
-OrgChartC2IP.GetUnitName     PROCEDURE
-CODE
-    ! do something
-    IF SELF.ul.Get() = TRUE THEN
-        RETURN SELF.ul.UnitName()
-    ELSE
-        RETURN ''
-    END    
-    
-OrgChartC2IP.SetUnitName     PROCEDURE(STRING sUnitName)
-CODE
-    ! do something
-    IF SELF.ul.Get() = TRUE THEN
-        IF SELF.ul.SetUnitName(sUnitName) = TRUE THEN
-            SELF.Redraw()
-            SELF.DisplaySelection()          
-            RETURN TRUE            
-        ELSE
-            RETURN FALSE            
-        END
-    ELSE
-        RETURN FALSE
-    END
-    
-OrgChartC2IP.GetUnitTypeCode    PROCEDURE
-    CODE
-        IF SELF.ul.Get() = TRUE THEN
-            RETURN SELF.ul.UnitTypeCode()
-        ELSE
-            RETURN ''
-        END    
-        
-           
-OrgChartC2IP.SetUnitTypeCode     PROCEDURE(STRING sUnitTypeCode)
-CODE
-    ! do something
-    IF SELF.ul.SetUnitTypeCode(sUnitTypeCode) = TRUE THEN
-        SELF.Redraw()
-        SELF.DisplaySelection()
-        RETURN TRUE
-    ELSE
-        RETURN FALSE
-    END    
-    
-OrgChartC2IP.GetEchelon     PROCEDURE
-CODE
-    ! do something
-    RETURN SELF.ul.Echelon()            
-    
-OrgChartC2IP.SetEchelon     PROCEDURE(LONG nEchelon)
-CODE
-    ! do something
-    IF SELF.ul.SetEchelon(nEchelon) = TRUE THEN
-        SELF.Redraw()
-        SELF.DisplaySelection()
-        RETURN TRUE
-    ELSE
-        RETURN FALSE
-    END        
-    
-OrgChartC2IP.GetHostility     PROCEDURE
-CODE
-    ! do something
-    RETURN SELF.ul.Hostility()
-        
-    
-OrgChartC2IP.SetHostility     PROCEDURE(LONG nHostility)
-CODE
-    ! do something
-    IF SELF.SetHostility(nHostility) = TRUE THEN
-        SELF.Redraw()
-        SELF.DisplaySelection()
-        RETURN TRUE
-    ELSE
-        RETURN FALSE
-    END
-        
-    
-OrgChartC2IP.GetHQ     PROCEDURE
-    CODE
-        
-        RETURN SELF.ul.isHQ()
-        
-    
-OrgChartC2IP.SetHQ     PROCEDURE(BOOL bIsHQ)
-CODE
-    ! do something
-    IF SELF.ul.SetHQ(bIsHQ) = TRUE THEN
-        SELF.Redraw()
-        SELF.DisplaySelection()
-        RETURN TRUE
-    ELSE
-        RETURN FALSE
-    END
-       
-    
-OrgChartC2IP.Save     PROCEDURE()
-CODE
-    ! do something
-    json.Start()
-    !collection &= json.CreateCollection('Collection')
-    !collection.Append(
-    !json.Add('C2IPName', SELF.Name)
-    collection &= json.CreateCollection('TaskOrg')
-    collection.Append('C2IPName', SELF.Name, json:String)
-    collection.Append(SELF.ul, 'Units')
-    
-    ! referenced C2IPs
-    collection.Append(SELF.refC2IPs, 'refC2IPs')    
-    
-!    LOOP i# = 1 TO RECORDS(SELF.refC2IPs)
-!        GET(SELF.refC2IPs, i#)
-!        IF ERROCODE() THEN
-!            SELF.
-!        END
-!    END    
-            
-    json.SaveFile(CLIP(SELF.Name)&'.c2ip', TRUE)
-    
-    RETURN TRUE
-    
-OrgChartC2IP.Save     PROCEDURE(STRING sFileName)
-CODE
-    ! do something
-    json.Start()
-    !collection &= json.CreateCollection('Collection')
-    !collection.Append(
-    !json.Add('C2IPName', SELF.Name)
-    collection &= json.CreateCollection('TaskOrg')
-    collection.Append('C2IPName', SELF.Name, json:String)
-    collection.Append(SELF.ul, 'Units')
-    
-    ! referenced C2IPs
-    collection.Append(SELF.refC2IPs, 'refC2IPs')    
-    
-    json.SaveFile(sFileName, TRUE)
-    
-    RETURN TRUE
-    
-OrgChartC2IP.Load   PROCEDURE(STRING sFileName)
-jsonItem  &JSONClass
-CODE
-    ! do something
-    
-    json.LoadFile(sFileName)
-    
-    i# = json.Records()
-    !MESSAGE('found = ' & i#)
-    
-    ! C2IP Name
-    jsonItem &= json.GetByName('C2IPName')
-    IF NOT jsonItem &= Null THEN
-        SELF.Name   = json.GetValueByName('C2IPName')
-    END
-    
-    ! Units
-    jsonItem &= json.GetByName('Units')
-    IF NOT jsonItem &= NULL THEN
-        !IF SELF.ul.Free() = TRUE THEN
-        !END
-        
-        FREE(SELF.ul.ul)
-        jsonItem.Load(SELF.ul.ul)
-    END  
-    
-    ! refrenced C2IPs
-    jsonItem &= json.GetByName('refC2IPs')
-    IF NOT jsonItem &= NULL THEN
-        FREE(SELF.refC2IPs)
-        jsonItem.Load(SELF.refC2IPs)
-    END
-    
-    
-    SELF.Redraw()
-    
-    RETURN TRUE
-    
-    
-    
-! attach/detach C2IPs
-OrgChartC2IP.AttachC2IP     PROCEDURE(STRING sFileName)
-jsonItem                        &JSONClass
-sC2IPName       STRING(100)
-CODE
-    ! do something
-    
-    json.LoadFile(sFileName)    
-    i# = json.Records()
-    
-    ! C2IP Name
-    jsonItem &= json.GetByName('C2IPName')
-    IF NOT jsonItem &= Null THEN
-        sC2IPName   = json.GetValueByName('C2IPName')
-        
-        SELF.refC2IPs.C2IPPath  = sFileName
-        SELF.refC2IPs.C2IPName  = sC2IPName
-        ADD(SELF.refC2IPs)
-                
-        RETURN TRUE
-    ELSE
-        RETURN FALSE
-    END        
-    
-    
-OrgChartC2IP.DetachC2IP     PROCEDURE(LONG nOPtion)
-CODE
-    ! do something
-    
-    
-    RETURN TRUE    
-    
-    
-    
-OrgChartC2IP.TakeEvent   PROCEDURE(UNSIGNED nKeyCode)
-
-CODE
-    ! do something        
-    
-    RETURN TRUE
-    
-    
-    
-OrgChartC2IP.checkLabelEditMode   PROCEDURE()
-
-CODE
-    ! do something
-    
-    
-    
-    
-OrgChartC2IP.TakeNodeAction   PROCEDURE(LONG nOption)
-
-CODE
-    ! do something
-    
-    CASE nOption
-    OF 1
-        ! Unit Name
-!        CREATE(?uNameEntry, CREATE:entry)
-!        SELF.uNameEntry = ''
-!        ?uNameEntry{PROP:use} = SELF.uNameEntry
-!        ?uNameEntry{PROP:text} = '@s100'
-!        ?uNameEntry{PROP:Ypos} = 200
-!        !?uNameEntry{PROP:
-!        UNHIDE(?uNameEntry)
-!        SELECT(?uNameEntry)
-    OF 2
-!        ! Unit Type        
-!        UNHIDE(?ListSymbology)
-!        SELECT(?ListSymbology)
-    OF 3
-        ! Echelon
-        IF SELF.TakeEchelon(POPUP(SELF.EchelonMenuOptions())) = TRUE THEN
-        END        
-    OF 4
-        ! Hostility
-        IF SELF.TakeHostility(POPUP(SELF.HostilityMenuOptions())) = TRUE THEN
-        END        
-    OF 5
-        ! HQ
-!        CREATE(?uHQ, CREATE:check)
-!        ?uHQ{PROP:Use} = SELF.bIsHQEntry
-!        ?uHQ{PROP:TrueValue} = TRUE
-!        ?uHQ{PROP:FalseValue} = FALSE
-!        ?uHQ{PROP:XPos} = 30
-!        ?uHQ{PROP:Ypos} = 200
-!        UNHIDE(?uHQ)
-!        SELECT(?uHQ)
-    END
-    
-    RETURN TRUE    
-    
-    
-    
-    
-OrgChartC2IP.NodeActionsMenuOptions   PROCEDURE()
-
-CODE
-    ! do something
-    
-    RETURN 'Change label | Change Unit type | Change Echelon | Change Hostility | Is HQ'
-    
-    
-    
-    
-OrgChartC2IP.TakeEchelon   PROCEDURE(LONG nOption)
-
-CODE
-    ! do something
-    
-    CASE nOption
-    OF 1
-        ! Team
-        ASSERT(SELF.SetEchelon(echTpy:Team), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Team)')
-    OF 2
-        ! Squad
-        ASSERT(SELF.SetEchelon(echTpy:Squad), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Squad)')
-    OF 3
-        ! Section
-        ASSERT(SELF.SetEchelon(echTpy:Section), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Section)')
-    OF 4
-        ! Platoon
-        ASSERT(SELF.SetEchelon(echTpy:Platoon), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Platoon)')
-    OF 5
-        ! Company
-        ASSERT(SELF.SetEchelon(echTpy:Company), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Company)')
-    OF 6
-        ! Battalion
-        ASSERT(SELF.SetEchelon(echTpy:Battalion), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Battalion)')
-    OF 7
-        ! Regiment
-        ASSERT(SELF.SetEchelon(echTpy:Regiment), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Regiment)')
-    OF 8
-        ! Brigade
-        ASSERT(SELF.SetEchelon(echTpy:Brigade), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Brigade)')
-    OF 9
-        ! Division
-        ASSERT(SELF.SetEchelon(echTpy:Division), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Division)')
-    OF 10
-        ! Corps
-        ASSERT(SELF.SetEchelon(echTpy:Corps), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Corps)')
-    OF 11
-        ! Army
-        ASSERT(SELF.SetEchelon(echTpy:Army), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Army)')
-    OF 12
-        ! Army Group
-        ASSERT(SELF.SetEchelon(echTpy:ArmyGroup), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:ArmyGroup)')
-    OF 13
-        ! Theater
-        ASSERT(SELF.SetEchelon(echTpy:Theater), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Theater)')
-    OF 14
-        ! Command
-        ASSERT(SELF.SetEchelon(echTpy:Command), 'OrgChartC2IP.TakeEchelon()->SELF.SetEchelon(echTpy:Command)')
-
-    END
-    
-    RETURN TRUE    
-    
-    
-    
-    
-OrgChartC2IP.EchelonMenuOptions   PROCEDURE()
-
-CODE
-    ! do something
-    
-    RETURN 'Team o| Squad * | Section **| Platoon ***| Company :| Battalion ::| Regiment :::| Brigade x| Division xx| Corps xxx| Army xxxx| Army Group xxxxx| Theater xxxxxx| Command ++'
-    
-    
-    
-    
-OrgChartC2IP.TakeHostility   PROCEDURE(LONG nOption)
-
-CODE
-    ! do something
-    
-    CASE nOption
-    OF 1
-        ! Unknown
-        ASSERT(SELF.SetHostility(hTpy:Unknown), 'OrgChartC2IP.TakeHostility()->SELF.SetHostility(hTpy:Unknown)')
-    OF 2
-        ! Assumed Friend
-        ASSERT(SELF.SetHostility(hTpy:AssumedFriend), 'OrgChartC2IP.TakeHostility()->SELF.SetHostility(hTpy:AssumedFriend)')
-    OF 3
-        ! Friend
-        ASSERT(SELF.SetHostility(hTpy:Friend), 'OrgChartC2IP.TakeHostility()->SELF.SetHostility(hTpy:Friend)')
-    OF 4
-        ! Neutral
-        ASSERT(SELF.SetHostility(hTpy:Neutral), 'OrgChartC2IP.TakeHostility()->SELF.SetHostility(hTpy:Neutral)')
-    OF 5
-        ! Suspect/Joker
-        ASSERT(SELF.SetHostility(hTpy:Suspect), 'OrgChartC2IP.TakeHostility()->SELF.SetHostility(hTpy:Suspect)')
-    OF 6
-        ! Hostile/Faker
-        ASSERT(SELF.SetHostility(hTpy:Hostile), 'OrgChartC2IP.TakeHostility()->SELF.SetHostility(hTpy:Hostile)')
-    END
-    
-    RETURN TRUE    
-    
-    
-    
-    
-OrgChartC2IP.HostilityMenuOptions   PROCEDURE()
-
-CODE
-    ! do something
-    
-    RETURN 'Unknown | Assumed Friend | Friend | Neutral | Suspect/Jokjer | Hostile/Faker'
-    
-    
-    
-    
-        
-
-
-OverlayC2IP.Construct       PROCEDURE()
-    CODE
-        PARENT.Construct()
-        
-OverlayC2IP.Destruct        PROCEDURE()
-    CODE
-        PARENT.Destruct()
-        
-        
-OverlayC2IP.Redraw  PROCEDURE()
-    CODE
-        SELF.drwImg.Blank(COLOR:White)
-        SELF.drwImg.Setpencolor(COLOR:Black)
-        SELF.drwImg.SetPenWidth(1)
-        
-        LOOP i# = 1 TO RECORDS(SELF.ul)
-            GET(SELF.ul.ul, i#)
-            IF NOT ERRORCODE() THEN
-                SELF.drwImg.Box(SELF.ul.xPos(), SELF.ul.yPos(), 50, 30, COLOR:Aqua)
-            END
-        END
+        sst.Trace('UnitsCollection.CollectionOperators.Eql     PROCEDURE(GenericCollection c1, GenericCollection c2) BEGIN')
  
-        SELF.drwImg.Display()
-
-        
-        
-OverlayC2IP.DeployBSO       PROCEDURE(*UnitBasicRecord pUrec, LONG nXPos, LONG nYPos)
-    CODE
-        sst.Trace('BEGIN:OverlayC2IP.DeployBSO')
-        sst.Trace('nXPos = ' & nXPos & ', nYPos = ' & nYPos)
-        pUrec.xPos  = nXPos
-        pUrec.yPos  = nYPos
-        
-        errCode#    = SELF.ul.InsertNode(pUrec)
-        IF errCode# = TRUE THEN
-            SELF.Redraw()
-        END
-        
-        sst.Trace('END:OverlayC2IP.DeployBSO')
-        RETURN TRUE
-        
-OverlayC2IP.AttachC2IP      PROCEDURE(STRING sFileName)
-jsonItem        &JSONClass
-sC2IPName       STRING(100)
-CODE
-    ! do something
-    
-    json.LoadFile(sFileName)    
-    i# = json.Records()
-    
-    ! C2IP Name
-    jsonItem &= json.GetByName('C2IPName')
-    IF NOT jsonItem &= Null THEN
-        sC2IPName   = json.GetValueByName('C2IPName')
-        
-        SELF.refC2IPs.C2IPPath  = sFileName
-        SELF.refC2IPs.C2IPName  = sC2IPName
-        ADD(SELF.refC2IPs)
+        OMIT('_noCompile')
+        c1.collection.unit.urec.UnitName  = pBSO.urec.UnitName
+        c1.collection.unit.urec.UnitType  = pBSO.urec.UnitType
+        c1.collection.unit.urec.UnitTypeCode  = pBSO.urec.UnitTypeCode
+        c1.collection.unit.urec.Echelon       = pBSO.urec.Echelon
+        c1.collection.unit.urec.Hostility     = pBSO.urec.Hostility
+        c1.collection.unit.urec.IsHQ          = pBSO.urec.IsHQ
+        c1.collection.unit.urec.xPos          = pBSO.urec.xPos
+        c1.collection.unit.urec.yPos          = pBSO.urec.yPos
+        ADD(c1.collection)
+        SELF.selQueuePos    = POINTER(SELF.collection)
+        _noCompile
                 
+        sst.Trace('UnitsCollection.CollectionOperators.Eql     PROCEDURE(GenericCollection c1, GenericCollection c2) END')
         RETURN TRUE
-    ELSE
-        RETURN FALSE
-    END        

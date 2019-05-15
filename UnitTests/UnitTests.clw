@@ -13,6 +13,7 @@ StringTheory:TemplateVersion        equate('2.58')
     include('StringTheory.Inc'),ONCE
 
     INCLUDE('pmC2IPLibrary.inc'), ONCE
+    INCLUDE('UT_BSO.inc'), ONCE
     INCLUDE('UT_BSOCollection.inc'), ONCE
     INCLUDE('UT_OrgChartC2ip.inc'), ONCE
 
@@ -38,6 +39,10 @@ OrgChartDestroyContext  PROCEDURE
 
   END
 
+! string theory objects
+sst                 stringtheory
+
+testBSO             UT_BSO
 
 testBSOCollection   UT_BSOCollection
 aRecord             GROUP(UnitBasicRecord)
@@ -90,6 +95,7 @@ testOrgChart        UT_OrgChartC2IP
         
         __tests
         
+        OMIT('_noCompile')
         OrgChartInitContext()
             testOrgChart.InsertNode()
         OrgChartDestroyContext()
@@ -104,6 +110,23 @@ testOrgChart        UT_OrgChartC2IP
         aRecord.yPos            = 100
             testBSOCollection.AddSpecificNode(aRecord)
         DestroyContext()
+        _noCompile
+        
+        
+        
+        ! BSO
+        !testBSO.InitContext()
+        testBSO.Eql()
+        !testBSO.DestroyContext()
+        
+        OMIT('_noCompile')
+        ! BSO Collection
+        ! Units Collection
+        
+        testBSOCollection.InitContext()
+        testBSOCollection.InsertAndVerifyABSO()
+        testBSOCollection.DestroyContext()
+        _noCompile
         
         
 HelloWorld          PROCEDURE

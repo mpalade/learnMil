@@ -28,11 +28,12 @@ sst                 stringtheory
 
 ActionsCollection.Construct   PROCEDURE
     CODE
-        SELF.al &= NEW(ActResTargetsQueue)
+        !SELF.al &= NEW(ActResTargetsQueue)
         SELF.collection &= NEW(ActResTargetsClassQueue)
         
 ActionsCollection.Destruct   PROCEDURE
-    CODE                
+    CODE
+        OMIT('_noCompile')
         ! Resources
         LOOP WHILE RECORDS(SELF.al.Resources)
             GET(SELF.al.Resources, 1)
@@ -55,14 +56,15 @@ ActionsCollection.Destruct   PROCEDURE
             DISPOSE(SELF.al.ActTargets)
             DELETE(SELF.al)
         END
+        _noCompile
         
         ! collection
         DISPOSE(SELF.collection)
         
-        DISPOSE(SELF.al)
+        !DISPOSE(SELF.al)
         
 ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
-    CODE
+    CODE                
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
         SELF.al.ActionTypeCode  = pARec.ActionTypeCode
@@ -71,7 +73,6 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         !SELF.al.xPos            = pARec.xPos
         !SELF.al.yPos            = pARec.yPos     
         !!!
-        OMIT('_noCompile')
         SELF.al.ActionPoints    &= NEW(PosList)
         LOOP i# = 1 TO RECORDS(parec.ActionPoints)
             GET(parec.ActionPoints, i#)
@@ -81,7 +82,6 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
                 ADD(SELF.al.ActionPoints)
             END                
         END
-        _noCompile
         SELF.al.ActionPoints    &= NEW(PosList)
         retVal# = SELF.C2IPOperators.Eql(SELF.al.ActionPoints, parec.ActionPoints)
 
@@ -124,10 +124,10 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec)
         ADD(SELF.al)   
         !MESSAGE('action added to the queue')
         
-        
 ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasicRecord  pURec)
+
     CODE
-        sst.Trace('ActionsCollection.InsertAction(action, resource) BEGIN')
+        sst.Trace('ActionsCollection.InsertAction(action, resource) BEGIN')                
         
         SELF.al.ActionName      = pARec.ActionName
         SELF.al.ActionType      = pARec.ActionType
@@ -159,6 +159,27 @@ ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasic
         ADD(SELF.al)   
         
         sst.Trace('ActionsCollection.InsertAction(action, resource) END')
+
+ActionsCollection.InsertAction      PROCEDURE(*Action pAction, *BSO pBSO)
+newAction                               Action
+aResource                               BSO
+newResources                            UnitsCollection
+newBSOTargets                           UnitsCollection
+newActTargets                           ActionsCollection
+    CODE
+        !newAction.Init(parec)
+        !aResource.Init(purec)
+        !newResources.Init(pBSO)
+        
+        newResources.InsertNode(pBSO)
+        
+        
+        SELF.collection.action      = pAction
+        SELF.collection.resources   = newResources
+        !SELF.collection.BSOtargets  = newBSOTargets
+        !SELF.collection.actTargets  = newActTargets        
+        ADD(SELF.collection)
+        
         
 ActionsCollection.InsertAction      PROCEDURE(ActionBasicRecord pARec, UnitBasicRecord  pURec, UnitBasicRecord pTarget_urec)        
     CODE

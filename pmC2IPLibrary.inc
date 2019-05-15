@@ -412,6 +412,7 @@ urec                    GROUP(UnitBasicRecord)
                         END
 
 Construct               PROCEDURE()
+Init                    PROCEDURE(*UnitBasicRecord pUrec), BOOL
 Destruct                PROCEDURE()
 
                     END
@@ -431,7 +432,7 @@ highestX                LONG, PRIVATE
 highestY                LONG, PRIVATE
 
 Construct               PROCEDURE()
-Init                    PROCEDURE(*ActionBasicRecord pArec), LONG
+Init                    PROCEDURE(*ActionBasicRecord pArec), BOOL
 Destruct                PROCEDURE()
 
 ComputeSelectRectangle  PROCEDURE(), PRIVATE
@@ -487,6 +488,7 @@ insertLastNode          PROCEDURE(), PRIVATE
 
 InsertNode              PROCEDURE
 InsertNode              PROCEDURE(*UnitBasicRecord pUrec), LONG
+InsertNode              PROCEDURE(*BSO pBSO), BOOL
 AddNode                 PROCEDURE(*UnitBasicRecord pUrec), LONG
 GetNode                 PROCEDURE(*UnitBasicRecord pURec), LONG
 GetNode                 PROCEDURE(LONG Pointer, *UnitBasicRecord pURec), BOOL
@@ -539,6 +541,7 @@ ChangeActionPos             PROCEDURE(LONG nPos, LONG nDX, LONG nDY), BOOL
 
 InsertAction                PROCEDURE(ActionBasicRecord parec)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec)
+InsertAction                PROCEDURE(*Action pAction, *BSO pBSO)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec, UnitBasicRecord pTarget_urec)
 InsertAction                PROCEDURE(ActionBasicRecord parec, UnitBasicRecord purec, ActionBasicRecord pTarget_arec)
 GetAction                   PROCEDURE(LONG nPointer, *ActionBasicRecord pARec), LONG

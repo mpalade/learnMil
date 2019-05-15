@@ -421,7 +421,11 @@ CODE
               
     END        
     
-    RETURN TRUE        
+    RETURN TRUE       
+    
+UnitsCollection.InsertNode  PROCEDURE(*BSO pBSO)
+    CODE
+        
     
 UnitsCollection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
     CODE
@@ -1018,7 +1022,19 @@ UnitsCollection.ChangeNodePos PROCEDURE(LONG nXPos, LONG nYPos)
             
         RETURN 0
         
-     
+BSO.Init            PROCEDURE(*UnitBasicRecord pUrec)
+    CODE
+        SELF.urec.Echelon       = pUrec.Echelon
+        SELF.urec.Hostility     = pUrec.Hostility
+        SELF.urec.IsHQ          = pUrec.IsHQ
+        SELF.urec.TreePos       = pUrec.TreePos
+        SELF.urec.UnitName      = pUrec.UnitName
+        SELF.urec.UnitType      = pUrec.UnitType
+        SELF.urec.UnitTypeCode  = pUrec.UnitTypeCode
+        SELF.urec.xPos          = pUrec.xPos
+        SELF.urec.yPos          = pUrec.yPos                
+        
+        RETURN TRUE
 
         
 
