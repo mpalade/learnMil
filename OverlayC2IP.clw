@@ -930,6 +930,7 @@ sMessage        STRING(100)
         ! double click
         CASE KEYCODE()
         OF MouseLeft2             
+            ! read keyboard
             LOOP UNTIL KEYBOARD()
                 ASK
                 IF KEYCODE() = EnterKey THEN
@@ -941,6 +942,7 @@ sMessage        STRING(100)
             SELF.drwImg.Show(selXPos#, selYPos#, CLIP(SELF.textBuffer))                
             SELF.drwImg.Display()   
             IF SELF.isDrawingSelection THEN
+                ! set editable to the selected Action
                 SELF.selectedDrawingClass.SetText(SELF.textBuffer)
             END
             

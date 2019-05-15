@@ -29,9 +29,10 @@ sst                 stringtheory
 ActionsCollection.Construct   PROCEDURE
     CODE
         SELF.al &= NEW(ActResTargetsQueue)
+        SELF.collection &= NEW(ActResTargetsClassQueue)
         
 ActionsCollection.Destruct   PROCEDURE
-    CODE
+    CODE                
         ! Resources
         LOOP WHILE RECORDS(SELF.al.Resources)
             GET(SELF.al.Resources, 1)
@@ -54,6 +55,9 @@ ActionsCollection.Destruct   PROCEDURE
             DISPOSE(SELF.al.ActTargets)
             DELETE(SELF.al)
         END
+        
+        ! collection
+        DISPOSE(SELF.collection)
         
         DISPOSE(SELF.al)
         

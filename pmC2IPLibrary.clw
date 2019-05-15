@@ -26,8 +26,14 @@ UnitsCollection.Construct     PROCEDURE()
         SELF.ul     &= NEW(UnitsQueue)
         SELF.tmpul  &=NEW(UnitsQueue)
         
+        ! collection
+        SELF.collection &= NEW(UnitsClassQueue)
+        
 UnitsCollection.Destruct      PROCEDURE()
-    CODE         
+    CODE
+        ! collection
+        DISPOSE(SELF.collection)
+        
         DISPOSE(SELF.tmpul)
         DISPOSE(SELF.ul)   
         

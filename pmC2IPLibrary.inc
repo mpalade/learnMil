@@ -358,6 +358,9 @@ xPos                        LONG
 yPos                        LONG
                     END
 
+! PosListClass Queue is necessary
+
+
 ! Unit Basic Record Structure
 UnitBasicRecord     GROUP, TYPE
 UnitName                    STRING(100)
@@ -459,7 +462,9 @@ InsertPoint                 PROCEDURE(*PosRecord pPRec), BOOL
 ! Units Collection Class
 ! a collection of Units Objects
 UnitsCollection       CLASS, MODULE('pmC2IPLibrary.clw'), LINK('pmC2IPLibrary.clw'), TYPE
-ul                      &UnitsQueue
+ul                          &UnitsQueue
+collection                  &UnitsClassQueue
+
 tmpul                   &UnitsQueue, PRIVATE
 urec                    GROUP(UnitBasicRecord)
                         END
@@ -524,7 +529,7 @@ ChangeNodePos           PROCEDURE(LONG nXPos, LONG nYPos), LONG
 ActionsCollection           CLASS, IMPLEMENTS(C2IPOperators), | 
                         MODULE('ActionsCollection.clw'), LINK('ActionsCollection.clw'), TYPE
 al                          &ActResTargetsQueue         ! a queue of action records
-!collection                  &ActResTargetsClassQueue    ! a queue of action classes
+collection                  &ActResTargetsClassQueue    ! a queue of action classes
 
 Construct                   PROCEDURE()
 Destruct                    PROCEDURE()
