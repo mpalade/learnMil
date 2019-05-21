@@ -1092,7 +1092,15 @@ GenericCollection.CollectionOperators.Get   PROCEDURE()
     CODE
         RETURN TRUE
                 
-GenericCollection.CollectionOperators.Add   PROCEDURE(GenericClass C)
+GenericCollection.CollectionOperators.Add   PROCEDURE(GenericClass c)
+    CODE
+        RETURN TRUE
+        
+GenericCollection.CollectionOperators.Rpl       PROCEDURE()
+    CODE
+        RETURN TRUE
+        
+GenericCollection.CollectionOperators.Ins   PROCEDURE()
     CODE
         RETURN TRUE
         
@@ -1161,6 +1169,50 @@ UnitsCollection.BSOCollOpr.Get      PROCEDURE(LONG nIndex, *BSO pBSO)
             
         ELSE
             retVal# = FALSE
+        END
+        
+        RETURN retVal#
+        
+
+UnitsCollection.BSOCollOpr.Rpl  PROCEDURE()
+    CODE
+        RETURN PARENT.CollectionOperators.Rpl()
+        
+UnitsCollection.BSOCollOpr.Rpl     PROCEDURE(LONG nIndex, BSO cBSO)
+    CODE
+        IF (nIndex <= RECORDS(SELF.collection)) AND (nIndex<>0) THEN
+            GET(SELF.collection, nIndex)
+            IF NOT ERRORCODE() THEN
+                SELF.collection.unit.BSOOpr.Eql(cBSO)
+                PUT(SELF.collection)
+                retVal# = TRUE
+            ELSE
+                retVal# = FALSE
+            END
+        ELSE
+            retVal# = FALSE            
+        END
+        
+        RETURN retVal#
+        
+UnitsCollection.BSOCollOpr.Ins      PROCEDURE()
+    CODE
+        RETURN PARENT.CollectionOperators.Ins()
+        
+UnitsCollection.BSOCollOpr.Ins      PROCEDURE(LONG nIndex, BSO cBSO)
+aBSO        BSO
+    CODE
+        IF (nIndex <= RECORDS(SELF.collection)) AND (nIndex<>0) THEN
+            GET(SELF.collection, nIndex)
+            IF NOT ERRORCODE() THEN
+                aBSO.BSOOpr.Eql(SELF.collection.unit)
+                SELF.collection.unit.BSOOpr.Eql(cBSO)
+                retVal# = TRUE
+            ELSE
+                retVal# = FALSE
+            END
+        ELSE
+            retVal# = FALSE            
         END
         
         RETURN retVal#

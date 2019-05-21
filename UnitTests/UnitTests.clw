@@ -120,7 +120,8 @@ testOrgChart        UT_OrgChartC2IP
         !testBSO.DestroyContext()
         
         ! BSO Collection
-        testBSOCollection.AddGet()
+        !testBSOCollection.AddGet()
+        testBSOCollection.Replace()
         
         OMIT('_noCompile')
         ! BSO Collection

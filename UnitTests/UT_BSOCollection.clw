@@ -161,8 +161,32 @@ receivedBSO                     BSO
         myColl.BSOCollOpr.Add(myBSO)
         myColl.BSOCollOpr.Get(1, receivedBSO)
         ASSERT(myBSO.urec.UnitName = receivedBSO.urec.UnitName, 'myColl.BSOCollOpr.Get(1, receivedBSO) ERROR')
+        ASSERT(myBSO.urec.UnitName = 'myName', 'myColl.BSOCollOpr.Get(1, receivedBSO) ERROR')
+        
+        myBSO.urec.UnitName = 'Zuzu'
+        myColl.BSOCollOpr.Add(myBSO)
+        myColl.BSOCollOpr.Get(2, receivedBSO)
+        ASSERT(myBSO.urec.UnitName = receivedBSO.urec.UnitName, 'myColl.BSOCollOpr.Get(2, receivedBSO) ERROR')
+        ASSERT(myBSO.urec.UnitName = 'Zuzu', 'myColl.BSOCollOpr.Get(1, receivedBSO) ERROR')
         
         
+UT_BSOCollection.Replace     PROCEDURE()
+myBSO                           BSO
+secBSO                          BSO
+myColl                          UnitsCollection
+receivedBSO                     BSO
+
+    CODE
+        myBSO.urec.UnitName = 'ana'
+        myColl.BSOCollOpr.Add(myBSO)
+        
+        secBSO.urec.UnitName    = 'dana'
+        
+        myColl.BSOCollOpr.Rpl(1, secBSO)
+        
+        myColl.BSOCollOpr.Get(1, receivedBSO)
+        ASSERT(receivedBSO.urec.UnitName = secBSO.urec.UnitName, 'myColl.BSOCollOpr.Rpl(1, secBSO) ERROR')
+        ASSERT(receivedBSO.urec.UnitName = 'dana', 'myColl.BSOCollOpr.Rpl(1, secBSO) ERROR')
         
 
 

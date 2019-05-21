@@ -410,12 +410,16 @@ CollectionOperators INTERFACE
 Add                     PROCEDURE(GenericClass c), BOOL
 Get                     PROCEDURE(), BOOL
 Eql                     PROCEDURE(GenericCollection c), BOOL
+Rpl                     PROCEDURE(), BOOL
+Ins                     PROCEDURE(), BOOL
                     END
 
 BSOCollOpr          INTERFACE(CollectionOperators)
 Add                     PROCEDURE(BSO cBSO), BOOL
 Get                     PROCEDURE(LONG nIndex, *BSO pBSO), BOOL
 Eql                     PROCEDURE(UnitsCollection c), BOOL
+Rpl                     PROCEDURE(LONG nIndex, BSO cBSO), BOOL
+Ins                     PROCEDURE(LONG nIndex, BSO cBSO), BOOL
                     END
 
 ClassOperators      INTERFACE

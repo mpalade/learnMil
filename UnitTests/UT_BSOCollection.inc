@@ -20,5 +20,6 @@ AddSpecificNode         PROCEDURE(*UnitBasicRecord pURec), BOOL
 InsertAndVerifyABSO     PROCEDURE()
 
 AddGet                  PROCEDURE()
+Replace                 PROCEDURE()
     END
     
