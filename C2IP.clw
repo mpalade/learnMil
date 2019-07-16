@@ -1261,6 +1261,12 @@ C2IP.C2IPUtilities.Log      PROCEDURE()
     CODE
         RETURN CLIP(SELF.lastOperation)
         
+        
+C2IP.C2IPUtilities.ExportImg        PROCEDURE(STRING sFileName)
+    CODE
+        SELF.drwImg.WritePNG(sFileName)
+        RETURN TRUE
+        
 
         
         

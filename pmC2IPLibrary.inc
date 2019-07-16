@@ -398,6 +398,7 @@ C2IPName                STRING(100)
 ! C2IP Utilities
 C2IPUtilities       INTERFACE
 Log                     PROCEDURE(), STRING
+ExportImg               PROCEDURE(STRING sFileName), LONG
                     END
 
 ! C2IP Operators
