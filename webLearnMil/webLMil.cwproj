@@ -8,7 +8,7 @@
     <AssemblyName>webLMil</AssemblyName>
     <OutputName>webLMil</OutputName>
     <CWOutputType>Exe</CWOutputType>
-    <DefineConstants>DrawLinkMode=&gt;1%3bDrawDllMode=&gt;0%3bDrawImage=&gt;0%3bNETTALKLOG=&gt;1%3b_ODDJOB_=&gt;0%3b_CRYPTONITE_=&gt;0%3b_JFILES_=&gt;1%3bStringTheoryLinkMode=&gt;1%3bStringTheoryDllMode=&gt;0%3bMD5=&gt;0%3bxFilesLinkMode=&gt;1%3bxFilesDllMode=&gt;0%3bjFilesLinkMode=&gt;1%3bjFilesDllMode=&gt;0%3b_ABCDllMode_=&gt;0%3b_ABCLinkMode_=&gt;1%3b_NetTalkDllMode_=&gt;0%3b_NetTalkLinkMode_=&gt;1</DefineConstants>
+    <DefineConstants>NETTALKLOG=&gt;1%3b_ODDJOB_=&gt;0%3b_CRYPTONITE_=&gt;0%3b_JFILES_=&gt;1%3bStringTheoryLinkMode=&gt;1%3bStringTheoryDllMode=&gt;0%3bMD5=&gt;0%3bxFilesLinkMode=&gt;1%3bxFilesDllMode=&gt;0%3bjFilesLinkMode=&gt;1%3bjFilesDllMode=&gt;0%3bDrawLinkMode=&gt;1%3bDrawDllMode=&gt;0%3bDrawImage=&gt;0%3b_ABCDllMode_=&gt;0%3b_ABCLinkMode_=&gt;1%3b_NetTalkDllMode_=&gt;0%3b_NetTalkLinkMode_=&gt;1</DefineConstants>
     <stack_size>16384</stack_size>
     <CopyCore>True</CopyCore>
   </PropertyGroup>
@@ -59,7 +59,17 @@
       <Generated>True</Generated>
       <ProjectGenerated>True</ProjectGenerated>
     </None>
+    <None Include="cs_libpng.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Generated>True</Generated>
+      <ProjectGenerated>True</ProjectGenerated>
+    </None>
     <None Include="dh2048.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Generated>True</Generated>
+      <ProjectGenerated>True</ProjectGenerated>
+    </None>
+    <None Include="FreeImage.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Generated>True</Generated>
       <ProjectGenerated>True</ProjectGenerated>
@@ -81,6 +91,11 @@
     </None>
     <None Include="pmC2IPLibrary.inc" />
     <None Include="ssleay32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Generated>True</Generated>
+      <ProjectGenerated>True</ProjectGenerated>
+    </None>
+    <None Include="zlib.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Generated>True</Generated>
       <ProjectGenerated>True</ProjectGenerated>
