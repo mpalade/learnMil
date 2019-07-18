@@ -219,7 +219,9 @@ CODE
     
 OrgChartC2IP.Load   PROCEDURE(STRING sFileName)
 jsonItem  &JSONClass
-CODE
+    CODE
+        sst.Trace('BEGIN:OrgChartC2IP.Load')
+        
     ! do something
     
     json.LoadFile(sFileName)
@@ -241,6 +243,7 @@ CODE
         
         FREE(SELF.ul.ul)
         jsonItem.Load(SELF.ul.ul)
+        sst.Trace('     OrgChartC2IP.Load->Units found = ' & RECORDS(SELF.ul.ul))
     END  
     
     ! refrenced C2IPs
@@ -251,7 +254,9 @@ CODE
     END
     
     
-    SELF.Redraw()
+        SELF.Redraw()
+        
+        sst.Trace('END:OrgChartC2IP.Load')
     
     RETURN TRUE
     

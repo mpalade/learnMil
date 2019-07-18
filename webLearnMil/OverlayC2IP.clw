@@ -1757,29 +1757,43 @@ OverlayC2IP.Save    PROCEDURE(STRING sFileName)
 arec                    GROUP(ActionBasicRecord)
                         END
 
-CODE
-    ! do something
-    json.Start()
-    collection &= json.CreateCollection('Overlay')
+    CODE
+        sst.Trace('OverlayC2IP.Save BEGIN')
+        
+        ! do something
+        json.Start()
+        collection &= json.CreateCollection('Overlay')
+        
+        ! C2IP Name
+        collection.Append('C2IPName', SELF.Name, json:String)
+        
+        ! Units
+        sst.Trace('     OverlayC2IP.Save Append Units')
+        collection.Append(SELF.ul.ul, 'Units')
     
-    ! C2IP Name
-    collection.Append('C2IPName', SELF.Name, json:String)
+        OMIT('__omit')
+        ! 2019097-18: there is bug saving Actions section
+        
+        ! Actions
+        sst.Trace('     OverlayC2IP.Save Append Actions')
+        collection.Append(SELF.al.al, 'Actions')
+        !json.reference  = SELF.al.al.Resources
+        !json.SetColumnType('Resources',jf:Reference)
     
-    ! Units
-    collection.Append(SELF.ul.ul, 'Units')
+        sst.Trace('     OverlayC2IP.Save Append Resources')
+        subItem &= collection.Append('Resources')
+        subItem.Append(SELF.al.al.Resources)
+        
+        __omit
     
-    ! Actions
-    collection.Append(SELF.al.al, 'Actions')
-    !json.reference  = SELF.al.al.Resources
-    !json.SetColumnType('Resources',jf:Reference)
-    
-    subItem &= collection.Append('Resources')
-    subItem.Append(SELF.al.al.Resources)
-    
-    ! referenced C2IPs
-    collection.Append(SELF.refC2IPs, 'refC2IPs')    
-    
-    json.SaveFile(sFileName, TRUE)
+        ! referenced C2IPs
+        sst.Trace('     OverlayC2IP.Save Append referenced C2IPs')
+        collection.Append(SELF.refC2IPs, 'refC2IPs')    
+            
+        sst.Trace('     OverlayC2IP.Save Save json')
+        json.SaveFile(sFileName, TRUE)
+        
+        sst.Trace('OverlayC2IP.Save BEGIN')
     
     RETURN TRUE        
     
@@ -1794,46 +1808,58 @@ json.AddByReference PROCEDURE (StringTheory pName,JSONClass pJson)
     
 OverlayC2IP.Load   PROCEDURE(STRING sFileName)
 jsonItem  &JSONClass
-CODE
-    ! do something
-    
-    json.LoadFile(sFileName)
-    
-    i# = json.Records()
-    !MESSAGE('found = ' & i#)
-    
-    ! C2IP Name
-    jsonItem &= json.GetByName('C2IPName')
-    IF NOT jsonItem &= Null THEN
-        SELF.Name   = json.GetValueByName('C2IPName')
-    END
-    
-    ! Units
-    jsonItem &= json.GetByName('Units')
-    IF NOT jsonItem &= NULL THEN
-        !IF SELF.ul.Free() = TRUE THEN
-        !END
+    CODE
+        sst.Trace('OverlayC2IP.Load BEGIN')
         
-        FREE(SELF.ul.ul)
-        jsonItem.Load(SELF.ul.ul)
-    END  
+        ! do something
+        
+        json.LoadFile(sFileName)
+        
+        i# = json.Records()
+        !MESSAGE('found = ' & i#)
+        
+        ! C2IP Name
+        jsonItem &= json.GetByName('C2IPName')
+        IF NOT jsonItem &= Null THEN
+            SELF.Name   = json.GetValueByName('C2IPName')
+        END
+        
+        ! Units
+            sst.Trace('     OverlayC2IP.Load GetByName-Units')
+        jsonItem &= json.GetByName('Units')
+        IF NOT jsonItem &= NULL THEN
+            !IF SELF.ul.Free() = TRUE THEN
+            !END
+            
+            FREE(SELF.ul.ul)
+            jsonItem.Load(SELF.ul.ul)
+        END  
     
-    ! Actions
-    jsonItem &= json.GetByName('Actions')
-    IF NOT jsonItem &= NULL THEN
-        FREE(SELF.al.al)
-        jsonItem.Load(SELF.al.al)
-    END  
+        OMIT('__omit')
+        ! 2019097-18: there is bug saving Actions section
+        
+        ! Actions
+        sst.Trace('     OverlayC2IP.Load GetByName-Actions')
+        jsonItem &= json.GetByName('Actions')
+        IF NOT jsonItem &= NULL THEN
+            FREE(SELF.al.al)
+            jsonItem.Load(SELF.al.al)
+        END 
+        
+        __omit
     
-    ! refrenced C2IPs
-    jsonItem &= json.GetByName('refC2IPs')
-    IF NOT jsonItem &= NULL THEN
-        FREE(SELF.refC2IPs)
-        jsonItem.Load(SELF.refC2IPs)
-    END
-    
-    
-    SELF.Redraw()
+        ! refrenced C2IPs
+            sst.Trace('     OverlayC2IP.Load GetByName-referenced C2IPs')
+        jsonItem &= json.GetByName('refC2IPs')
+        IF NOT jsonItem &= NULL THEN
+            FREE(SELF.refC2IPs)
+            jsonItem.Load(SELF.refC2IPs)
+        END
+        
+        sst.Trace('     OverlayC2IP.Load Redraw')
+        SELF.Redraw()
+        
+        sst.Trace('OverlayC2IP.Load END')
     
     RETURN TRUE    
     
