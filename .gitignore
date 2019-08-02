@@ -1276,3 +1276,7 @@ webLearnMil/web/preview/uploads/ORBAT_ROU_v2.c2ip.img
 webLearnMil/web/uploads/gigel.c2ip
 *.obj
 *.obj
+obj/release/learnMil005.obj
+obj/release/learnMil_cv.RSC
+obj/release/learnMil_BC2.obj
+obj/release/learnMil005.obj
