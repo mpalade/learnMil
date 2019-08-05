@@ -60,6 +60,12 @@ END
 !!! </summary>
 cvBkgWnd PROCEDURE (STRING sC2IPPath)
 
+sFoundUnitName       STRING(100)                           ! 
+sFoundUnitCode       STRING(20)                            ! 
+nFoundUnitID         DECIMAL(7)                            ! 
+nFoundBSOTypeID      DECIMAL(7)                            ! 
+nFoundC2IEID         DECIMAL(7)                            ! 
+nFoundC2IPID         DECIMAL(7)                            ! 
 QuickWindow          WINDOW('conversion background window'),AT(,,260,160),FONT('Microsoft Sans Serif',8,,FONT:regular, |
   CHARSET:DEFAULT),RESIZE,CENTER,GRAY,IMM,HLP('cvBkgWnd'),SYSTEM
                        BUTTON('&OK'),AT(101,142,49,14),USE(?Ok),LEFT,ICON('WAOK.ICO'),FLAT,MSG('Accept operation'), |
@@ -127,12 +133,15 @@ ReturnValue          BYTE,AUTO
   SELF.AddItem(?Cancel,RequestCancelled)                   ! Add the cancel control to the window manager
   Relate:C2IEs.SetOpenRelated()
   Relate:C2IEs.Open                                        ! File C2IEs used by this procedure, so make sure it's RelationManager is open
-  Relate:c2ieUnits.SetOpenRelated()
-  Relate:c2ieUnits.Open                                    ! File c2ieUnits used by this procedure, so make sure it's RelationManager is open
+  Relate:Units.SetOpenRelated()
+  Relate:Units.Open                                        ! File Units used by this procedure, so make sure it's RelationManager is open
+  Relate:_Units.Open                                       ! File _Units used by this procedure, so make sure it's RelationManager is open
+  Access:type_BSO.UseFile                                  ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_C2IE.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_C2IP.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:C2IPContent.UseFile                               ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:C2IPs.UseFile                                     ! File referenced in 'Other Files' so need to inform it's FileManager
+  Access:c2ieUnits.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   SELF.FilesOpened = True
   SELF.Open(QuickWindow)                                   ! Open window
     QuickWindow{PROP:Buffer} = 1 ! Remove flicker when animating.
@@ -163,12 +172,13 @@ ReturnValue          BYTE,AUTO
       
               ! Prepare C2IE table
               Access:C2IEs.PrimeAutoInc()
-              C2IPCt:C2IEInstance = C2IE:ID
-              
+              nFoundC2IEID        = C2IE:ID            
+              C2IPCt:C2IEInstance = C2IE:ID            
               Access:C2IEs.TryInsert()
               
               ! Prepare C2IP table
-              Access:C2IPs.PrimeAutoInc()        
+              Access:C2IPs.PrimeAutoInc()   
+              nFoundC2IPID        = C2IP:ID
               C2IPCt:C2IPPackage  = C2IP:ID
               Access:C2IPs.TryInsert()
               
@@ -176,8 +186,12 @@ ReturnValue          BYTE,AUTO
               Access:C2IPContent.PrimeAutoInc()
               Access:C2IPContent.TryInsert()   
               
+              
+              
+              OMIT('__noCompile')
               ! LOOP through Units
-              MESSAGE('rec = ' & RECORDS(refOrgChart.ul.collection))
+                  ! should be correct
+              !MESSAGE('rec = ' & RECORDS(refOrgChart.ul.collection))
               LOOP i# = 1 TO RECORDS(refOrgChart.ul.collection)
                   GET(refOrgChart.ul.collection, i#)
                   IF NOT ERRORCODE() THEN
@@ -185,8 +199,47 @@ ReturnValue          BYTE,AUTO
                   END
                   
               END
+              __noCompile
               
-              
+              log.Trace('RECORDS(SELF.ul.ul) = ' & RECORDS(refOrgChart.ul.ul))
+              IF RECORDS(refOrgChart.ul.ul) > 0 THEN
+                  LOOP i# = 1 TO RECORDS(refOrgChart.ul.ul)
+                      GET(refOrgChart.ul.ul, i#)
+                      log.Trace('i# = ' & i#)
+                      IF NOT ERRORCODE() THEN
+                          sFoundUnitName  = refOrgChart.ul.ul.UnitName
+                          sFoundUnitCode  = refOrgChart.ul.ul.UnitName
+                          !MESSAGE(refOrgChart.ul.ul.UnitName)
+                          
+                          _Uni:Name   = sFoundUnitName
+                          IF Access:_Units.Fetch(_Uni:KName) = Level:Benign THEN
+                              ! keep current Object ID
+                              nFoundUnitID    = _Uni:ID
+                          ELSE
+                              ! determine BSO Type
+                              tpyBSO:Code = 'Units'
+                              IF Access:type_BSO.Fetch(tpyBSO:KCode) = Level:Benign THEN
+                                  nFoundBSOTypeID = tpyBSO:ID
+                              END
+                                                          
+                              ! insert new Object
+                              Uni:Name       = sFoundUnitName
+                              Uni:Code       = sFoundUnitCode
+                              Uni:BSOType    = nFoundBSOTypeID
+                              Access:Units.PrimeAutoInc()
+                              Access:Units.TryInsert()
+                              nFoundUnitID    = Uni:ID
+                          END
+                          
+                          ! Update c2ieUnits table
+                          c2ieUni:C2IE    = nFoundC2IEID
+                          c2ieUni:Unit    = nFoundUnitID
+                          c2ieUni:Hostility   = 1
+                          Access:c2ieUnits.PrimeAutoInc()
+                          Access:c2ieUnits.TryInsert()
+                      END            
+                  END
+              END
           END
       END    
   END
@@ -204,7 +257,8 @@ ReturnValue          BYTE,AUTO
   IF ReturnValue THEN RETURN ReturnValue.
   IF SELF.FilesOpened
     Relate:C2IEs.Close
-    Relate:c2ieUnits.Close
+    Relate:Units.Close
+    Relate:_Units.Close
   END
   IF SELF.Opened
     INIMgr.Update('cvBkgWnd',QuickWindow)                  ! Save window data to non-volatile store

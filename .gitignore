@@ -1280,3 +1280,8 @@ obj/release/learnMil005.obj
 obj/release/learnMil_cv.RSC
 obj/release/learnMil_BC2.obj
 obj/release/learnMil005.obj
+DATA/type_BSO.SCN
+DATA/type_Hostility.SCN
+DATA/Units.SCN
+obj/release/learnMil005.obj
+obj/release/learnMil_BC2.obj
