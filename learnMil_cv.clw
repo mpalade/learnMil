@@ -136,6 +136,7 @@ ReturnValue          BYTE,AUTO
   Relate:Units.SetOpenRelated()
   Relate:Units.Open                                        ! File Units used by this procedure, so make sure it's RelationManager is open
   Relate:_Units.Open                                       ! File _Units used by this procedure, so make sure it's RelationManager is open
+  Access:c2ieTaskOrg.UseFile                               ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_BSO.UseFile                                  ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_C2IE.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
   Access:type_C2IP.UseFile                                 ! File referenced in 'Other Files' so need to inform it's FileManager
@@ -237,6 +238,33 @@ ReturnValue          BYTE,AUTO
                           c2ieUni:Hostility   = 1
                           Access:c2ieUnits.PrimeAutoInc()
                           Access:c2ieUnits.TryInsert()
+                          
+                          ! Update c2ieTaskOrg table
+                          Access:c2ieTaskOrg.PrimeRecord()
+                          Access:c2ieTaskOrg.PrimeAutoInc()
+                          c2ieTO:C2IE     = nFoundC2IEID
+                          CASE refOrgChart.ul.ul.TreePos
+                          OF 1
+                              ! Parent
+                              c2ieTO:Parent   = nFoundUnitID
+                          OF 2
+                              ! Child1
+                              c2ieTO:Child1   = nFoundUnitID
+                          OF 3
+                              ! Child2
+                              c2ieTO:Child2   = nFoundUnitID
+                          OF 4
+                              ! Child3
+                              c2ieTO:Child3   = nFoundUnitID
+                          OF 5
+                              ! Child4
+                              c2ieTO:Child4   = nFoundUnitID
+                          OF 6
+                              ! Child5
+                              c2ieTO:Child5   = nFoundUnitID                            
+                          END
+                          Access:c2ieTaskOrg.TryInsert()
+                          
                       END            
                   END
               END
