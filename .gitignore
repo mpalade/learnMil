@@ -1289,3 +1289,15 @@ obj/release/learnMil005.obj
 obj/release/learnMil005.obj
 DATA/Units.SCN
 DATA/c2ieUnitsC2Relationships.SCN
+DATA/c2ieUnitsC2Relationships.SCN
+DATA/Units.SCN
+obj/release/learnMil005.obj
+obj/release/learnMil_BC2.obj
+DATA/c2ieUnitsC2Relationships.SCN
+DATA/c2ieUnitsNorm.SCN
+DATA/c2ieUnitsC2Relationships.SCN
+DATA/c2ieUnitsNormContent.SCN
+DATA/Units.SCN
+obj/release/learnMil005.obj
+obj/release/learnMil_BC2.obj
+obj/release/learnMil_Catalogs.RSC
