@@ -1301,3 +1301,7 @@ DATA/Units.SCN
 obj/release/learnMil005.obj
 obj/release/learnMil_BC2.obj
 obj/release/learnMil_Catalogs.RSC
+DATA/c2ieUnitsC2Relationships.SCN
+DATA/Units.SCN
+obj/release/learnMil005.obj
+obj/release/learnMil_BC2.obj
