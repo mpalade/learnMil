@@ -48,6 +48,9 @@
     <Compile Include="webLMil004.clw">
       <Generated>true</Generated>
     </Compile>
+    <Compile Include="webLMil005.clw">
+      <Generated>true</Generated>
+    </Compile>
     <Compile Include="WEBLMIL_BC.CLW">
       <Generated>true</Generated>
     </Compile>
