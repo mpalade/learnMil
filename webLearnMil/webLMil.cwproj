@@ -57,6 +57,12 @@
     <Compile Include="webLMil_BC0.CLW">
       <Generated>true</Generated>
     </Compile>
+    <Compile Include="webLMil_c2ie.clw">
+      <Generated>true</Generated>
+    </Compile>
+    <Compile Include="webLMil_Rg.clw">
+      <Generated>true</Generated>
+    </Compile>
     <Compile Include="webLM_nw.clw">
       <Generated>true</Generated>
     </Compile>
