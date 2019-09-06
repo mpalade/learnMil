@@ -27,7 +27,7 @@
 <div class="bs-example">
         <ul class="list-unstyled">
             <li class="media">
-                <img src="Degree-Radian_Conversion.svg" class="mr-3" alt="Sample Image" id="imgDeSchimbat">
+                <img src="" class="mr-3" alt="Sample Image" id="imgDeSchimbat">
     
     
                 <div class="media-body">
@@ -38,14 +38,14 @@
                 </div>
             </li>
             <li class="media my-2">
-                <img src="Degree-Radian_Conversion.svg" class="mr-3" alt="Sample Image">
+                <img src="" class="mr-3" alt="Sample Image">
                 <div class="media-body">
                     <h5 class="mt-0">TEST2</h5>
                     <p>TEST2</p>
                 </div>
             </li>
             <li class="media">
-                <img src="./Degree-Radian_Conversion.svg" class="mr-3" alt="Sample Image">
+                <img src="" class="mr-3" alt="Sample Image">
                 <div class="media-body">
                     <h5 class="mt-0">TEST3</h5>
                     <p>TEST3</p>
@@ -73,9 +73,9 @@
 
 <div id="div_svg"  justify-content="center"></div>
 
-<object type="image/svg+xml" data="E:/teste/SvgExport.svg">
+<object type="image/svg+xml" data="">
     <!-- Your fall back here -->
-    <img src="E:/teste/SvgExport.svg" alt="No SVG support, afisam png"/>
+    <img src="" alt="No SVG support, afisam png"/>
 </object>
 
 
@@ -129,6 +129,7 @@
         // var urlString = 'http://localhost:7888/interactive/geodefense/symbology/wcf/symbsvg?sidc='+ x;
         // var urlString = 'http://localhost:7888/interactive/geodefense/symbology/symbsvg?sidc='+ x;
         var urlString = 'http://127.0.0.1:89/getSymbolSVG?sSymbolCode='+ x;
+        //var urlString = 'http://10.2.5.179:7888/interactive/geodefense/symbology/symbsvg?sidc='+ x;
         var request = new Request(urlString, {
             headers: new Headers({
                 'Accept': 'application/json'
