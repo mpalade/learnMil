@@ -2296,3 +2296,10 @@ webLearnMil/webLMilSrv/webLMilSrv_ni.clw
 webLearnMil/webLMilSrv/zlibwapi.dll
 webLearnMil/webLMilSrv/webLMilSrv005.clw
 webLearnMil/webLMilSrv/WEBLMILSRV005.INC
+obj/release/learnMil_BC2.obj
+obj/release/learnMil005.obj
+obj/release/learnMil_BC2.obj
+learnMil005.clw
+learnMil006.clw
+learnMil007.clw
+webLearnMil/webLMilSrv/ServerState.xml
