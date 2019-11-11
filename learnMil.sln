@@ -2,17 +2,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 # Clarion 2.1.0.2447
-Project("{12B76EC0-1D7B-4FA7-A7D0-C524288B48A1}") = "learnMil", "learnMil.cwproj", "{50ACA5E7-B6CC-428D-86E4-E57243EF7DD2}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"
 	ProjectSection(SolutionItems) = postProject
 		learnMil.app = learnMil.app
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{472100F9-2B37-4642-90CF-7E553EF91F42}"
-	ProjectSection(SolutionItems) = postProject
-		leanMilNotes.docx = leanMilNotes.docx
-	EndProjectSection
+Project("{12B76EC0-1D7B-4FA7-A7D0-C524288B48A1}") = "learnMil", "learnMil.cwproj", "9F346365-904B-4B4D-A1D3-334D6EE1D64F"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,8 +23,17 @@ Global
 		{0015241F-24E1-4CE7-8A69-7BF333852FBC}.Debug|Win32.ActiveCfg = Debug|Win32
 		{0015241F-24E1-4CE7-8A69-7BF333852FBC}.Release|Win32.Build.0 = Release|Win32
 		{0015241F-24E1-4CE7-8A69-7BF333852FBC}.Release|Win32.ActiveCfg = Release|Win32
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{472100F9-2B37-4642-90CF-7E553EF91F42} = {{2150E333-8FDC-42A3-9474-1A3956D46DE8}}
+		6DB77F9E-6903-4F3E-8002-353BCFE8B7F7.Debug|Win32.Build.0 = Debug|Win32
+		6DB77F9E-6903-4F3E-8002-353BCFE8B7F7.Debug|Win32.ActiveCfg = Debug|Win32
+		6DB77F9E-6903-4F3E-8002-353BCFE8B7F7.Release|Win32.Build.0 = Release|Win32
+		6DB77F9E-6903-4F3E-8002-353BCFE8B7F7.Release|Win32.ActiveCfg = Release|Win32
+		9F346365-904B-4B4D-A1D3-334D6EE1D64F.Debug|Win32.Build.0 = Debug|Win32
+		9F346365-904B-4B4D-A1D3-334D6EE1D64F.Debug|Win32.ActiveCfg = Debug|Win32
+		9F346365-904B-4B4D-A1D3-334D6EE1D64F.Release|Win32.Build.0 = Release|Win32
+		9F346365-904B-4B4D-A1D3-334D6EE1D64F.Release|Win32.ActiveCfg = Release|Win32
+		2A3C409D-8246-4214-AE36-B83D9EC5F537.Debug|Win32.Build.0 = Debug|Win32
+		2A3C409D-8246-4214-AE36-B83D9EC5F537.Debug|Win32.ActiveCfg = Debug|Win32
+		2A3C409D-8246-4214-AE36-B83D9EC5F537.Release|Win32.Build.0 = Release|Win32
+		2A3C409D-8246-4214-AE36-B83D9EC5F537.Release|Win32.ActiveCfg = Release|Win32
 	EndGlobalSection
 EndGlobal

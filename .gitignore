@@ -2303,3 +2303,5 @@ learnMil005.clw
 learnMil006.clw
 learnMil007.clw
 webLearnMil/webLMilSrv/ServerState.xml
+obj/release/learnMil_BC2.obj
+obj/release/learnMil005.obj
