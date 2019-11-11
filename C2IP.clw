@@ -58,7 +58,9 @@ C2IP.Destruct       PROCEDURE()
 C2IP.InitDraw     PROCEDURE(Draw pDraw)
 CODE
     ! Init Drawing Object    
-    SELF.drwImg     &= pDraw            
+    SELF.drwImg     &= pDraw     
+    
+    RETURN TRUE
                   
 C2IP.DrawNode_HQ    PROCEDURE()
     CODE
@@ -1258,6 +1260,12 @@ C2IP.isABSOSelected PROCEDURE()
 C2IP.C2IPUtilities.Log      PROCEDURE()
     CODE
         RETURN CLIP(SELF.lastOperation)
+        
+        
+C2IP.C2IPUtilities.ExportImg        PROCEDURE(STRING sFileName)
+    CODE
+        SELF.drwImg.WritePNG(sFileName)
+        RETURN TRUE
         
 
         

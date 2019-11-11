@@ -29,13 +29,20 @@
     <line_numbers>False</line_numbers>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ActionsCollection.clw" />
+    <Compile Include="C2IP.clw" />
+    <Compile Include="OrgChartC2IP.clw" />
+    <Compile Include="OverlayC2IP.clw" />
     <Compile Include="pmC2IPLibrary.clw" />
+    <Compile Include="PointsCollection.clw" />
     <Compile Include="UnitTests.clw" />
+    <Compile Include="UT_BSO.clw" />
     <Compile Include="UT_BSOCollection.clw" />
     <Compile Include="UT_OrgChartC2IP.clw" />
     <None Include="cs_libpng.dll" />
     <None Include="FreeImage.dll" />
     <None Include="pmC2IPLibrary.inc" />
+    <None Include="UT_BSO.inc" />
     <None Include="UT_BSOCollection.inc" />
     <None Include="UT_OrgChartC2IP.inc" />
     <None Include="zlib.dll" />

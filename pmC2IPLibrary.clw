@@ -26,8 +26,14 @@ UnitsCollection.Construct     PROCEDURE()
         SELF.ul     &= NEW(UnitsQueue)
         SELF.tmpul  &=NEW(UnitsQueue)
         
+        ! collection
+        SELF.collection &= NEW(UnitsClassQueue)
+        
 UnitsCollection.Destruct      PROCEDURE()
-    CODE         
+    CODE
+        ! collection
+        DISPOSE(SELF.collection)
+        
         DISPOSE(SELF.tmpul)
         DISPOSE(SELF.ul)   
         
@@ -415,7 +421,11 @@ CODE
               
     END        
     
-    RETURN TRUE        
+    RETURN TRUE       
+    
+UnitsCollection.InsertNode  PROCEDURE(*BSO pBSO)
+    CODE
+        
     
 UnitsCollection.AddNode       PROCEDURE(*UnitBasicRecord pUrec)
     CODE
@@ -495,6 +505,7 @@ UnitsCollection.GetNode       PROCEDURE()
         
 Action.Construct    PROCEDURE()
     CODE
+        SELF.arec.ActionPoints          &= NEW(PosList)
         
 Action.Init    PROCEDURE(*ActionBasicRecord pARec)
     CODE
@@ -502,18 +513,124 @@ Action.Init    PROCEDURE(*ActionBasicRecord pARec)
         SELF.arec.ActionPointsNumber    = pArec.ActionPointsNumber
         SELF.arec.ActionType            = pArec.ActionType
         SELF.arec.ActionTypeCode        = pArec.ActionTypeCode
-        SELF.arec.xPos                  = pArec.xPos
-        SELF.arec.yPos                  = pArec.yPos
+        ! action points
+        !SELF.arec.ActionPoints          &= NEW(PosList)
+        LOOP i# = 1 TO RECORDS(pArec.ActionPoints)
+            GET(pArec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                SELF.arec.ActionPoints.xPos = pArec.ActionPoints.xPos
+                SELF.arec.ActionPoints.yPos = pArec.ActionPoints.yPos
+                ADD(SELF.arec.ActionPoints)
+                
+                ! usual Position records
+                CASE i#
+                OF 1
+                    SELF.xPos1  = pArec.ActionPoints.xPos
+                    SELF.yPos1  = pArec.ActionPoints.yPos
+                    
+                    SELF.lowestX = SELF.xPos1
+                    SELF.lowestY = SELF.yPos1
+                OF 2
+                    SELF.xPos2  = pArec.ActionPoints.xPos
+                    SELF.yPos2  = pArec.ActionPoints.yPos
+                    
+                    IF SELF.xPos2 < SELF.lowestX THEN
+                        SELF.lowestX    = SELF.xPos2
+                    ELSE
+                        SELF.highestX   = SELF.xPos2
+                    END
+                    IF SELF.yPos2 < SELF.lowestY THEN
+                        SELF.lowestY    = SELF.yPos2
+                    ELSE
+                        SELF.highestY   = SELF.yPos2
+                    END                                                           
+                ELSE
+                    ! lowest & highest
+                    IF pArec.ActionPoints.xPos < SELF.lowestX THEN
+                        SELF.lowestX    = pArec.ActionPoints.xPos
+                    END
+                    IF pArec.ActionPoints.xPos > SELF.highestX THEN
+                        SELF.highestX    = pArec.ActionPoints.xPos
+                    END
+                    IF pArec.ActionPoints.yPos < SELF.lowestY THEN
+                        SELF.lowestY    = pArec.ActionPoints.yPos
+                    END
+                    IF pArec.ActionPoints.yPos > SELF.highestY THEN
+                        SELF.highestY   = pArec.ActionPoints.yPos
+                    END                    
+                END
+            END            
+        END
+        
+        !SELF.arec.xPos                  = pArec.xPos
+        !SELF.arec.yPos                  = pArec.yPos
         
         RETURN TRUE
         
 Action.Destruct     PROCEDURE()
     CODE
+        DISPOSE(SELF.arec.ActionPoints)
+        
+        
+Action.ComputeSelectRectangle       PROCEDURE()
+    CODE
+        LOOP i# = 1 TO RECORDS(SELF.arec.ActionPoints)
+            GET(SELF.arec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN                                
+                x#  = SELF.arec.ActionPoints.xPos
+                y#  = SELF.arec.ActionPoints.yPos
+                ! usual Position records
+                CASE i#
+                OF 1
+                    SELF.lowestX = x#
+                    SELF.lowestY = y#
+                OF 2                    
+                    IF x# < SELF.lowestX THEN
+                        SELF.lowestX    = x#
+                    ELSE
+                        SELF.highestX   = x#
+                    END
+                    IF y# < SELF.lowestY THEN
+                        SELF.lowestY    = y#
+                    ELSE
+                        SELF.highestY   = y#
+                    END                                                           
+                ELSE
+                    ! lowest & highest
+                    IF x# < SELF.lowestX THEN
+                        SELF.lowestX    = x#
+                    END
+                    IF x# > SELF.highestX THEN
+                        SELF.highestX    = x#
+                    END
+                    IF y# < SELF.lowestY THEN
+                        SELF.lowestY    = y#
+                    END
+                    IF y# > SELF.highestY THEN
+                        SELF.highestY   = y#
+                    END                    
+                END
+            END            
+        END
+        
+Action.GetAnchorPoints      PROCEDURE(*LONG pLowestX, *LONG pLowestY, *LONG pHighestX, *LONG pHighestY)        
+    CODE
+        SELF.ComputeSelectRectangle()
+        pLowestX    = SELF.lowestX
+        pLowestY    = SELF.lowestY
+        pHighestX   = SELF.highestX
+        pHighestY   = SELF.highestY
+        RETURN TRUE
+        
+Action.SetText      PROCEDURE(STRING sText)
+    CODE
+        SELF.arec.editableText  = sText
+        RETURN TRUE
         
 Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
     CODE
-        currentSlope$   = (SELF.arec.xPos[1] - SELF.arec.xPos[2]) / (SELF.arec.yPos[1] - SELF.arec.yPos[2])
-        computedSlope$  = (SELF.arec.xPos[1] - nXPos) / (SELF.arec.yPos[1] - nYPos)        
+        currentSlope$   = (SELF.xPos1 - SELF.xPos2) / (SELF.yPos1 - SELF.yPos2)
+        computedSlope$  = (SELF.xPos1 - nXPos) / (SELF.yPos1 - nYPos)        
         
         !MESSAGE('slopes ' & currentSlope$ & ' vs. ' & computedSlope$)
         IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
@@ -525,13 +642,68 @@ Action.CheckLineByMouse     PROCEDURE(LONG nXPos, LONG nYPos)
 Action.CheckRectangleByMouse        PROCEDURE(LONG nXPos, LONG nYPos)                       
     CODE
         !sst.Trace('Action.CheckRectangleByMouse BEGIN')
-        IF (SELF.arec.xPos[1] <= nXPOs) AND (nXPos <= SELF.arec.xPos[2]) AND |
-            (SELF.arec.yPos[1] <= nYPos) AND (nYPos <= SELF.arec.yPos[2]) THEN
+        IF (SELF.xPos1 <= nXPOs) AND (nXPos <= SELF.xPos2) AND |
+            (SELF.yPos1 <= nYPos) AND (nYPos <= SELF.yPos2) THEN
             RETURN TRUE
         ELSE
             RETURN FALSE
         END
         !sst.Trace('Action.CheckRectangleByMouse END')
+        
+Action.CheckFreeHandByMouse PROCEDURE(LONG nXPos, LONG nYPos)
+    CODE                
+
+        retVal# = FALSE
+        
+        IF (SELF.lowestX <= nXPos) AND |
+            (nXPos <= SELF.highestX) AND |
+            (SELF.lowestY <= nYPos) AND |
+            (nYPos <= SELF.highestY) THEN
+            retVal# = TRUE            
+        END
+        
+        
+        OMIT('_noCompile')
+        LOOP i# = 1 TO RECORDS(SELF.arec.ActionPoints)
+            GET(SELF.arec.ActionPoints, i#)
+            IF NOT ERRORCODE() THEN
+                IF i# = 1 THEN
+                    xPos1# = SELF.arec.ActionPoints.xPos
+                    yPos1# = SELF.arec.ActionPoints.yPos
+                END
+                IF i# = 2 THEN
+                    xPos2# = SELF.arec.ActionPoints.xPos
+                    yPos2# = SELF.arec.ActionPoints.yPos
+                    
+                    currentSlope$   = (xPos1# - xPos2#) / (yPos1# - yPos2#)
+                    computedSlope$  = (xPos1# - nXPos) / (yPos1# - nYPos)    
+                    
+                    IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
+                        retVal# = TRUE
+                        BREAK                        
+                    END
+                END
+                IF i# > 2 THEN
+                    xPos1#  = xPos2#
+                    yPos1#  = yPos2#
+                    
+                    xPos2# = SELF.arec.ActionPoints.xPos
+                    yPos2# = SELF.arec.ActionPoints.yPos
+                    
+                    currentSlope$   = (xPos1# - xPos2#) / (yPos1# - yPos2#)
+                    computedSlope$  = (xPos1# - nXPos) / (yPos1# - nYPos)      
+                    
+                    IF ROUND(ABS(currentSlope$), 0.1) = ROUND(ABS(computedSlope$), 0.1) THEN
+                        retVal# = TRUE
+                        BREAK
+                    END
+                END                                                                                         
+            END                        
+        END        
+        _noCompile
+        
+        RETURN retVal#
+        
         
                               
         
@@ -850,7 +1022,19 @@ UnitsCollection.ChangeNodePos PROCEDURE(LONG nXPos, LONG nYPos)
             
         RETURN 0
         
-     
+BSO.Init            PROCEDURE(*UnitBasicRecord pUrec)
+    CODE
+        SELF.urec.Echelon       = pUrec.Echelon
+        SELF.urec.Hostility     = pUrec.Hostility
+        SELF.urec.IsHQ          = pUrec.IsHQ
+        SELF.urec.TreePos       = pUrec.TreePos
+        SELF.urec.UnitName      = pUrec.UnitName
+        SELF.urec.UnitType      = pUrec.UnitType
+        SELF.urec.UnitTypeCode  = pUrec.UnitTypeCode
+        SELF.urec.xPos          = pUrec.xPos
+        SELF.urec.yPos          = pUrec.yPos                
+        
+        RETURN TRUE
 
         
 

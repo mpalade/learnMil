@@ -1,0 +1,210 @@
+﻿<!-- NetWebServer -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Learning Military www Version</title>
+<!-- Net:c:Head -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<style type="text/css">
+    .bs-example{
+        margin: 20px;        
+    }
+    .media img{
+        width: 80px;
+    }
+</style>
+</head>
+
+<body>
+<!-- Net:PageHeaderTag -->
+<div class="bs-example">
+        <ul class="list-unstyled">
+            <li class="media">
+                <img src="" class="mr-3" alt="Sample Image" id="imgDeSchimbat">
+    
+    
+                <div class="media-body">
+                    <a class="mt-0" href = "https://www.google.com">
+                        <h5 >TEST1</h5>
+                    </a>
+                    <p>TEST1</p>
+                </div>
+            </li>
+            <li class="media my-2">
+                <img src="" class="mr-3" alt="Sample Image">
+                <div class="media-body">
+                    <h5 class="mt-0">TEST2</h5>
+                    <p>TEST2</p>
+                </div>
+            </li>
+            <li class="media">
+                <img src="" class="mr-3" alt="Sample Image">
+                <div class="media-body">
+                    <h5 class="mt-0">TEST3</h5>
+                    <p>TEST3</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+<!-- end teste media -->
+
+
+
+<!-- Incepe test add img from svg -->
+<!-- ///////////////////////////// -->
+
+<h2>JavaScript test: SVG from IdCode VCF</h2>
+
+<p>Exmple:</p>
+<p>&emsp;SUPPS-----*****</p>
+<p>&emsp;SFPPS-----*****</p>
+<p>&emsp;SJPPS-----*****</p>
+<br>
+<input type="text" id="unitSymbolID" maxlength="20" minlength="2" value="" required />
+<button onclick="GetUnit()">Get Unit</button>
+
+<div id="div_svg"  justify-content="center"></div>
+
+<object type="image/svg+xml" data="">
+    <!-- Your fall back here -->
+    <img src="" alt="No SVG support, afisam png"/>
+</object>
+
+
+<style>
+    .democlass {
+            color: red;
+    }
+
+    img {
+    max-height: 300px;
+    display: inline;
+    /* margin-left: 57px; */
+    object-position: 50% 50%;
+    vertical-align: middle;
+    }
+
+    .fill {
+    object-fit: fill;
+    }
+
+    .cover {
+    object-fit: cover;
+    }
+
+    .contain {
+    object-fit: contain;
+    }
+
+    .none {
+    object-fit: none;
+    }
+</style>
+
+
+<!-- #region javascript-->
+<script>
+
+    const svgTest = `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150">
+                    <circle cx="25" cy="25" r="20"/></svg>`;
+    
+    function GetUnit(idcode) 
+    {
+        // Get the value of the input field with id="numb"
+        if (idcode == null) {
+            x = document.getElementById("unitSymbolID").value;
+        }
+        else {
+            x = idcode;
+        }
+    
+        // var urlString = 'http://localhost:7888/interactive/geodefense/symbology/wcf/symbsvg?sidc='+ x;
+        // var urlString = 'http://localhost:7888/interactive/geodefense/symbology/symbsvg?sidc='+ x;
+        var urlString = 'http://127.0.0.1:89/getSymbolSVG?sSymbolCode='+ x;
+        //var urlString = 'http://10.2.5.179:7888/interactive/geodefense/symbology/symbsvg?sidc='+ x;
+        var request = new Request(urlString, {
+            headers: new Headers({
+                'Accept': 'application/json'
+                //'Content-Type': 'application/json',
+            })
+        });
+    
+    
+        fetch(request).then(function(response) {
+    
+            // console.log(response.url);
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                //alert("Something went wrong for symbol:" + x);
+                // throw new Error('Something went wrong on api server!');
+                console.log('Something went wrong on api server for symb! '+ x);
+
+            }
+    
+        }).then(function(myJson) {
+    
+            // console.log(myJson);     
+            const svg2 = myJson;   // svgTest;
+            const blob2 = new Blob([svg2], {type: 'image/svg+xml'});
+            const url2 = URL.createObjectURL(blob2);
+            // const image2 = document.createElement('img');    
+            // image2.addEventListener('load', () => URL.revokeObjectURL(url2), {once: true});
+            // image2.src = url2;
+    
+            //merge si asa
+            //var data = "data:image/svg+xml,"+ svg2;
+            //image2.src = data;
+    
+            if (idcode == null) {
+            var image2 = document.getElementById("imgDeSchimbat"); 
+            image2.addEventListener('load', () => URL.revokeObjectURL(url2), {once: true});
+            image2.src = url2;  
+        }
+        else {
+            const image2 = document.createElement('img');    
+            image2.addEventListener('load', () => URL.revokeObjectURL(url2), {once: true});
+            image2.src = url2;
+             var element = document.getElementById("div_svg");
+            element.appendChild(image2);  
+        }
+            // var element = document.getElementById("div_svg");
+            // element.appendChild(image2);    
+    
+
+            // var h1 = document.getElementsByTagName("H2")[0];
+            // var att = document.createAttribute("class");
+            // att.value = "democlass";
+            // h1.setAttributeNode(att);
+    
+    
+            // var img = document.getElementsByTagName("img")[0];
+            // var att2 = document.createAttribute("class");
+            // att2.value = "contain";
+            // img.setAttributeNode(att2);
+    
+        }).catch(function(error) {
+            //alert("There has been a problem with your fetch operation:" + error.message);
+            console.log('There has been a problem with your fetch operation: ', error.message);
+        });
+    }
+    </script>
+    <!-- endregion -->
+
+<!-- Net:B_w3Units -->
+
+<!-- Net:PageFooterTag -->
+
+<!-- Net:c:BodyEnd -->     
+
+</body>
+
+</html>

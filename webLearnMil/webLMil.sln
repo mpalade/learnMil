@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+# Clarion 2.1.0.2447
+Project("{12B76EC0-1D7B-4FA7-A7D0-C524288B48A1}") = "webLMil", "webLMil.cwproj", "{6AFDABA9-B6E9-4848-AC32-CF423158EAD4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"
+	ProjectSection(SolutionItems) = postProject
+		webLMil.app = webLMil.app
+		webLMilSrv\webLMilSrv.app = webLMilSrv\webLMilSrv.app
+	EndProjectSection
+EndProject
+Project("{12B76EC0-1D7B-4FA7-A7D0-C524288B48A1}") = "webLMilSrv", "webLMilSrv\webLMilSrv.cwproj", "{727E20EF-95E4-4AE7-B83A-6B26673B3A90}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6AFDABA9-B6E9-4848-AC32-CF423158EAD4}.Debug|Win32.Build.0 = Debug|Win32
+		{6AFDABA9-B6E9-4848-AC32-CF423158EAD4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6AFDABA9-B6E9-4848-AC32-CF423158EAD4}.Release|Win32.Build.0 = Release|Win32
+		{6AFDABA9-B6E9-4848-AC32-CF423158EAD4}.Release|Win32.ActiveCfg = Release|Win32
+		{50ACA5E7-B6CC-428D-86E4-E57243EF7DD2}.Debug|Win32.Build.0 = Debug|Win32
+		{50ACA5E7-B6CC-428D-86E4-E57243EF7DD2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{50ACA5E7-B6CC-428D-86E4-E57243EF7DD2}.Release|Win32.Build.0 = Release|Win32
+		{50ACA5E7-B6CC-428D-86E4-E57243EF7DD2}.Release|Win32.ActiveCfg = Release|Win32
+		{8E9111D4-C219-4E3D-BA74-F9519F6618E1}.Debug|Win32.Build.0 = Debug|Win32
+		{8E9111D4-C219-4E3D-BA74-F9519F6618E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8E9111D4-C219-4E3D-BA74-F9519F6618E1}.Release|Win32.Build.0 = Release|Win32
+		{8E9111D4-C219-4E3D-BA74-F9519F6618E1}.Release|Win32.ActiveCfg = Release|Win32
+		{727E20EF-95E4-4AE7-B83A-6B26673B3A90}.Debug|Win32.Build.0 = Debug|Win32
+		{727E20EF-95E4-4AE7-B83A-6B26673B3A90}.Debug|Win32.ActiveCfg = Debug|Win32
+		{727E20EF-95E4-4AE7-B83A-6B26673B3A90}.Release|Win32.Build.0 = Release|Win32
+		{727E20EF-95E4-4AE7-B83A-6B26673B3A90}.Release|Win32.ActiveCfg = Release|Win32
+	EndGlobalSection
+EndGlobal

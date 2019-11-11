@@ -42,20 +42,25 @@ CODE
     SELF.drwImg.Setpencolor(COLOR:Black)
     SELF.drwImg.SetPenWidth(1)
     
-    sst.Trace('RECORDS(SELF.ul) = ' & RECORDS(SELF.ul))
-    LOOP i# = 1 TO RECORDS(SELF.ul)
-        GET(SELF.ul.ul, i#)
-        sst.Trace('i# = ' & i#)
-        IF NOT ERRORCODE() THEN
-            ! Main Symbol
-            SELF.DrawNode_MainSymbol()                                                                                    
-            ! Echelon
-            SELF.DrawNode_Echelon()            
+    sst.Trace('RECORDS(SELF.ul.ul) = ' & RECORDS(SELF.ul.ul))
+    IF RECORDS(SELF.ul.ul) > 0 THEN
+        LOOP i# = 1 TO RECORDS(SELF.ul.ul)
+            GET(SELF.ul.ul, i#)
+            sst.Trace('i# = ' & i#)
+            IF NOT ERRORCODE() THEN
+                ! Main Symbol
+                SELF.DrawNode_MainSymbol()                                                                                    
+                ! Echelon
+                SELF.DrawNode_Echelon()            
+            END            
         END
-        
     END
     
-    SELF.drwImg.Display()
+    sst.Trace('OrgChartC2IP.Redraw -> before Display')
+    IF RECORDS(SELF.ul.ul) > 0 THEN
+        SELF.drwImg.Display()
+    END
+    sst.Trace('OrgChartC2IP.Redraw -> after Display')
     sst.Trace('END:OrgChartC2IP.Redraw')
     
     
@@ -214,7 +219,9 @@ CODE
     
 OrgChartC2IP.Load   PROCEDURE(STRING sFileName)
 jsonItem  &JSONClass
-CODE
+    CODE
+        sst.Trace('BEGIN:OrgChartC2IP.Load')
+        
     ! do something
     
     json.LoadFile(sFileName)
@@ -236,6 +243,7 @@ CODE
         
         FREE(SELF.ul.ul)
         jsonItem.Load(SELF.ul.ul)
+        sst.Trace('     OrgChartC2IP.Load->Units found = ' & RECORDS(SELF.ul.ul))
     END  
     
     ! refrenced C2IPs
@@ -246,7 +254,9 @@ CODE
     END
     
     
-    SELF.Redraw()
+        SELF.Redraw()
+        
+        sst.Trace('END:OrgChartC2IP.Load')
     
     RETURN TRUE
     

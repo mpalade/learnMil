@@ -15,7 +15,8 @@ OMIT('***')
 
     END
 
-aCollection     &BSOCollection    
+!aCollection     &BSOCollection    
+aCollection     &UnitsCollection    
 
     INCLUDE('Equates.CLW'),ONCE
     INCLUDE('pmC2IPLibrary.INC'),ONCE
@@ -24,7 +25,8 @@ aCollection     &BSOCollection
 
 UT_BSOCollection.InitContext        PROCEDURE
     CODE
-        aCollection &= NEW(BSOCollection)
+        !aCollection &= NEW(BSOCollection)
+        aCollection &= NEW(UnitsCollection)
         
 UT_BSOCollection.DestroyContext     PROCEDURE
     CODE
@@ -48,6 +50,24 @@ UT_BSOCollection.InsertNode    PROCEDURE
         ASSERT(aCollection.UnitTypeCode()='','UT_BSOCollection.InsertNode:aCollection.Echelon=')
         ASSERT(aCollection.UnitTypeCode()=uTpy:notDefined,'UT_BSOCollection.InsertNode:aCollection.Echelon=uTpy:notDefined')        
         RETURN TRUE
+        
+UT_BSOCollection.InsertAndVerifyABSO        PROCEDURE
+myBSO       BSO
+rcvBSO      BSO
+    CODE
+        myBSO.urec.Echelon      = echTpy:Army
+        myBSO.urec.Hostility    = hTpy:Friend
+        myBSO.urec.IsHQ         = FALSE
+        myBSO.urec.TreePos      = 1
+        myBSO.urec.UnitName     = 'myUnit'
+        myBSO.urec.UnitType     = uTpy:Amphibious
+        myBSO.urec.UnitTypeCode = 'uTpy:Amphibious'
+        myBSO.urec.xPos         = 100
+        myBSO.urec.yPos         = 100
+        
+        
+        aCollection.InsertNode(myBSO)
+        
         
         
 UT_BSOCollection.InsertNodeOnEmptyCollection        PROCEDURE
@@ -131,8 +151,42 @@ UT_BSOCollection.AddSpecificNode    PROCEDURE(*UnitBasicRecord pURec)
         RETURN TRUE
         
         
+UT_BSOCollection.AddGet     PROCEDURE()
+myBSO                           BSO
+myColl                          UnitsCollection
+receivedBSO                     BSO
+
+    CODE
+        myBSO.urec.UnitName = 'myName'
+        myColl.BSOCollOpr.Add(myBSO)
+        myColl.BSOCollOpr.Get(1, receivedBSO)
+        ASSERT(myBSO.urec.UnitName = receivedBSO.urec.UnitName, 'myColl.BSOCollOpr.Get(1, receivedBSO) ERROR')
+        ASSERT(myBSO.urec.UnitName = 'myName', 'myColl.BSOCollOpr.Get(1, receivedBSO) ERROR')
+        
+        myBSO.urec.UnitName = 'Zuzu'
+        myColl.BSOCollOpr.Add(myBSO)
+        myColl.BSOCollOpr.Get(2, receivedBSO)
+        ASSERT(myBSO.urec.UnitName = receivedBSO.urec.UnitName, 'myColl.BSOCollOpr.Get(2, receivedBSO) ERROR')
+        ASSERT(myBSO.urec.UnitName = 'Zuzu', 'myColl.BSOCollOpr.Get(1, receivedBSO) ERROR')
         
         
+UT_BSOCollection.Replace     PROCEDURE()
+myBSO                           BSO
+secBSO                          BSO
+myColl                          UnitsCollection
+receivedBSO                     BSO
+
+    CODE
+        myBSO.urec.UnitName = 'ana'
+        myColl.BSOCollOpr.Add(myBSO)
+        
+        secBSO.urec.UnitName    = 'dana'
+        
+        myColl.BSOCollOpr.Rpl(1, secBSO)
+        
+        myColl.BSOCollOpr.Get(1, receivedBSO)
+        ASSERT(receivedBSO.urec.UnitName = secBSO.urec.UnitName, 'myColl.BSOCollOpr.Rpl(1, secBSO) ERROR')
+        ASSERT(receivedBSO.urec.UnitName = 'dana', 'myColl.BSOCollOpr.Rpl(1, secBSO) ERROR')
         
 
 

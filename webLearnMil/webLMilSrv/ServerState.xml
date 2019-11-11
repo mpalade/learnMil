@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<NetTalkWebServerState>
+<SessionQueue>
+  <row>
+    <SESSIONID>vbGUdj0carKq5kVUH4LQqwrFWjolLJ</SESSIONID>
+    <HOST>localhost:89</HOST>
+    <DATE>79875</DATE>
+    <TIME>6811712</TIME>
+    <LOGGEDIN>0</LOGGEDIN>
+    <LEVEL>0</LEVEL>
+    <IP>127.0.0.1</IP>
+    <EXPIRYAFTERHS>90001</EXPIRYAFTERHS>
+    <REFERER/>
+  </row>
+</SessionQueue>
+<SessionDataQueue>
+  <row>
+    <SESSIONID>vbGUdj0carKq5kVUH4LQqwrFWjolLJ</SESSIONID>
+    <TABID/>
+    <NAME>_ajax_</NAME>
+    <VALUE>1</VALUE>
+    <PICTURE/>
+    <VALUEFORMATTED>0</VALUEFORMATTED>
+    <VALUEEXISTS>0</VALUEEXISTS>
+    <EXTVALUESIZE>0</EXTVALUESIZE>
+    <EXTVALUELEN>0</EXTVALUELEN>
+    <EXTVALUE/>
+    <WATCH>0</WATCH>
+  </row>
+  <row>
+    <SESSIONID>vbGUdj0carKq5kVUH4LQqwrFWjolLJ</SESSIONID>
+    <TABID/>
+    <NAME>_mobile_</NAME>
+    <VALUE>0</VALUE>
+    <PICTURE/>
+    <VALUEFORMATTED>0</VALUEFORMATTED>
+    <VALUEEXISTS>0</VALUEEXISTS>
+    <EXTVALUESIZE>0</EXTVALUESIZE>
+    <EXTVALUELEN>0</EXTVALUELEN>
+    <EXTVALUE/>
+    <WATCH>0</WATCH>
+  </row>
+  <row>
+    <SESSIONID>vbGUdj0carKq5kVUH4LQqwrFWjolLJ</SESSIONID>
+    <TABID/>
+    <NAME>_screenheight_</NAME>
+    <VALUE>937</VALUE>
+    <PICTURE/>
+    <VALUEFORMATTED>0</VALUEFORMATTED>
+    <VALUEEXISTS>0</VALUEEXISTS>
+    <EXTVALUESIZE>0</EXTVALUESIZE>
+    <EXTVALUELEN>0</EXTVALUELEN>
+    <EXTVALUE/>
+    <WATCH>0</WATCH>
+  </row>
+  <row>
+    <SESSIONID>vbGUdj0carKq5kVUH4LQqwrFWjolLJ</SESSIONID>
+    <TABID/>
+    <NAME>_screenwidth_</NAME>
+    <VALUE>1903</VALUE>
+    <PICTURE/>
+    <VALUEFORMATTED>0</VALUEFORMATTED>
+    <VALUEEXISTS>0</VALUEEXISTS>
+    <EXTVALUESIZE>0</EXTVALUESIZE>
+    <EXTVALUELEN>0</EXTVALUELEN>
+    <EXTVALUE/>
+    <WATCH>0</WATCH>
+  </row>
+  <row>
+    <SESSIONID>vbGUdj0carKq5kVUH4LQqwrFWjolLJ</SESSIONID>
+    <TABID/>
+    <NAME>_theme_</NAME>
+    <VALUE>ShoeStrap3</VALUE>
+    <PICTURE/>
+    <VALUEFORMATTED>0</VALUEFORMATTED>
+    <VALUEEXISTS>0</VALUEEXISTS>
+    <EXTVALUESIZE>0</EXTVALUESIZE>
+    <EXTVALUELEN>0</EXTVALUELEN>
+    <EXTVALUE/>
+    <WATCH>0</WATCH>
+  </row>
+</SessionDataQueue>
+<BrowseIDQueue>
+</BrowseIDQueue>
+<SettingsQueue>
+</SettingsQueue>
+<ChannelQueue>
+</ChannelQueue>
+<ChannelNameQueue>
+</ChannelNameQueue>
+<BrowseSettingsQueue>
+</BrowseSettingsQueue>
+</NetTalkWebServerState>
