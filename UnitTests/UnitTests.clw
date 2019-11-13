@@ -54,7 +54,7 @@ testOrgChart        UT_OrgChartC2IP
     CODE
         HelloWorld()
         
-        OMIT('__tests')
+        OMIT('__tests')!BSO
         
         InitContext()        
         testBSOCollection.InsertNode()
@@ -95,25 +95,26 @@ testOrgChart        UT_OrgChartC2IP
         
         __tests
         
-        OMIT('_noCompile')
+        !OrgChart
+        !OMIT('_noCompile')
         OrgChartInitContext()
             testOrgChart.InsertNode()
         OrgChartDestroyContext()
         
         InitContext()
-        aRecord.UnitName    = 'myName'
-        aRecord.UnitTypeCode    = uTpy:Amphibious
-        aRecord.Echelon         = echTpy:Brigade
-        aRecord.Hostility       = hTpy:Hostile
-        aRecord.IsHQ            = TRUE
-        aRecord.xPos            = 100
-        aRecord.yPos            = 100
+            aRecord.UnitName    = 'myName'
+            aRecord.UnitTypeCode    = uTpy:Amphibious
+            aRecord.Echelon         = echTpy:Brigade
+            aRecord.Hostility       = hTpy:Hostile
+            aRecord.IsHQ            = TRUE
+            aRecord.xPos            = 100
+            aRecord.yPos            = 100
             testBSOCollection.AddSpecificNode(aRecord)
         DestroyContext()
-        _noCompile
+        !_noCompile
         
         
-        
+        OMIT('_noCompile')!BSO
         ! BSO
         !testBSO.InitContext()
         testBSO.Eql()
@@ -122,8 +123,9 @@ testOrgChart        UT_OrgChartC2IP
         ! BSO Collection
         !testBSOCollection.AddGet()
         testBSOCollection.Replace()
+        _noCompile
         
-        OMIT('_noCompile')
+        OMIT('_noCompile')!BSO
         ! BSO Collection
         ! Units Collection
         

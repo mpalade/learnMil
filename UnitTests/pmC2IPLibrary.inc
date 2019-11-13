@@ -400,6 +400,12 @@ C2IPUtilities       INTERFACE
 Log                     PROCEDURE(), STRING
                     END
 
+! C2IP Visual Representation
+C2IPRepresentation  INTERFACE
+Display                 PROCEDURE(*Draw aDrawSupport), BOOL
+                    END
+
+
 ! C2IP Operators
 C2IPOperators       INTERFACE
 Eql                     PROCEDURE(PosList l1, PosList l2), BOOL
@@ -592,7 +598,8 @@ CheckLineByMouse            PROCEDURE(LONG nXPos, LONG nYPos), LONG
     
 
 ! Generic C2IP structure
-C2IP                CLASS, IMPLEMENTS(C2IPUtilities), MODULE('C2IP.clw'), LINK('C2IP.clw'), TYPE
+C2IP                            CLASS, IMPLEMENTS(C2IPUtilities), IMPLEMENTS(C2IPRepresentation), |
+                                    MODULE('C2IP.clw'), LINK('C2IP.clw'), TYPE
 Name                    STRING(100)
 ul                      &UnitsCollection
 tmpul                   &UnitsCollection

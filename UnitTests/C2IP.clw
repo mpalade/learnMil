@@ -1261,6 +1261,12 @@ C2IP.C2IPUtilities.Log      PROCEDURE()
     CODE
         RETURN CLIP(SELF.lastOperation)
         
+        
+C2IP.C2IPRepresentation.Display     PROCEDURE(*Draw aDrawSupport)
+    CODE
+        aDrawSupport.Blank()
+        RETURN TRUE
+        
 
         
         
