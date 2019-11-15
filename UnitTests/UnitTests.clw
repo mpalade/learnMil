@@ -15,6 +15,7 @@ StringTheory:TemplateVersion        equate('2.58')
     INCLUDE('pmC2IPLibrary.inc'), ONCE
     INCLUDE('UT_BSO.inc'), ONCE
     INCLUDE('UT_BSOCollection.inc'), ONCE
+    INCLUDE('UT_C2IP.inc'), ONCE
     INCLUDE('UT_OrgChartC2ip.inc'), ONCE
 
 
@@ -34,6 +35,9 @@ HelloWorld              PROCEDURE
 InitContext             PROCEDURE
 DestroyContext          PROCEDURE
 
+C2IPInitContext         PROCEDURE
+C2IPDestroyContext      PROCEDURE
+
 OrgChartInitContext     PROCEDURE
 OrgChartDestroyContext  PROCEDURE
 
@@ -48,13 +52,15 @@ testBSOCollection   UT_BSOCollection
 aRecord             GROUP(UnitBasicRecord)
                     END
 
+testC2IP            UT_C2IP
 testOrgChart        UT_OrgChartC2IP
 
 
     CODE
         HelloWorld()
         
-        OMIT('__tests')!BSO
+        !BSO Collection
+        OMIT('_noCompile')
         
         InitContext()        
         testBSOCollection.InsertNode()
@@ -93,10 +99,18 @@ testOrgChart        UT_OrgChartC2IP
         testBSOCollection.InsertSpecificNode(aRecord)
         DestroyContext()
         
-        __tests
+        _noCompile
+        
+        
+        !C2IP
+        C2IPInitContext()
+            testC2IP.SetGetName()
+        C2IPDestroyContext()
+        
+        
         
         !OrgChart
-        !OMIT('_noCompile')
+        OMIT('_noCompile')
         OrgChartInitContext()
             testOrgChart.InsertNode()
         OrgChartDestroyContext()
@@ -111,10 +125,10 @@ testOrgChart        UT_OrgChartC2IP
             aRecord.yPos            = 100
             testBSOCollection.AddSpecificNode(aRecord)
         DestroyContext()
-        !_noCompile
+        _noCompile
         
-        
-        OMIT('_noCompile')!BSO
+        !BSO
+        OMIT('_noCompile')
         ! BSO
         !testBSO.InitContext()
         testBSO.Eql()
@@ -125,7 +139,8 @@ testOrgChart        UT_OrgChartC2IP
         testBSOCollection.Replace()
         _noCompile
         
-        OMIT('_noCompile')!BSO
+        !BSO
+        OMIT('_noCompile')
         ! BSO Collection
         ! Units Collection
         
@@ -155,3 +170,12 @@ OrgChartInitContext PROCEDURE
 OrgChartDestroyContext      PROCEDURE
     CODE
         testOrgChart.DestroyContext()
+
+! C2IP Ccontrext        
+C2IPInitContext PROCEDURE
+    CODE
+        testC2IP.InitContext()
+        
+C2IPDestroyContext      PROCEDURE
+    CODE
+        testC2IP.DestroyContext()        

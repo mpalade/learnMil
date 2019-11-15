@@ -38,6 +38,8 @@
     <Compile Include="UnitTests.clw" />
     <Compile Include="UT_BSO.clw" />
     <Compile Include="UT_BSOCollection.clw" />
+    <Compile Include="UT_C2IP.clw" />
+    <None Include="UT_C2IP.inc" />
     <Compile Include="UT_OrgChartC2IP.clw" />
     <None Include="cs_libpng.dll" />
     <None Include="FreeImage.dll" />

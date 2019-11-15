@@ -17,6 +17,10 @@ OMIT('***')
 anOrgChart          &OrgChartC2IP
 aDraw               &Draw
 
+anURec              GROUP(UnitBasicRecord)
+                    END
+
+
     INCLUDE('Equates.CLW'),ONCE
     INCLUDE('pmC2IPLibrary.INC'),ONCE
 
@@ -44,6 +48,8 @@ UT_OrgChartC2IP.Destruct   PROCEDURE
 
 UT_OrgChartC2IP.InsertNode  PROCEDURE
     CODE
+        anURec.UnitName = 'mama'
+        
         !aDraw.Box(10, 10, 10, 10)
         !aDraw.Show(5, 5, 'mama')       
         !aDraw.Display()
