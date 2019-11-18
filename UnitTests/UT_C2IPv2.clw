@@ -69,7 +69,9 @@ loc:BSO     BSO
         
 UT_C2IPv2.FoundBSO  PROCEDURE
 loc:C2IP    nvC2IP
-loc:BSO     BSO
+loc:BSO                 BSO
+loc:foundBSO            BSO
+loc:foundBSOPosition    LONG
     CODE
         log.Trace('UT_C2IPv2.FoundBSO PROCEDURE BEGIN')       
         
@@ -79,11 +81,46 @@ loc:BSO     BSO
         log.Trace('loc:C2IP.GetContentCount() = ' & count#)
         ASSERT(count# = 1, 'AddBSO error')
         
-        !!!
+        retCode#    = loc:C2IP.FoundBSO(loc:BSO, loc:foundBSO, loc:foundBSOPosition)
+        log.Trace('loc:foundBSO = ' & loc:foundBSO.urec.UnitName)
+        ASSERT(loc:foundBSO.urec.UnitName = loc:BSO.urec.UnitName, 'loc:C2IP.FoundBSO error')
         
         log.Trace('UT_C2IPv2.FoundBSO PROCEDURE END')       
         
-                        
+UT_C2IPv2.AddSeveralBSOFoundBSO     PROCEDURE
+loc:C2IP    nvC2IP
+loc:BSO1                                BSO
+loc:BSO2                                BSO
+loc:BSO3                                BSO
+loc:foundBSO            BSO
+loc:foundBSOPosition    LONG
+    CODE
+        log.Trace('UT_C2IPv2.AddSeveralBSOFoundBSO PROCEDURE BEGIN')     
+        
+        loc:BSO1.urec.UnitName  = 'BSO1'
+        loc:C2IP.AddBSO(loc:BSO1)
+        count# = loc:C2IP.GetContentCount()
+        log.Trace('loc:C2IP.GetContentCount() = ' & count#)
+        ASSERT(count# = 1, 'AddBSO error')
+        
+        loc:BSO2.urec.UnitName  = 'BSO2'
+        loc:C2IP.AddBSO(loc:BSO2)
+        count# = loc:C2IP.GetContentCount()
+        log.Trace('loc:C2IP.GetContentCount() = ' & count#)
+        ASSERT(count# = 2, 'AddBSO error')
+        
+        loc:BSO3.urec.UnitName  = 'BSO3'
+        loc:C2IP.AddBSO(loc:BSO3)
+        count# = loc:C2IP.GetContentCount()
+        log.Trace('loc:C2IP.GetContentCount() = ' & count#)
+        ASSERT(count# = 3, 'AddBSO error')
+        
+        retCode#    = loc:C2IP.FoundBSO(loc:BSO2, loc:foundBSO, loc:foundBSOPosition)
+        log.Trace('loc:foundBSO = ' & loc:foundBSO.urec.UnitName)
+        ASSERT(loc:foundBSO.urec.UnitName = loc:BSO2.urec.UnitName, 'loc:C2IP.FoundBSO error')
+        
+        log.Trace('UT_C2IPv2.AddSeveralBSOFoundBSO PROCEDURE END')       
+        
         
         
 UT_C2IPv2.AddTwoBSO PROCEDURE    
@@ -101,6 +138,27 @@ loc:BSO     BSO
         
         log.Trace('UT_C2IPv2.AddTwoBSO PROCEDURE END')       
         
+UT_C2IPv2.AddBSOCollection  PROCEDURE
+loc:C2IP                        nvC2IP
+loc:BSOColl                     UnitsCollection
+loc:BSO1                        BSO
+loc:BSO2                        BSO
+loc:BSO3                        BSO
+    CODE
+        log.Trace('UT_C2IPv2.AddBSOCollection PROCEDURE BEGIN')   
+        
+        loc:BSO1.urec.UnitName = 'BSO1'
+        loc:BSO2.urec.UnitName = 'BSO2'
+        loc:BSO3.urec.UnitName = 'BSO3'
+        
+        loc:BSOColl.AddNode(loc:BSO1)        
+        loc:BSOColl.AddNode(loc:BSO2)        
+        loc:BSOColl.AddNode(loc:BSO3)        
+        
+        loc:C2IP.AddBSOColl(loc:BSOColl)
+        ASSERT(loc:C2IP.GetContentCount() = 3, 'nvC2IP.AddBSOColl() error')
+        
+        log.Trace('UT_C2IPv2.AddBSOCollection PROCEDURE END')   
         
         
 UT_C2IPv2.LoadBSOContent    PROCEDURE

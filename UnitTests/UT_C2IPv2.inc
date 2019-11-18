@@ -12,6 +12,10 @@ SetGetName          PROCEDURE
 AddBSO              PROCEDURE
 FoundBSO            PROCEDURE
 AddTwoBSO           PROCEDURE
+AddSeveralBSOFoundBSO       PROCEDURE
+
+    ! test Add BSO Collection
+AddBSOCollection    PROCEDURE
     
 
     ! tess C2IP load BSOs contet

@@ -1264,6 +1264,8 @@ foundBSO    BSO
                     IF foundBSO.BSOOpr.IsEql(cBSO) = TRUE THEN
                         retCode#    = TRUE
                         pFoundID    = i#
+                    ELSE
+                        retCode#    = FALSE
                     END                    
                 END   
                 i# = i# + 1

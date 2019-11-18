@@ -112,15 +112,21 @@ testC2IPv2          UT_C2IPv2
         
         
         !C2IP        
+        OMIT('_noCompile')
         C2IPInitContext()
             testC2IP.SetGetName()
         C2IPDestroyContext()
+        _noCompile
         
         !C2IP v2
         C2IPv2_InitContext()
             testC2IPv2.SetGetName()
             testC2IPv2.AddBSO()
             testC2IPv2.AddTwoBSO()
+                ! Add a BSO, find that BSO
+            testC2IPv2.FoundBSO()
+            testC2IPv2.AddSeveralBSOFoundBSO()
+            testC2IPv2.AddBSOCollection()
         C2IPv2_DestroyContext()
         
         
@@ -156,15 +162,16 @@ testC2IPv2          UT_C2IPv2
         _noCompile
         
         !BSO
-        !OMIT('_noCompile')
+        OMIT('_noCompile')
         ! BSO Collection
         ! Units Collection
         
         testBSOCollection.InitContext()
         !testBSOCollection.InsertAndVerifyABSO()
         retCode#    = testBSOCollection.InsertAndFind()
+        retCode#    = testBSOCollection.InsertAndFindAndGet()
         testBSOCollection.DestroyContext()
-        !_noCompile
+        _noCompile
         
         
 HelloWorld          PROCEDURE

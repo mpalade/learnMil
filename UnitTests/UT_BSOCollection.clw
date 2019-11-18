@@ -90,13 +90,51 @@ loc:nFoundID                            LONG
         loc:BSO3.urec.UnitName  = 'BSO3'
         loc:BSOColl.BSOCollOpr.Add(loc:BSO3)
         
-        retCode#    = loc:BSOColl.BSOCollOpr.Find(loc:BSO2, loc:nFoundID)
+        retCode#    = loc:BSOColl.BSOCollOpr.Find(loc:BSO3, loc:nFoundID)
         log.Trace('     retCode#(loc:BSOColl.BSOCollOpr.Find) = ' & retCode#)
         log.Trace('     loc:nFoundID = ' & loc:nFoundID)        
         ASSERT(retCode# = TRUE, 'BSOColl.BSOCollOpr.Find() exception')
         ASSERT(loc:nFoundID <> 0, 'BSOColl.BSOCollOpr.Find() error')
         
         log.Trace('UT_BSOCollection.InsertAndFind PROCEDURE END')       
+        RETURN TRUE
+        
+UT_BSOCollection.InsertAndFindAndGet        PROCEDURE        
+loc:BSOColl                             UnitsCollection
+loc:BSO1                                BSO
+loc:BSO2                                BSO
+loc:BSO3                                BSO
+loc:nFoundID                                    LONG
+loc:pFoundBSO                                   BSO
+
+    CODE
+        log.Trace('UT_BSOCollection.InsertAndFindAndGet PROCEDURE BEGIN')     
+        
+        loc:BSO1.urec.UnitName   = 'BSO1'
+        loc:BSOColl.BSOCollOpr.Add(loc:BSO1)
+        
+        loc:BSO2.urec.UnitName   = 'BSO2'
+        loc:BSOColl.BSOCollOpr.Add(loc:BSO2)
+        
+        loc:BSO3.urec.UnitName  = 'BSO3'
+        loc:BSOColl.BSOCollOpr.Add(loc:BSO3)
+        
+        ! Find
+        retCode#    = loc:BSOColl.BSOCollOpr.Find(loc:BSO3, loc:nFoundID)
+        log.Trace('     retCode#(loc:BSOColl.BSOCollOpr.Find) = ' & retCode#)
+        log.Trace('     loc:nFoundID = ' & loc:nFoundID)        
+        ASSERT(retCode# = TRUE, 'BSOColl.BSOCollOpr.Find() exception')
+        ASSERT(loc:nFoundID <> 0, 'BSOColl.BSOCollOpr.Find() error')
+        
+        ! Get
+        retCode#    = loc:BSOColl.BSOCollOpr.Get(loc:nFoundID, loc:pFoundBSO)
+        log.Trace('     retCode#(loc:BSOColl.BSOCollOpr.Get) = ' & retCode#)
+        log.Trace('     loc:pFoundBSO.UnitName = ' & loc:pFoundBSO.urec.UnitName)
+        ASSERT(retCode# = TRUE, 'BSOColl.BSOCollOpr.Get() exception')
+        ASSERT(loc:pFoundBSO.urec.UnitName = loc:BSO3.urec.UnitName, 'BSOColl.BSOCollOpr.Get() error')
+        
+        log.Trace('UT_BSOCollection.InsertAndFindAndGet PROCEDURE END')     
+        
         RETURN TRUE
         
         
