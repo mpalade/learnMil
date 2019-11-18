@@ -18,6 +18,7 @@ InsertSpecificNode      PROCEDURE(*UnitBasicRecord pURec), BOOL
 AddSpecificNode         PROCEDURE(*UnitBasicRecord pURec), BOOL
 
 InsertAndVerifyABSO     PROCEDURE()
+InsertAndFind           PROCEDURE(), BOOL
 
 AddGet                  PROCEDURE()
 Replace                 PROCEDURE()

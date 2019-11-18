@@ -31,6 +31,8 @@
   <ItemGroup>
     <Compile Include="ActionsCollection.clw" />
     <Compile Include="C2IP.clw" />
+    <None Include="C2IPLibv2.inc" />
+    <Compile Include="nvC2IP.clw" />
     <Compile Include="OrgChartC2IP.clw" />
     <Compile Include="OverlayC2IP.clw" />
     <Compile Include="pmC2IPLibrary.clw" />
@@ -40,6 +42,8 @@
     <Compile Include="UT_BSOCollection.clw" />
     <Compile Include="UT_C2IP.clw" />
     <None Include="UT_C2IP.inc" />
+    <Compile Include="UT_C2IPv2.clw" />
+    <None Include="UT_C2IPv2.inc" />
     <Compile Include="UT_OrgChartC2IP.clw" />
     <None Include="cs_libpng.dll" />
     <None Include="FreeImage.dll" />

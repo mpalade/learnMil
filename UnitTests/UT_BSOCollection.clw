@@ -23,6 +23,9 @@ aCollection     &UnitsCollection
 
     INCLUDE('UT_BSOCollection.INC'),ONCE
 
+! string theory objects
+log                 stringtheory
+
 UT_BSOCollection.InitContext        PROCEDURE
     CODE
         !aCollection &= NEW(BSOCollection)
@@ -67,6 +70,34 @@ rcvBSO      BSO
         
         
         aCollection.InsertNode(myBSO)
+        
+UT_BSOCollection.InsertAndFind      PROCEDURE
+loc:BSOColl                             UnitsCollection
+loc:BSO1                                BSO
+loc:BSO2                                BSO
+loc:BSO3                                BSO
+loc:nFoundID                            LONG
+
+    CODE
+        log.Trace('UT_BSOCollection.InsertAndFind PROCEDURE BEGIN')       
+        
+        loc:BSO1.urec.UnitName   = 'BSO1'
+        loc:BSOColl.BSOCollOpr.Add(loc:BSO1)
+        
+        loc:BSO2.urec.UnitName   = 'BSO2'
+        loc:BSOColl.BSOCollOpr.Add(loc:BSO2)
+        
+        loc:BSO3.urec.UnitName  = 'BSO3'
+        loc:BSOColl.BSOCollOpr.Add(loc:BSO3)
+        
+        retCode#    = loc:BSOColl.BSOCollOpr.Find(loc:BSO2, loc:nFoundID)
+        log.Trace('     retCode#(loc:BSOColl.BSOCollOpr.Find) = ' & retCode#)
+        log.Trace('     loc:nFoundID = ' & loc:nFoundID)        
+        ASSERT(retCode# = TRUE, 'BSOColl.BSOCollOpr.Find() exception')
+        ASSERT(loc:nFoundID <> 0, 'BSOColl.BSOCollOpr.Find() error')
+        
+        log.Trace('UT_BSOCollection.InsertAndFind PROCEDURE END')       
+        RETURN TRUE
         
         
         

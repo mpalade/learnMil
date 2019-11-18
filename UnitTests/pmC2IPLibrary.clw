@@ -454,8 +454,17 @@ UnitsCollection.AddNode  PROCEDURE(*BSO pBSO)
     CODE
         sst.Trace('UnitsCollection.AddNode  PROCEDURE(*BSO pBSO) BEGIN')
         
+        sst.Trace('pBSO.urec.UnitName = ' & pBSO.urec.UnitName)
+        sst.Trace('pBSO.urec.UnitType = ' & pBSO.urec.UnitType)
+        sst.Trace('pBSO.urec.UnitTypeCode = ' & pBSO.urec.UnitTypeCode)
+        
+        
+        SELF.collection.unit    &= NEW(BSO)
+        
         SELF.collection.unit.urec.UnitName  = pBSO.urec.UnitName
+        sst.Trace('UnitName')
         SELF.collection.unit.urec.UnitType  = pBSO.urec.UnitType
+        sst.Trace('UnitType')
         SELF.collection.unit.urec.UnitTypeCode  = pBSO.urec.UnitTypeCode
         SELF.collection.unit.urec.Echelon       = pBSO.urec.Echelon
         SELF.collection.unit.urec.Hostility     = pBSO.urec.Hostility
@@ -1082,6 +1091,20 @@ BSO.BSOOpr.Eql      PROCEDURE(BSO c)
         
         sst.Trace('BSO.BSOOpr.Eql      PROCEDURE(BSO c) END')        
         RETURN TRUE
+        
+BSO.BSOOpr.IsEql    PROCEDURE(GenericClass c)
+    CODE
+        RETURN PARENT.ClassOperators.IsEql(c)
+
+BSO.BSOOpr.IsEql    PROCEDURE(BSO c)
+    CODE
+        retCode#    = FALSE
+        IF SELF.urec.UnitName = c.urec.UnitName THEN
+            retCode#    = TRUE
+        END
+        
+        RETURN retCode#
+        
                 
 SECTION('GenericCollection INTERFACES')
 GenericCollection.CollectionOperators.Eql   PROCEDURE(GenericCollection c)
@@ -1104,8 +1127,17 @@ GenericCollection.CollectionOperators.Ins   PROCEDURE()
     CODE
         RETURN TRUE
         
+GenericCollection.CollectionOperators.Find  PROCEDURE(GenericClass c, *LONG pFoundID)
+    CODE
+        pFoundID = 0
+        RETURN TRUE
+        
 SECTION('GenericClass INTERFACES')        
 GenericClass.ClassOperators.Eql     PROCEDURE(GenericClass c)
+    CODE
+        RETURN TRUE
+        
+GenericClass.ClassOperators.IsEql   PROCEDURE(GenericClass c)
     CODE
         RETURN TRUE
 
@@ -1216,4 +1248,29 @@ aBSO        BSO
         END
         
         RETURN retVal#
+        
+UnitsCollection.BSOCollOpr.Find     PROCEDURE(GenericClass c, *LONG pFoundID)
+    CODE
+        RETURN PARENT.CollectionOperators.Find(c, pFoundID)
+        
+UnitsCollection.BSOCollOPr.Find     PROCEDURE(BSO cBSO, *LONG pFoundID)
+foundBSO    BSO
+    CODE
+        IF RECORDS(SELF.collection) > 0 THEN
+            i# = 1
+            LOOP
+                retCode#    = SELF.BSOCollOpr.Get(i#, foundBSO)
+                IF retCode# = TRUE THEN
+                    IF foundBSO.BSOOpr.IsEql(cBSO) = TRUE THEN
+                        retCode#    = TRUE
+                        pFoundID    = i#
+                    END                    
+                END   
+                i# = i# + 1
+            UNTIL (i# > RECORDS(SELF.collection) OR retCode# = TRUE)
+        ELSE
+            RETURN FALSE
+        END
+                        
+        RETURN TRUE
         

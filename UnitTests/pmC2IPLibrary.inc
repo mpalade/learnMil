@@ -418,6 +418,7 @@ Get                     PROCEDURE(), BOOL
 Eql                     PROCEDURE(GenericCollection c), BOOL
 Rpl                     PROCEDURE(), BOOL
 Ins                     PROCEDURE(), BOOL
+Find                    PROCEDURE(GenericClass c, *LONG pFoundID), BOOL
                     END
 
 BSOCollOpr          INTERFACE(CollectionOperators)
@@ -426,14 +427,17 @@ Get                     PROCEDURE(LONG nIndex, *BSO pBSO), BOOL
 Eql                     PROCEDURE(UnitsCollection c), BOOL
 Rpl                     PROCEDURE(LONG nIndex, BSO cBSO), BOOL
 Ins                     PROCEDURE(LONG nIndex, BSO cBSO), BOOL
+Find                    PROCEDURE(BSO cBSO, *LONG pFoundID), BOOL
                     END
 
 ClassOperators      INTERFACE
 Eql                     PROCEDURE(GenericClass c), BOOL
+IsEql                   PROCEDURE(GenericClass c), BOOL
                     END
 
 BSOOpr              INTERFACE(ClassOperators)
 Eql                     PROCEDURE(BSO c), BOOL
+IsEql                   PROCEDURE(BSO c), BOOL
                     END
 
 

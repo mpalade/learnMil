@@ -18,6 +18,10 @@ StringTheory:TemplateVersion        equate('2.58')
     INCLUDE('UT_C2IP.inc'), ONCE
     INCLUDE('UT_OrgChartC2ip.inc'), ONCE
 
+    ! C2IP Library v2
+    INCLUDE('C2IPLibv2.inc'), ONCE
+    INCLUDE('UT_C2IPv2.inc'), ONCE
+
 
 OMIT('***')
  * Created with Clarion 10.0
@@ -41,6 +45,9 @@ C2IPDestroyContext      PROCEDURE
 OrgChartInitContext     PROCEDURE
 OrgChartDestroyContext  PROCEDURE
 
+C2IPv2_InitContext      PROCEDURE
+C2IPv2_DestroyContext   PROCEDURE
+
   END
 
 ! string theory objects
@@ -54,6 +61,8 @@ aRecord             GROUP(UnitBasicRecord)
 
 testC2IP            UT_C2IP
 testOrgChart        UT_OrgChartC2IP
+
+testC2IPv2          UT_C2IPv2
 
 
     CODE
@@ -102,10 +111,17 @@ testOrgChart        UT_OrgChartC2IP
         _noCompile
         
         
-        !C2IP
+        !C2IP        
         C2IPInitContext()
             testC2IP.SetGetName()
         C2IPDestroyContext()
+        
+        !C2IP v2
+        C2IPv2_InitContext()
+            testC2IPv2.SetGetName()
+            testC2IPv2.AddBSO()
+            testC2IPv2.AddTwoBSO()
+        C2IPv2_DestroyContext()
         
         
         
@@ -140,14 +156,15 @@ testOrgChart        UT_OrgChartC2IP
         _noCompile
         
         !BSO
-        OMIT('_noCompile')
+        !OMIT('_noCompile')
         ! BSO Collection
         ! Units Collection
         
         testBSOCollection.InitContext()
-        testBSOCollection.InsertAndVerifyABSO()
+        !testBSOCollection.InsertAndVerifyABSO()
+        retCode#    = testBSOCollection.InsertAndFind()
         testBSOCollection.DestroyContext()
-        _noCompile
+        !_noCompile
         
         
 HelloWorld          PROCEDURE
@@ -179,3 +196,12 @@ C2IPInitContext PROCEDURE
 C2IPDestroyContext      PROCEDURE
     CODE
         testC2IP.DestroyContext()        
+        
+! C2IPv2 Ccontrext        
+C2IPv2_InitContext PROCEDURE
+    CODE
+        testC2IPv2.InitContext()
+        
+C2IPv2_DestroyContext      PROCEDURE
+    CODE
+        testC2IPv2.DestroyContext()                
