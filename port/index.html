@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111a24">
+    <title>Fieldplot — C2IP editor</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Fieldplot home">
+        <span class="brand-mark">F</span>
+        <span>FIELD<span class="brand-light">PLOT</span></span>
+      </a>
+      <div class="document-title">
+        <span class="eyebrow">C2IP WORKSPACE</span>
+        <strong id="document-name">Untitled operation</strong>
+      </div>
+      <div class="top-actions">
+        <span class="save-state" id="save-state">Saved locally</span>
+        <button class="button button-quiet" id="open-button" type="button">Open .c2ip</button>
+        <button class="button button-primary" id="download-button" type="button">Export .c2ip</button>
+        <input id="open-file" type="file" accept=".c2ip,.json,application/json" hidden>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="left-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">MISSION DESIGN</span>
+            <h1>Workspace</h1>
+          </div>
+          <button class="icon-button" id="new-button" type="button" title="Start a new workspace" aria-label="Start a new workspace">＋</button>
+        </div>
+
+        <div class="mode-switch" role="tablist" aria-label="Workspace mode">
+          <button class="mode-tab active" id="org-tab" type="button" role="tab" aria-selected="true">Organization</button>
+          <button class="mode-tab" id="overlay-tab" type="button" role="tab" aria-selected="false">Map overlay</button>
+        </div>
+
+        <section class="sidebar-section">
+          <div class="section-title">
+            <h2 id="contents-title">Units</h2>
+            <span class="count-pill" id="item-count">0</span>
+          </div>
+          <div id="item-list" class="item-list"></div>
+          <button id="add-unit-button" class="button button-add" type="button">＋ <span>Add unit</span></button>
+        </section>
+
+        <section class="sidebar-section tools-section" id="tools-section" hidden>
+          <div class="section-title">
+            <h2>Drawing tools</h2>
+          </div>
+          <div id="tool-list" class="tool-list"></div>
+          <label class="button button-quiet map-button">
+            <span>▧</span> Set background map
+            <input id="map-file" type="file" accept="image/*" hidden>
+          </label>
+          <button id="clear-map-button" class="text-button" type="button" hidden>Remove background map</button>
+        </section>
+
+        <div class="sidebar-foot">
+          <span class="status-dot"></span>
+          <span>Changes are saved in this browser</span>
+        </div>
+      </aside>
+
+      <section class="canvas-panel">
+        <div class="canvas-toolbar">
+          <div class="canvas-heading">
+            <span class="eyebrow" id="canvas-eyebrow">ORDER OF BATTLE</span>
+            <strong id="canvas-title">Organization chart</strong>
+          </div>
+          <div class="canvas-controls">
+            <button id="zoom-out" class="icon-button small" type="button" aria-label="Zoom out">−</button>
+            <span id="zoom-label" class="zoom-label">100%</span>
+            <button id="zoom-in" class="icon-button small" type="button" aria-label="Zoom in">＋</button>
+            <span class="toolbar-divider"></span>
+            <button id="fit-button" class="button button-quiet button-small" type="button">Fit</button>
+          </div>
+        </div>
+        <div class="canvas-wrap" id="canvas-wrap">
+          <canvas id="editor-canvas" aria-label="Interactive organization chart and map overlay"></canvas>
+          <div id="empty-hint" class="empty-hint">
+            <span class="hint-icon">⌖</span>
+            <strong>Your workspace starts here</strong>
+            <span>Add a unit or switch to map overlay to begin.</span>
+            <button id="empty-add-button" class="button button-primary" type="button">Add first unit</button>
+          </div>
+        </div>
+        <footer class="canvas-footer">
+          <div class="legend">
+            <span><i class="legend-swatch friend"></i> Friendly</span>
+            <span><i class="legend-swatch neutral"></i> Neutral</span>
+            <span><i class="legend-swatch hostile"></i> Hostile</span>
+            <span><i class="legend-swatch unknown"></i> Unknown</span>
+          </div>
+          <span id="canvas-help">Drag units to reposition · Select a unit to edit its details</span>
+        </footer>
+      </section>
+
+      <aside class="right-panel">
+        <div class="inspector-heading">
+          <span class="eyebrow">DETAILS</span>
+          <h2 id="inspector-title">Nothing selected</h2>
+          <p id="inspector-subtitle">Select a unit on the canvas to inspect or edit it.</p>
+        </div>
+        <div id="inspector-content" class="inspector-content"></div>
+        <div id="inspector-empty" class="inspector-empty">
+          <span class="empty-select-icon">↖</span>
+          <span>Choose an item on the canvas or in the list.</span>
+        </div>
+      </aside>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
